@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Lock, LogOut, Check, Search, MapPin, Eye, Calendar, AlertCircle, FileText, Phone, MessageSquare, ExternalLink, ShieldCheck, Trash2, Clock, EyeOff, Edit3, X, Download, RefreshCw, Copy } from 'lucide-react';
+import { Lock, LogOut, Check, Search, MapPin, Eye, Calendar, AlertCircle, FileText, Phone, MessageSquare, ExternalLink, ShieldCheck, Trash2, Clock, EyeOff, Edit3, X, Download, RefreshCw, Copy, Plus } from 'lucide-react';
 import { SignedIn, SignedOut, SignIn, UserButton, useUser } from '@clerk/clerk-react';
 import santiagoImg from '../assets/santiago.jpg';
 import { generateLegislativeProject } from '../utils/wordGenerator';

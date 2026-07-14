@@ -1,0 +1,24 @@
+  const handleExportExcel = () => {
+    // Sort reports by category alphabetically
+    const sortedReports = [...filteredReports].sort((a, b) => {
+      const catA = a.category || '';
+      const catB = b.category || '';
+      return catA.localeCompare(catB);
+    });
+
+    const headers = ['ID', 'Tracking Code', 'Fecha', 'Categoria', 'Ubicacion', 'Estado', 'Nombre Anonimo', 'Telefono Anonimo'];
+    const csvContent = [
+      headers.join(','),
+      ...sortedReports.map(r => 
+        `"${r.id}","${r.trackingCode || ''}","${new Date(r.date).toLocaleDateString()}","${r.category}","${r.location}","${r.status}","${r.anonymousName || ''}","${r.anonymousPhone || ''}"`
+      )
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `reclamos_concejo_${new Date().toLocaleDateString()}.csv`;
+    link.click();
+  };
+
+  // Prevent rendering admin interface if not fully authorized

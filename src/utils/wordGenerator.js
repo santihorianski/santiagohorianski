@@ -69,6 +69,18 @@ export const generateLegislativeProject = async (report) => {
     sections: [{
       properties: {},
       children: [
+        // REFERENCIA DE SEGUIMIENTO AL INICIO
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Ref: Reclamo Ciudadano N° ${report.trackingCode || report.id}`,
+              italics: true,
+              size: 20, // 10pt
+            })
+          ],
+          alignment: AlignmentType.RIGHT,
+          spacing: { after: 400 },
+        }),
         // ENCABEZADO
         new Paragraph({
           children: [

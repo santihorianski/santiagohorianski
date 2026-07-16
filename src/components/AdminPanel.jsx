@@ -801,16 +801,14 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 onClick={() => setActiveTab('mapa')}
                 className={`btn ${activeTab === 'mapa' ? 'btn-primary' : 'btn-secondary'}`}
               >Mapa Interactivo</button>
-              {userRole === 'admin' && (
-                <button 
-                  onClick={() => setActiveTab('whatsapp')}
-                  className={`btn ${activeTab === 'whatsapp' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                >
-                  <MessageSquare size={18} />
-                  WhatsApp QR
-                </button>
-              )}
+              <button 
+                onClick={() => setActiveTab('whatsapp')}
+                className={`btn ${activeTab === 'whatsapp' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              >
+                <MessageSquare size={18} />
+                WhatsApp QR
+              </button>
             </div>
           </div>
         </div>
@@ -1302,7 +1300,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
           </div>
         )}
 
-        {activeTab === 'whatsapp' && userRole === 'admin' && (
+        {activeTab === 'whatsapp' && (
           <div className="admin-whatsapp-section fade-in glass-panel" style={{ padding: '2rem', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div>
               <h3>Configuración de WhatsApp (Evolution API)</h3>

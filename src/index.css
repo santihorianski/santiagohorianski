@@ -385,6 +385,11 @@ input, textarea, select {
   box-shadow: 0 0 12px rgba(217, 160, 36, 0.25);
 }
 
+/* Evitar que Google Maps repita iconos de advertencia en el input si la API tiene restricciones */
+.pac-target-input {
+  background-image: none !important;
+}
+
 .form-textarea {
   min-height: 100px;
   resize: vertical;

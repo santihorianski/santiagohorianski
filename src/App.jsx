@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { supabase, isSupabaseConfigured } from './supabaseClient';
 
 // Carga perezosa (Lazy Loading) para optimización de rendimiento
 const Hero = lazy(() => import('./components/Hero'));
@@ -119,12 +120,56 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Mapeadores DB <> Reclamos
+  const mapDbToReport = (db) => ({
+    id: db.id,
+    trackingCode: Number(db.tracking_code),
+    title: db.title,
+    description: db.description,
+    category: db.category,
+    location: db.location || `${db.barrio} - ${db.calle_principal}`,
+    barrio: db.barrio,
+    callePrincipal: db.calle_principal,
+    entreCalle1: db.entre_calle_1 || '',
+    entreCalle2: db.entre_calle_2 || '',
+    phone: db.phone || '',
+    anonymousName: db.anonymous_name || '',
+    gpsLat: db.gps_lat || null,
+    gpsLng: db.gps_lng || null,
+    upvotes: Number(db.upvotes || 0),
+    status: db.status || 'recibido',
+    isVisible: db.is_visible !== false,
+    photos: db.photos || [],
+    statusHistory: db.status_history || [],
+    createdAt: db.created_at
+  });
+
+  const mapReportToDb = (rep) => ({
+    id: rep.id,
+    tracking_code: Number(rep.trackingCode),
+    title: rep.title,
+    description: rep.description,
+    category: rep.category,
+    barrio: rep.barrio || rep.location?.split(' - ')[0] || 'Desconocido',
+    calle_principal: rep.callePrincipal || rep.location?.split(' - ')[1] || 'No especificada',
+    entre_calle_1: rep.entreCalle1 || null,
+    entre_calle_2: rep.entreCalle2 || null,
+    phone: rep.phone || null,
+    anonymous_name: rep.anonymousName || null,
+    gps_lat: rep.gpsLat || null,
+    gps_lng: rep.gpsLng || null,
+    upvotes: Number(rep.upvotes || 0),
+    status: rep.status,
+    is_visible: rep.isVisible !== false,
+    photos: rep.photos || [],
+    status_history: rep.statusHistory || []
+  });
+
   const [reports, setReports] = useState(() => {
     try {
       const saved = localStorage.getItem('municipal_reports');
       const parsed = saved ? JSON.parse(saved) : null;
       if (Array.isArray(parsed)) {
-        // Migración: Asegurar que los reportes viejos recuperen su teléfono mockeado
         return parsed.map(rep => {
           if (!rep.phone) {
             const initial = INITIAL_REPORTS.find(i => i.id === rep.id);
@@ -140,6 +185,7 @@ export default function App() {
       return INITIAL_REPORTS;
     }
   });
+
   const [newsList, setNewsList] = useState(() => {
     try {
       const saved = localStorage.getItem('municipal_news');
@@ -149,10 +195,65 @@ export default function App() {
       return INITIAL_NEWS;
     }
   });
+
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('site_theme');
     return savedTheme ? savedTheme : 'light';
   });
+
+  // Cargar datos de Supabase si está activo
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const fetchSupabaseData = async () => {
+      try {
+        // 1. Reclamos
+        const { data: reportsData, error: reportsError } = await supabase
+          .from('municipal_reports')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (reportsError) throw reportsError;
+
+        if (reportsData && reportsData.length > 0) {
+          setReports(reportsData.map(mapDbToReport));
+        } else {
+          // Sembrar datos iniciales si la DB está vacía
+          const dbSeed = INITIAL_REPORTS.map(mapReportToDb);
+          const { error: seedError } = await supabase
+            .from('municipal_reports')
+            .insert(dbSeed);
+          if (!seedError) {
+            setReports(INITIAL_REPORTS);
+          }
+        }
+
+        // 2. Noticias
+        const { data: newsData, error: newsError } = await supabase
+          .from('municipal_news')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (newsError) throw newsError;
+
+        if (newsData && newsData.length > 0) {
+          setNewsList(newsData);
+        } else {
+          // Sembrar noticias si la DB está vacía
+          const { error: seedNewsError } = await supabase
+            .from('municipal_news')
+            .insert(INITIAL_NEWS);
+          if (!seedNewsError) {
+            setNewsList(INITIAL_NEWS);
+          }
+        }
+      } catch (err) {
+        console.error("Error al sincronizar con Supabase en la carga inicial:", err);
+      }
+    };
+
+    fetchSupabaseData();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('municipal_reports', JSON.stringify(reports));
@@ -183,7 +284,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location.pathname]);
 
-  const handleUpvoteReport = (reportId) => {
+  const handleUpvoteReport = async (reportId) => {
     const votedKey = `upvoted_${reportId}`;
     if (sessionStorage.getItem(votedKey)) return;
 
@@ -191,34 +292,67 @@ export default function App() {
       prevReports.map(rep => {
         if (rep.id === reportId) {
           sessionStorage.setItem(votedKey, 'true');
-          return { ...rep, upvotes: rep.upvotes + 1 };
+          const newUpvotes = rep.upvotes + 1;
+          
+          if (isSupabaseConfigured) {
+            supabase
+              .from('municipal_reports')
+              .update({ upvotes: newUpvotes })
+              .eq('id', reportId)
+              .then(({ error }) => {
+                if (error) console.error("Error al sumar voto en Supabase:", error);
+              });
+          }
+          
+          return { ...rep, upvotes: newUpvotes };
         }
         return rep;
       })
     );
   };
 
-  const handleAddReport = (newReportData) => {
+  const handleAddReport = async (newReportData) => {
     const newReport = {
       id: `rep-${Date.now()}`,
       trackingCode: newReportData.trackingCode || Math.floor(1000 + Math.random() * 9000),
       title: newReportData.title,
       description: newReportData.description,
       category: newReportData.category,
-      urgency: newReportData.urgency,
-      location: newReportData.location || 'No especificada',
+      urgency: newReportData.urgency || 'media',
+      location: newReportData.location || `${newReportData.barrio} - ${newReportData.callePrincipal}`,
+      barrio: newReportData.barrio || 'Desconocido',
+      callePrincipal: newReportData.callePrincipal || 'No especificada',
+      entreCalle1: newReportData.entreCalle1 || '',
+      entreCalle2: newReportData.entreCalle2 || '',
       status: 'recibido',
       upvotes: 1,
       createdAt: new Date().toISOString(),
       anonymousName: newReportData.anonymousName || 'Vecino Anónimo',
       statusHistory: [{ status: 'recibido', timestamp: new Date().toISOString() }],
       photos: newReportData.photos || [],
+      phone: newReportData.phone || null,
+      gpsLat: newReportData.gpsLat || null,
+      gpsLng: newReportData.gpsLng || null,
       isVisible: false
     };
+
     setReports(prev => [newReport, ...prev]);
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase
+          .from('municipal_reports')
+          .insert([mapReportToDb(newReport)]);
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error al guardar el reclamo en Supabase:", err);
+      }
+    }
   };
 
-  const handleUpdateReport = (updatedReport) => {
+  const handleUpdateReport = async (updatedReport) => {
+    let finalReport = updatedReport;
+    
     setReports(prevReports => 
       prevReports.map(rep => {
         if (rep.id === updatedReport.id) {
@@ -226,46 +360,143 @@ export default function App() {
           if (rep.status !== updatedReport.status) {
             newHistory.push({ status: updatedReport.status, timestamp: new Date().toISOString() });
           }
-          return { ...updatedReport, statusHistory: newHistory };
+          finalReport = { ...updatedReport, statusHistory: newHistory };
+          return finalReport;
         }
         return rep;
       })
     );
-  };
 
-  const handleDeleteReport = (id) => {
-    setReports(prevReports => prevReports.filter(rep => rep.id !== id));
-  };
+    if (isSupabaseConfigured) {
+      try {
+        const currentReport = reports.find(r => r.id === updatedReport.id);
+        const newHistory = [...(currentReport?.statusHistory || [])];
+        if (currentReport && currentReport.status !== updatedReport.status) {
+          newHistory.push({ status: updatedReport.status, timestamp: new Date().toISOString() });
+        }
+        const reportToUpload = { ...updatedReport, statusHistory: newHistory };
 
-  const handleToggleReportVisibility = (id) => {
-    setReports(prev => prev.map(rep => {
-      if (rep.id === id) {
-        return { ...rep, isVisible: !rep.isVisible };
+        const { error } = await supabase
+          .from('municipal_reports')
+          .update(mapReportToDb(reportToUpload))
+          .eq('id', updatedReport.id);
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error al actualizar el reclamo en Supabase:", err);
       }
-      return rep;
-    }));
-  };
-
-  const handleSaveNews = (newsData) => {
-    if (newsData.id) {
-      setNewsList(prev => prev.map(n => n.id === newsData.id ? newsData : n));
-    } else {
-      const newNews = { ...newsData, id: `news-${Date.now()}`, isVisible: true };
-      setNewsList(prev => [newNews, ...prev]);
     }
   };
 
-  const handleDeleteNews = (id) => {
-    setNewsList(prev => prev.filter(n => n.id !== id));
+  const handleDeleteReport = async (id) => {
+    setReports(prevReports => prevReports.filter(rep => rep.id !== id));
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase
+          .from('municipal_reports')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error al eliminar el reclamo en Supabase:", err);
+      }
+    }
   };
 
-  const handleToggleNewsVisibility = (id) => {
+  const handleToggleReportVisibility = async (id) => {
+    let newVisibility = false;
+    
+    setReports(prev => prev.map(rep => {
+      if (rep.id === id) {
+        newVisibility = !rep.isVisible;
+        return { ...rep, isVisible: newVisibility };
+      }
+      return rep;
+    }));
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase
+          .from('municipal_reports')
+          .update({ is_visible: newVisibility })
+          .eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error al cambiar la visibilidad del reclamo en Supabase:", err);
+      }
+    }
+  };
+
+  const handleSaveNews = async (newsData) => {
+    if (newsData.id) {
+      setNewsList(prev => prev.map(n => n.id === newsData.id ? newsData : n));
+      
+      if (isSupabaseConfigured) {
+        try {
+          const { error } = await supabase
+            .from('municipal_news')
+            .update(newsData)
+            .eq('id', newsData.id);
+          if (error) throw error;
+        } catch (err) {
+          console.error("Error al actualizar la noticia en Supabase:", err);
+        }
+      }
+    } else {
+      const newNews = { ...newsData, id: `news-${Date.now()}`, isVisible: true };
+      setNewsList(prev => [newNews, ...prev]);
+
+      if (isSupabaseConfigured) {
+        try {
+          const { error } = await supabase
+            .from('municipal_news')
+            .insert([newNews]);
+          if (error) throw error;
+        } catch (err) {
+          console.error("Error al crear la noticia en Supabase:", err);
+        }
+      }
+    }
+  };
+
+  const handleDeleteNews = async (id) => {
+    setNewsList(prev => prev.filter(n => n.id !== id));
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase
+          .from('municipal_news')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error al eliminar la noticia en Supabase:", err);
+      }
+    }
+  };
+
+  const handleToggleNewsVisibility = async (id) => {
+    let newVisibility = false;
+    
     setNewsList(prev => prev.map(n => {
       if (n.id === id) {
-        return { ...n, isVisible: !n.isVisible };
+        newVisibility = !n.isVisible;
+        return { ...n, isVisible: newVisibility };
       }
       return n;
     }));
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase
+          .from('municipal_news')
+          .update({ isVisible: newVisibility })
+          .eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error al alternar visibilidad de noticia en Supabase:", err);
+      }
+    }
   };
 
   // Scroll al top en cambio de ruta

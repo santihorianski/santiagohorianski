@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Search, MapPin, ThumbsUp, Check, MessageSquare, AlertCircle, Calendar, PlusCircle, Filter } from 'lucide-react';
 import santiagoImg from '../assets/santiago.jpg';
@@ -69,10 +70,39 @@ const getStatusDetails = (report) => {
 };
 
 export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
+  const location = useLocation();
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [trackingInput, setTrackingInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todas');
+  
+  const reportsListRef = useRef(null);
+
+  const scrollToReports = () => {
+    if (reportsListRef.current) {
+      const elementRect = reportsListRef.current.getBoundingClientRect();
+      const absoluteElementTop = elementRect.top + window.pageYOffset;
+      // Restar un offset mayor en móviles (130px) y computadoras (170px) para que no haga scroll de más
+      const offset = window.innerWidth < 768 ? 130 : 170;
+      window.scrollTo({
+        top: absoluteElementTop - offset,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Auto-cargar código de seguimiento desde la URL (?codigo=XXXX)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const code = params.get('codigo');
+    if (code) {
+      setTrackingInput(code);
+      setSearchTerm(code);
+      setTimeout(() => {
+        scrollToReports();
+      }, 600);
+    }
+  }, [location.search]);
   const [selectedStatus, setSelectedStatus] = useState('Todos');
   const [sortBy, setSortBy] = useState('recent'); // 'recent' or 'upvotes'
 
@@ -92,13 +122,23 @@ export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
         return false;
       }
 
+      // Filtro por Estado (ignorar si es búsqueda directa por código de seguimiento)
+      if (selectedStatus !== 'Todos' && rep.status !== selectedStatus && !isExactTrackingSearch) {
+        return false;
+      }
+      
+      // Filtro por Categoría (ignorar si es búsqueda directa por código de seguimiento)
+      if (selectedCategory !== 'Todas' && rep.category !== selectedCategory && !isExactTrackingSearch) {
+        return false;
+      }
+
       const matchesSearch = rep.title.toLowerCase().includes(searchTermLower) || 
                             rep.description.toLowerCase().includes(searchTermLower) ||
                             rep.location.toLowerCase().includes(searchTermLower) ||
                             (rep.trackingCode && rep.trackingCode.toString().includes(cleanSearch) && cleanSearch !== '');
       
-      const matchesCategory = selectedCategory === 'Todas' || rep.category === selectedCategory;
-      const matchesStatus = selectedStatus === 'Todos' || rep.status === selectedStatus;
+      const matchesCategory = selectedCategory === 'Todas' || rep.category === selectedCategory || isExactTrackingSearch;
+      const matchesStatus = selectedStatus === 'Todos' || rep.status === selectedStatus || isExactTrackingSearch;
 
       return matchesSearch && matchesCategory && matchesStatus;
     })
@@ -138,28 +178,35 @@ export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Hacé tu reclamo ahora mismo de forma simple y nosotros lo gestionamos ante la municipalidad.</p>
               </div>
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                <div className="tracking-mini-form" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-dark)', padding: '0.5rem', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (trackingInput.trim()) {
+                      setSearchTerm(trackingInput);
+                      setTimeout(() => {
+                        scrollToReports();
+                      }, 100);
+                    }
+                  }} 
+                  className="tracking-mini-form" 
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-dark)', padding: '0.5rem', borderRadius: '10px', border: '1px solid var(--border-color)' }}
+                >
                   <Search size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
                   <input 
                     type="text" 
                     placeholder="N° de seguimiento..." 
                     value={trackingInput}
                     onChange={(e) => setTrackingInput(e.target.value.replace(/#/g, ''))}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && trackingInput.trim()) {
-                        setSearchTerm(trackingInput);
-                      }
-                    }}
                     style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', outline: 'none', width: '130px', fontSize: '0.85rem' }}
                   />
                   <button 
-                    onClick={() => trackingInput.trim() && setSearchTerm(trackingInput)}
+                    type="submit"
                     className="btn btn-secondary" 
                     style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
                   >
                     Rastrear
                   </button>
-                </div>
+                </form>
                 <button 
                   onClick={() => setIsWizardOpen(true)}
                   className="btn btn-primary" 
@@ -201,6 +248,13 @@ export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
             <FormularioReclamosVecinales 
               onSubmitReport={(data) => {
                 onSubmitReport(data);
+                if (data.trackingCode) {
+                  setTrackingInput(data.trackingCode.toString());
+                  setSearchTerm(data.trackingCode.toString());
+                  setTimeout(() => {
+                    scrollToReports();
+                  }, 400);
+                }
               }}
               onClose={() => setIsWizardOpen(false)}
             />
@@ -268,7 +322,7 @@ export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
             </div>
 
             {/* Reports List */}
-            <div className="reports-list">
+            <div ref={reportsListRef} className="reports-list">
               {filteredReports.length === 0 ? (
                 <div className="empty-feed-card glass-panel">
                   <AlertCircle size={40} className="empty-icon" />
@@ -282,7 +336,7 @@ export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
                   const statusClass = `status-${rep.status}`;
                   
                   return (
-                    <div key={rep.id} className={`report-card-item card ${statusClass}`} data-aos="fade-up">
+                    <div key={rep.id} className={`report-card-item card ${statusClass}`}>
                       {/* Top Info row */}
                       <div className="report-card-top">
                         <div className="report-meta">

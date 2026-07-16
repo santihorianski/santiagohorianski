@@ -38,24 +38,6 @@ export default defineConfig({
     })
   ],
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'vendor-react';
-            }
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-            if (id.includes('leaflet') || id.includes('react-leaflet')) {
-              return 'vendor-maps';
-            }
-            return 'vendor-core';
-          }
-        }
-      }
-    },
     chunkSizeWarningLimit: 1000
   }
 })

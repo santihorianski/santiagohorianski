@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Lock, LogOut, Check, Search, MapPin, Eye, Calendar, AlertCircle, FileText, Phone, MessageSquare, ExternalLink, ShieldCheck, Trash2, Clock, EyeOff, Edit3, X, Download, RefreshCw, Copy, Plus, Image } from 'lucide-react';
+import { Lock, LogOut, Check, Search, MapPin, Eye, Calendar, AlertCircle, FileText, Phone, MessageSquare, ExternalLink, ShieldCheck, Trash2, Clock, EyeOff, Edit3, X, Download, RefreshCw, Copy, Plus, Image, ZoomIn } from 'lucide-react';
 import { SignedIn, SignedOut, SignIn, UserButton, useUser } from '@clerk/clerk-react';
 import santiagoImg from '../assets/santiago.jpg';
 import { generateLegislativeProject } from '../utils/wordGenerator';
@@ -27,10 +27,102 @@ export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, on
   const userRole = getUserRole(userEmail);
 
   // Tab state
-  const [activeTab, setActiveTab] = useState('reclamos'); // 'reclamos' | 'noticias' | 'mapa'
+  const [activeTab, setActiveTab] = useState('reclamos'); // 'reclamos' | 'noticias' | 'mapa' | 'whatsapp'
   
   const pdfRef = useRef(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [isSendingWA, setIsSendingWA] = useState(false);
+
+  // WhatsApp (Green API) config states
+  const [idInstanceInput, setIdInstanceInput] = useState(() => localStorage.getItem('override_green_api_id') || '');
+  const [apiTokenInput, setApiTokenInput] = useState(() => localStorage.getItem('override_green_api_token') || '');
+  const [waStatus, setWaStatus] = useState('checking'); // 'checking', 'authorized', etc.
+  const [qrCodeData, setQrCodeData] = useState('');
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [isFetchingQR, setIsFetchingQR] = useState(false);
+
+  const checkWhatsAppStatus = async () => {
+    const idInstance = idInstanceInput || localStorage.getItem('override_green_api_id') || import.meta.env.VITE_GREEN_API_ID || "710722683088";
+    const apiToken = apiTokenInput || localStorage.getItem('override_green_api_token') || import.meta.env.VITE_GREEN_API_TOKEN || "dc4c710bbc6042e28a74919badcb451119dded45a4a84367a9";
+    
+    if (!idInstance || !apiToken) {
+      setWaStatus('notConfigured');
+      return;
+    }
+
+    setIsCheckingStatus(true);
+    try {
+      const cluster = idInstance.toString().substring(0, 4);
+      const url = `https://${cluster}.api.greenapi.com/waInstance${idInstance}/getStateInstance/${apiToken}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      
+      if (data && data.stateInstance) {
+        setWaStatus(data.stateInstance);
+        if (data.stateInstance === 'notAuthorized') {
+          fetchQrCode(idInstance, apiToken);
+        } else {
+          setQrCodeData('');
+        }
+      } else {
+        setWaStatus('error');
+      }
+    } catch (err) {
+      console.error("Error al obtener estado de WhatsApp:", err);
+      setWaStatus('error');
+    } finally {
+      setIsCheckingStatus(false);
+    }
+  };
+
+  const fetchQrCode = async (idInstance, apiToken) => {
+    setIsFetchingQR(true);
+    try {
+      const cluster = idInstance.toString().substring(0, 4);
+      const url = `https://${cluster}.api.greenapi.com/waInstance${idInstance}/qr/${apiToken}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data && data.type === 'image' && data.message) {
+        setQrCodeData(data.message);
+      } else if (data && data.message) {
+        setQrCodeData(data.message);
+      }
+    } catch (err) {
+      console.error("Error al obtener el código QR:", err);
+    } finally {
+      setIsFetchingQR(false);
+    }
+  };
+
+  const handleSaveCredentials = (e) => {
+    e.preventDefault();
+    if (idInstanceInput) localStorage.setItem('override_green_api_id', idInstanceInput);
+    else localStorage.removeItem('override_green_api_id');
+
+    if (apiTokenInput) localStorage.setItem('override_green_api_token', apiTokenInput);
+    else localStorage.removeItem('override_green_api_token');
+
+    alert("✅ Credenciales de Green API actualizadas localmente.");
+    checkWhatsAppStatus();
+  };
+
+  const handleClearCredentials = () => {
+    localStorage.removeItem('override_green_api_id');
+    localStorage.removeItem('override_green_api_token');
+    setIdInstanceInput('');
+    setApiTokenInput('');
+    alert("🔄 Credenciales temporales eliminadas. Usando configuración predeterminada.");
+    setWaStatus('checking');
+    setTimeout(() => {
+      checkWhatsAppStatus();
+    }, 100);
+  };
+
+  useEffect(() => {
+    if (activeTab === 'whatsapp') {
+      checkWhatsAppStatus();
+    }
+  }, [activeTab]);
 
   // Dashboard states
   const [searchTerm, setSearchTerm] = useState('');
@@ -154,22 +246,7 @@ Párrafo final o conclusión de la noticia.`);
     setIsEditingNews(false);
   };
 
-  const handleSaveStatus = () => {
-    if (selectedReport) {
-      onUpdateReport(selectedReport.id, {
-        status: editStatus,
-        adminResponse: editResponse,
-        comisionName: editComisionName,
-        comisionConcejal: editComisionConcejal,
-        sesionNumber: editSesionNumber
-      });
-      setIsSaveSuccess(true);
-      setTimeout(() => {
-        setIsSaveSuccess(false);
-        setSelectedReport(null);
-      }, 2000);
-    }
-  };
+
 
   // KPIs calculations
   const totalReports = reports.length;
@@ -219,13 +296,13 @@ Párrafo final o conclusión de la noticia.`);
     switch (status) {
       case 'recibido':
         return {
-          text: 'Recibido por secretaría del Concejo para armar el proyecto',
+          text: '📥 Recibido por secretaría del concejal para armar el proyecto',
           badgeClass: 'admin-badge-recibido',
           shortText: 'Recibido'
         };
       case 'presentado':
         return {
-          text: 'Proyecto presentado',
+          text: '📄 Proyecto presentado oficialmente',
           badgeClass: 'admin-badge-presentado',
           shortText: 'Presentado'
         };
@@ -233,26 +310,26 @@ Párrafo final o conclusión de la noticia.`);
         const comision = report.comisionName || '[Pendiente]';
         const concejal = report.comisionConcejal || '[Pendiente]';
         return {
-          text: `Proyecto en comisión de ${comision} a cargo del Concejal ${concejal}`,
+          text: `👥 Proyecto en comisión de ${comision} a cargo del Concejal ${concejal}`,
           badgeClass: 'admin-badge-comision',
           shortText: 'En Comisión'
         };
       case 'en_votacion':
         const sesion = report.sesionNumber || '[Pendiente]';
         return {
-          text: `Proyecto en votación en la sesión N° ${sesion}`,
+          text: `🗳️ Proyecto en votación en la sesión N° ${sesion}`,
           badgeClass: 'admin-badge-votacion',
           shortText: 'En Votación'
         };
       case 'aprobado':
         return {
-          text: 'Proyecto Aprobado - A esperar que el EJECUTIVO (La Municipalidad) lo haga',
+          text: '✅ Proyecto Aprobado - A esperar que el EJECUTIVO (La Municipalidad) lo ejecute',
           badgeClass: 'admin-badge-aprobado',
           shortText: 'Aprobado'
         };
       default:
         return {
-          text: 'Recibido por secretaría del Concejo para armar el proyecto',
+          text: '📥 Recibido por secretaría del concejal para armar el proyecto',
           badgeClass: 'admin-badge-recibido',
           shortText: 'Recibido'
         };
@@ -396,9 +473,7 @@ Párrafo final o conclusión de la noticia.`);
   };
 
   const handleToggleReportVisibility = (id) => {
-    const report = filteredReports.find(r => r.id === id);
-    if (!report) return;
-    onUpdateReport(id, { ...report, isVisible: report.isVisible === false ? true : false });
+    onToggleReportVisibility(id);
   };
 
   const handleSaveReportChanges = (e) => {
@@ -415,6 +490,12 @@ Párrafo final o conclusión de la noticia.`);
     };
 
     onUpdateReport(updated);
+    
+    // Disparar WhatsApp de forma silenciosa (silent = true) si el estado cambió
+    if (updated.phone && updated.status !== selectedReport.status) {
+      sendWhatsAppNotification(updated, true); 
+    }
+    
     setIsSaveSuccess(true);
     
     setSelectedReport(updated);
@@ -428,7 +509,18 @@ Párrafo final o conclusión de la noticia.`);
   // Generador de mensaje de estado
   const generateStatusMessage = (report) => {
     const statusText = getStatusDetails(report).text;
-    return `Hola ${report.anonymousName || 'vecino'}, me contacto desde el equipo del Concejal Santiago Horianski en relación a tu reclamo #${report.trackingCode || ''} sobre "${report.category}" en ${report.location}. Te comento el estado actual de la gestión: ${statusText}. ¡Seguimos trabajando!`;
+    const codigo = report.trackingCode || '';
+    const vecino = report.anonymousName || 'vecino';
+    
+    return `👋 Hola *${vecino}*, me contacto desde el equipo del Concejal Santiago Horianski en relación a tu reclamo *#${codigo}* sobre *"${report.category}"* en *${report.location}*.
+
+*Estado de la gestión:*
+${statusText}
+
+🔍 Podés seguir los avances de tu trámite en tiempo real ingresando a este enlace directo:
+https://santiagohorianski.com/gestion?codigo=${codigo}
+
+¡Seguimos trabajando! 💪`;
   };
 
   // Helper for WhatsApp link
@@ -443,6 +535,95 @@ Párrafo final o conclusión de la noticia.`);
         
     const text = encodeURIComponent(generateStatusMessage(report));
     return `https://wa.me/${formatted}?text=${text}`;
+  };
+
+  const sendWhatsAppNotification = async (report, silent = false) => {
+    if (!report.phone) return;
+    setIsSendingWA(true);
+    try {
+      console.log("Iniciando envío de WhatsApp a:", report.phone);
+      const cleaned = report.phone.toString().replace(/\D/g, '');
+      const formatted = cleaned.startsWith('54') 
+        ? cleaned 
+        : cleaned.startsWith('9') 
+          ? '54' + cleaned 
+          : '549' + (cleaned.startsWith('0') ? cleaned.slice(1) : cleaned);
+      
+      const chatId = `${formatted}@c.us`;
+      console.log("Chat ID generado:", chatId);
+      const message = generateStatusMessage(report);
+
+      const idInstance = localStorage.getItem('override_green_api_id') || import.meta.env.VITE_GREEN_API_ID || "710722683088";
+      const apiToken = localStorage.getItem('override_green_api_token') || import.meta.env.VITE_GREEN_API_TOKEN || "dc4c710bbc6042e28a74919badcb451119dded45a4a84367a9";
+      
+      if (!idInstance || !apiToken) {
+        if (!silent) {
+          alert("Faltan las credenciales de Green API en las variables de entorno.");
+        }
+        setIsSendingWA(false);
+        return;
+      }
+
+      // El subdominio es los primeros 4 dígitos del ID de instancia
+      const cluster = idInstance.toString().substring(0, 4);
+      const url = `https://${cluster}.api.greenapi.com/waInstance${idInstance}/sendMessage/${apiToken}`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chatId: chatId,
+          message: message
+        })
+      });
+
+      const data = await response.json();
+      if (data && data.idMessage) {
+        console.log("✅ ¡Mensaje enviado con éxito!", data.idMessage);
+        if (!silent) {
+          alert(`✅ ¡Mensaje enviado con éxito!\n\nDestinatario: ${chatId}\nID Mensaje: ${data.idMessage}\n\nTexto enviado:\n${message}`);
+        }
+      } else {
+        const errorJson = JSON.stringify(data, null, 2);
+        const copyText = (txt) => {
+          const textArea = document.createElement("textarea");
+          textArea.value = txt;
+          textArea.style.position = "fixed";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          try { document.execCommand('copy'); } catch(e){}
+          document.body.removeChild(textArea);
+        };
+
+        const wantToCopyError = confirm(`❌ Error al enviar la notificación.\n\n¿Querés COPIAR EL ERROR de la API al portapapeles para pegarlo en el chat de soporte?\n\n- Si elegís ACEPTAR: Se copia el código de error.\n- Si elegís CANCELAR: Se copia el texto del mensaje para envío manual.`);
+        
+        if (wantToCopyError) {
+          copyText(errorJson);
+        } else {
+          copyText(message);
+        }
+        console.error('GreenAPI Error Response:', data);
+      }
+    } catch (error) {
+      console.error('GreenAPI Network Error:', error);
+      
+      const copyText = (txt) => {
+        const textArea = document.createElement("textarea");
+        textArea.value = txt;
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try { document.execCommand('copy'); } catch(e){}
+        document.body.removeChild(textArea);
+      };
+      copyText(message);
+
+      alert(`💥 Error al conectar con Green API.\n\n⚠️ El texto del mensaje se copió automáticamente al portapapeles por si querés enviarlo de forma manual.\n\nError: ${error.message}`);
+    } finally {
+      setIsSendingWA(false);
+    }
   };
 
   const handleCopyMessage = (report) => {
@@ -578,6 +759,16 @@ Párrafo final o conclusión de la noticia.`);
                 onClick={() => setActiveTab('mapa')}
                 className={`btn ${activeTab === 'mapa' ? 'btn-primary' : 'btn-secondary'}`}
               >Mapa Interactivo</button>
+              {userRole === 'admin' && (
+                <button 
+                  onClick={() => setActiveTab('whatsapp')}
+                  className={`btn ${activeTab === 'whatsapp' ? 'btn-primary' : 'btn-secondary'}`}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                  <MessageSquare size={18} />
+                  WhatsApp QR
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -735,8 +926,8 @@ Párrafo final o conclusión de la noticia.`);
                           )}
                           {rep.phone && (
                             <>
-                              <button onClick={() => window.open(getWhatsAppLink(rep), '_blank')} className="btn btn-table-action" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '0.35rem 0.5rem' }} title="WhatsApp Rápido">
-                                <Phone size={14} />
+                              <button onClick={() => sendWhatsAppNotification(rep, false)} disabled={isSendingWA} className="btn btn-table-action" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '0.35rem 0.5rem', opacity: isSendingWA ? 0.5 : 1 }} title="Enviar WhatsApp Automático">
+                                {isSendingWA ? <RefreshCw size={14} className="spin-animation" /> : <Phone size={14} />}
                               </button>
                               <button onClick={() => handleCopyMessage(rep)} className="btn btn-secondary btn-table-action" style={{ padding: '0.35rem 0.5rem' }} title="Copiar estado para enviar">
                                 <Copy size={14} />
@@ -773,7 +964,20 @@ Párrafo final o conclusión de la noticia.`);
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3>Detalle de Gestión del Reclamo</h3>
                     
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      {selectedReport.phone && (
+                        <button 
+                          type="button" 
+                          onClick={() => sendWhatsAppNotification(selectedReport, false)}
+                          disabled={isSendingWA}
+                          className="btn btn-accent" 
+                          style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#25D366', borderColor: '#25D366', color: '#fff', opacity: isSendingWA ? 0.7 : 1 }}
+                          title="Enviar WhatsApp automático con el estado actual del reclamo"
+                        >
+                          {isSendingWA ? <RefreshCw size={16} className="spin-animation" /> : <MessageSquare size={16} />}
+                          {isSendingWA ? 'Enviando...' : 'Enviar Notificación'}
+                        </button>
+                      )}
                       <button 
                         type="button" 
                         onClick={() => generateLegislativeProject(selectedReport)} 
@@ -781,17 +985,17 @@ Párrafo final o conclusión de la noticia.`);
                         style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                         title="Crear Proyecto de Comunicación automáticamente"
                       >
-                        <FileText size={16} /> Generar Proyecto Word
+                        <FileText size={16} /> Word
                       </button>
                       <button 
                         type="button" 
                         onClick={handleGeneratePDF} 
                         disabled={isGeneratingPDF}
                         className="btn btn-secondary" 
-                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', borderColor: '#e11d48', color: '#e11d48', backgroundColor: '#fff' }}
-                        title="Exportar a PDF"
+                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                        title="Descargar Ficha Interna PDF"
                       >
-                        <FileText size={16} /> {isGeneratingPDF ? 'Generando...' : 'Descargar Ficha PDF'}
+                        <Download size={16} /> {isGeneratingPDF ? 'Generando...' : 'Ficha PDF'}
                       </button>
                     </div>
                   </div>
@@ -928,7 +1132,7 @@ Párrafo final o conclusión de la noticia.`);
 
                   <div className="drawer-actions">
                     <button type="button" onClick={() => setSelectedReport(null)} className="btn btn-secondary">Cancelar</button>
-                    <button type="button" onClick={handleSaveStatus} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <button type="submit" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <Check size={18} /> Guardar Cambios
                     </button>
                   </div>
@@ -1051,7 +1255,147 @@ Párrafo final o conclusión de la noticia.`);
           <div className="admin-map-section fade-in glass-panel" style={{ padding: '1rem', borderRadius: '20px', height: '600px', display: 'flex', flexDirection: 'column' }}>
             <h3 style={{ marginBottom: '1rem', paddingLeft: '1rem' }}>Mapa de Reclamos Vecinales</h3>
             <div style={{ flex: 1, borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-              <AdminMap reports={filteredReports} />
+              <AdminMap reports={filteredReports} onOpenDetail={handleOpenDetail} />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'whatsapp' && userRole === 'admin' && (
+          <div className="admin-whatsapp-section fade-in glass-panel" style={{ padding: '2rem', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div>
+              <h3>Configuración de WhatsApp (Green API)</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
+                Monitoreá el estado de la conexión de WhatsApp y escaneá el código QR directamente para vincular tu dispositivo.
+              </p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', alignItems: 'start' }}>
+              
+              {/* Formulario de Credenciales */}
+              <form onSubmit={handleSaveCredentials} className="glass-panel" style={{ padding: '1.5rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.2rem', background: 'rgba(255, 255, 255, 0.01)', border: '1px solid var(--border-color)' }}>
+                <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--primary)' }}>
+                  <ShieldCheck size={18} /> Credenciales de Instancia
+                </h4>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>ID Instancia (idInstance) *</label>
+                  <input 
+                    type="text" 
+                    value={idInstanceInput} 
+                    onChange={e => setIdInstanceInput(e.target.value)}
+                    placeholder="Ej. 710722683088" 
+                    className="form-input"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Token de API (apiTokenInstance) *</label>
+                  <input 
+                    type="password" 
+                    value={apiTokenInput} 
+                    onChange={e => setApiTokenInput(e.target.value)}
+                    placeholder="Token largo de Green API" 
+                    className="form-input"
+                    required
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                  <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '0.6rem' }}>
+                    Guardar y Conectar
+                  </button>
+                  {(localStorage.getItem('override_green_api_id') || localStorage.getItem('override_green_api_token')) && (
+                    <button type="button" onClick={handleClearCredentials} className="btn btn-secondary" style={{ padding: '0.6rem', color: 'var(--danger)', borderColor: 'var(--danger)' }}>
+                      Restablecer
+                    </button>
+                  )}
+                </div>
+              </form>
+
+              {/* Estado de Conexión & QR */}
+              <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', justifyContent: 'center', minHeight: '300px', background: 'rgba(255, 255, 255, 0.01)', textAlign: 'center', border: '1px solid var(--border-color)' }}>
+                <h4 style={{ alignSelf: 'flex-start', margin: 0, color: 'var(--text-primary)' }}>
+                  Estado del Servicio
+                </h4>
+
+                {isCheckingStatus ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                    <RefreshCw size={40} className="spin-animation" style={{ color: 'var(--primary)' }} />
+                    <p style={{ fontSize: '0.9rem' }}>Verificando conexión con Green API...</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                    
+                    {/* Status Badge */}
+                    <div style={{ 
+                      padding: '0.75rem 1.5rem', 
+                      borderRadius: '50px', 
+                      fontSize: '0.9rem', 
+                      fontWeight: 'bold', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '0.5rem',
+                      background: 
+                        waStatus === 'authorized' ? 'rgba(16, 185, 129, 0.15)' :
+                        waStatus === 'notAuthorized' ? 'rgba(234, 179, 8, 0.15)' :
+                        waStatus === 'notConfigured' ? 'rgba(100, 116, 139, 0.15)' :
+                        'rgba(239, 68, 68, 0.15)',
+                      color: 
+                        waStatus === 'authorized' ? 'var(--success)' :
+                        waStatus === 'notAuthorized' ? 'var(--warning)' :
+                        waStatus === 'notConfigured' ? 'var(--text-secondary)' :
+                        'var(--danger)',
+                      border: '1px solid currentColor'
+                    }}>
+                      {waStatus === 'authorized' ? 'CONECTADO / ONLINE' :
+                       waStatus === 'notAuthorized' ? 'DESCONECTADO / REFIERE QR' :
+                       waStatus === 'notConfigured' ? 'SIN CONFIGURAR' :
+                       `ERROR DE CONEXIÓN (${waStatus.toUpperCase()})`}
+                    </div>
+
+                    {/* QR Code Container */}
+                    {waStatus === 'notAuthorized' && (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '280px' }}>
+                          Escaneá este código QR desde tu celular (WhatsApp: Dispositivos Vinculados) para activar los mensajes automáticos:
+                        </p>
+                        
+                        {isFetchingQR ? (
+                          <div style={{ width: '180px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', borderRadius: '12px' }}>
+                            <RefreshCw size={24} className="spin-animation" style={{ color: '#000' }} />
+                          </div>
+                        ) : qrCodeData ? (
+                          <div style={{ padding: '10px', background: '#fff', borderRadius: '12px', boxShadow: '0 8px 20px rgba(0,0,0,0.2)' }}>
+                            <img 
+                              src={`data:image/png;base64,${qrCodeData}`} 
+                              alt="Código QR de WhatsApp" 
+                              style={{ width: '180px', height: '180px', display: 'block' }}
+                            />
+                          </div>
+                        ) : (
+                          <p style={{ fontSize: '0.8rem', color: 'var(--danger)' }}>No se pudo cargar el código QR. Intentá refrescar.</p>
+                        )}
+                      </div>
+                    )}
+
+                    {waStatus === 'authorized' && (
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '300px', marginTop: '1rem' }}>
+                        ¡Tu número de WhatsApp está vinculado con éxito! Los ciudadanos recibirán notificaciones al enviar reclamos y al actualizar sus estados.
+                      </p>
+                    )}
+
+                    <button 
+                      type="button" 
+                      onClick={checkWhatsAppStatus}
+                      className="btn btn-secondary"
+                      style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
+                    >
+                      <RefreshCw size={14} /> Actualizar Estado
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

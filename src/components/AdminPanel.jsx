@@ -33,36 +33,71 @@ export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, on
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isSendingWA, setIsSendingWA] = useState(false);
 
-  // WhatsApp (Green API) config states
-  const [idInstanceInput, setIdInstanceInput] = useState(() => localStorage.getItem('override_green_api_id') || '');
-  const [apiTokenInput, setApiTokenInput] = useState(() => localStorage.getItem('override_green_api_token') || '');
+  // WhatsApp (Evolution API) config states
+  const [apiBaseUrlInput, setApiBaseUrlInput] = useState(() => localStorage.getItem('override_evolution_api_url') || '');
+  const [instanceNameInput, setInstanceNameInput] = useState(() => localStorage.getItem('override_evolution_instance_name') || '');
+  const [apiKeyInput, setApiKeyInput] = useState(() => localStorage.getItem('override_evolution_api_key') || '');
   const [waStatus, setWaStatus] = useState('checking'); // 'checking', 'authorized', etc.
   const [qrCodeData, setQrCodeData] = useState('');
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [isFetchingQR, setIsFetchingQR] = useState(false);
 
   const checkWhatsAppStatus = async () => {
-    const idInstance = idInstanceInput || localStorage.getItem('override_green_api_id') || import.meta.env.VITE_GREEN_API_ID || "710722683088";
-    const apiToken = apiTokenInput || localStorage.getItem('override_green_api_token') || import.meta.env.VITE_GREEN_API_TOKEN || "dc4c710bbc6042e28a74919badcb451119dded45a4a84367a9";
-    
-    if (!idInstance || !apiToken) {
+    const apiBaseUrl = apiBaseUrlInput || localStorage.getItem('override_evolution_api_url') || import.meta.env.VITE_EVOLUTION_API_URL || "https://api.santiagohorianski.com";
+    const instanceName = instanceNameInput || localStorage.getItem('override_evolution_instance_name') || import.meta.env.VITE_EVOLUTION_INSTANCE_NAME || "buzon_ciudadano";
+    const apiKey = apiKeyInput || localStorage.getItem('override_evolution_api_key') || import.meta.env.VITE_EVOLUTION_API_KEY || "my_secure_evolution_api_global_key";
+
+    if (!apiBaseUrl || !instanceName || !apiKey) {
       setWaStatus('notConfigured');
       return;
     }
 
     setIsCheckingStatus(true);
     try {
-      const cluster = idInstance.toString().substring(0, 4);
-      const url = `https://${cluster}.api.greenapi.com/waInstance${idInstance}/getStateInstance/${apiToken}`;
-      const res = await fetch(url);
+      const cleanUrl = apiBaseUrl.replace(/\/$/, "");
+      const url = `${cleanUrl}/instance/connectionState/${instanceName}`;
+      
+      const res = await fetch(url, {
+        headers: { 'apikey': apiKey }
+      });
+
+      if (res.status === 404) {
+        // La instancia no existe, intentamos crearla
+        console.log(`Instancia ${instanceName} no existe. Creándola...`);
+        const createRes = await fetch(`${cleanUrl}/instance/create`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'apikey': apiKey
+          },
+          body: JSON.stringify({
+            instanceName: instanceName,
+            token: instanceName,
+            qrcode: true
+          })
+        });
+        if (createRes.ok) {
+          setWaStatus('notAuthorized');
+          fetchQrCode(apiBaseUrl, instanceName, apiKey);
+        } else {
+          setWaStatus('error');
+        }
+        return;
+      }
+
       const data = await res.json();
       
-      if (data && data.stateInstance) {
-        setWaStatus(data.stateInstance);
-        if (data.stateInstance === 'notAuthorized') {
-          fetchQrCode(idInstance, apiToken);
-        } else {
+      if (data && data.instance) {
+        const state = data.instance.state; // 'open' | 'connecting' | 'close'
+        if (state === 'open') {
+          setWaStatus('authorized');
           setQrCodeData('');
+        } else if (state === 'connecting') {
+          setWaStatus('connecting');
+          setQrCodeData('');
+        } else {
+          setWaStatus('notAuthorized');
+          fetchQrCode(apiBaseUrl, instanceName, apiKey);
         }
       } else {
         setWaStatus('error');
@@ -75,17 +110,19 @@ export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, on
     }
   };
 
-  const fetchQrCode = async (idInstance, apiToken) => {
+  const fetchQrCode = async (apiBaseUrl, instanceName, apiKey) => {
     setIsFetchingQR(true);
     try {
-      const cluster = idInstance.toString().substring(0, 4);
-      const url = `https://${cluster}.api.greenapi.com/waInstance${idInstance}/qr/${apiToken}`;
-      const res = await fetch(url);
+      const cleanUrl = apiBaseUrl.replace(/\/$/, "");
+      const url = `${cleanUrl}/instance/connect/${instanceName}`;
+      const res = await fetch(url, {
+        headers: { 'apikey': apiKey }
+      });
       const data = await res.json();
-      if (data && data.type === 'image' && data.message) {
-        setQrCodeData(data.message);
-      } else if (data && data.message) {
-        setQrCodeData(data.message);
+      if (data && data.code) {
+        // Limpiamos prefijo base64 si ya lo incluye.
+        const cleanCode = data.code.startsWith('data:image') ? data.code.split(',')[1] : data.code;
+        setQrCodeData(cleanCode);
       }
     } catch (err) {
       console.error("Error al obtener el código QR:", err);
@@ -96,22 +133,27 @@ export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, on
 
   const handleSaveCredentials = (e) => {
     e.preventDefault();
-    if (idInstanceInput) localStorage.setItem('override_green_api_id', idInstanceInput);
-    else localStorage.removeItem('override_green_api_id');
+    if (apiBaseUrlInput) localStorage.setItem('override_evolution_api_url', apiBaseUrlInput);
+    else localStorage.removeItem('override_evolution_api_url');
 
-    if (apiTokenInput) localStorage.setItem('override_green_api_token', apiTokenInput);
-    else localStorage.removeItem('override_green_api_token');
+    if (instanceNameInput) localStorage.setItem('override_evolution_instance_name', instanceNameInput);
+    else localStorage.removeItem('override_evolution_instance_name');
 
-    alert("✅ Credenciales de Green API actualizadas localmente.");
+    if (apiKeyInput) localStorage.setItem('override_evolution_api_key', apiKeyInput);
+    else localStorage.removeItem('override_evolution_api_key');
+
+    alert("✅ Credenciales de Evolution API actualizadas localmente.");
     checkWhatsAppStatus();
   };
 
   const handleClearCredentials = () => {
-    localStorage.removeItem('override_green_api_id');
-    localStorage.removeItem('override_green_api_token');
-    setIdInstanceInput('');
-    setApiTokenInput('');
-    alert("🔄 Credenciales temporales eliminadas. Usando configuración predeterminada.");
+    localStorage.removeItem('override_evolution_api_url');
+    localStorage.removeItem('override_evolution_instance_name');
+    localStorage.removeItem('override_evolution_api_key');
+    setApiBaseUrlInput('');
+    setInstanceNameInput('');
+    setApiKeyInput('');
+    alert("🔄 Credenciales temporales de Evolution API eliminadas. Usando configuración predeterminada.");
     setWaStatus('checking');
     setTimeout(() => {
       checkWhatsAppStatus();
@@ -540,6 +582,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
   const sendWhatsAppNotification = async (report, silent = false) => {
     if (!report.phone) return;
     setIsSendingWA(true);
+    const message = generateStatusMessage(report);
     try {
       console.log("Iniciando envío de WhatsApp a:", report.phone);
       const cleaned = report.phone.toString().replace(/\D/g, '');
@@ -549,39 +592,38 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
           ? '54' + cleaned 
           : '549' + (cleaned.startsWith('0') ? cleaned.slice(1) : cleaned);
       
-      const chatId = `${formatted}@c.us`;
-      console.log("Chat ID generado:", chatId);
-      const message = generateStatusMessage(report);
+      const apiBaseUrl = localStorage.getItem('override_evolution_api_url') || import.meta.env.VITE_EVOLUTION_API_URL || "https://api.santiagohorianski.com";
+      const instanceName = localStorage.getItem('override_evolution_instance_name') || import.meta.env.VITE_EVOLUTION_INSTANCE_NAME || "buzon_ciudadano";
+      const apiKey = localStorage.getItem('override_evolution_api_key') || import.meta.env.VITE_EVOLUTION_API_KEY || "my_secure_evolution_api_global_key";
 
-      const idInstance = localStorage.getItem('override_green_api_id') || import.meta.env.VITE_GREEN_API_ID || "710722683088";
-      const apiToken = localStorage.getItem('override_green_api_token') || import.meta.env.VITE_GREEN_API_TOKEN || "dc4c710bbc6042e28a74919badcb451119dded45a4a84367a9";
-      
-      if (!idInstance || !apiToken) {
+      if (!apiBaseUrl || !instanceName || !apiKey) {
         if (!silent) {
-          alert("Faltan las credenciales de Green API en las variables de entorno.");
+          alert("Faltan las credenciales de Evolution API en las variables de entorno.");
         }
         setIsSendingWA(false);
         return;
       }
 
-      // El subdominio es los primeros 4 dígitos del ID de instancia
-      const cluster = idInstance.toString().substring(0, 4);
-      const url = `https://${cluster}.api.greenapi.com/waInstance${idInstance}/sendMessage/${apiToken}`;
+      const cleanUrl = apiBaseUrl.replace(/\/$/, "");
+      const url = `${cleanUrl}/message/sendText/${instanceName}`;
 
       const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'apikey': apiKey
+        },
         body: JSON.stringify({
-          chatId: chatId,
-          message: message
+          number: formatted,
+          text: message
         })
       });
 
       const data = await response.json();
-      if (data && data.idMessage) {
-        console.log("✅ ¡Mensaje enviado con éxito!", data.idMessage);
+      if (data && data.key && data.key.id) {
+        console.log("✅ ¡Mensaje enviado con éxito!", data.key.id);
         if (!silent) {
-          alert(`✅ ¡Mensaje enviado con éxito!\n\nDestinatario: ${chatId}\nID Mensaje: ${data.idMessage}\n\nTexto enviado:\n${message}`);
+          alert(`✅ ¡Mensaje enviado con éxito!\n\nDestinatario: ${formatted}\nID Mensaje: ${data.key.id}\n\nTexto enviado:\n${message}`);
         }
       } else {
         const errorJson = JSON.stringify(data, null, 2);
@@ -603,10 +645,10 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
         } else {
           copyText(message);
         }
-        console.error('GreenAPI Error Response:', data);
+        console.error('Evolution API Error Response:', data);
       }
     } catch (error) {
-      console.error('GreenAPI Network Error:', error);
+      console.error('Evolution API Network Error:', error);
       
       const copyText = (txt) => {
         const textArea = document.createElement("textarea");
@@ -620,7 +662,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
       };
       copyText(message);
 
-      alert(`💥 Error al conectar con Green API.\n\n⚠️ El texto del mensaje se copió automáticamente al portapapeles por si querés enviarlo de forma manual.\n\nError: ${error.message}`);
+      alert(`💥 Error al conectar con Evolution API.\n\n⚠️ El texto del mensaje se copió automáticamente al portapapeles por si querés enviarlo de forma manual.\n\nError: ${error.message}`);
     } finally {
       setIsSendingWA(false);
     }
@@ -1263,9 +1305,9 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
         {activeTab === 'whatsapp' && userRole === 'admin' && (
           <div className="admin-whatsapp-section fade-in glass-panel" style={{ padding: '2rem', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div>
-              <h3>Configuración de WhatsApp (Green API)</h3>
+              <h3>Configuración de WhatsApp (Evolution API)</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-                Monitoreá el estado de la conexión de WhatsApp y escaneá el código QR directamente para vincular tu dispositivo.
+                Monitoreá el estado de la conexión de WhatsApp y escaneá el código QR directamente para vincular tu dispositivo en tu servidor VPS.
               </p>
             </div>
 
@@ -1274,28 +1316,40 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
               {/* Formulario de Credenciales */}
               <form onSubmit={handleSaveCredentials} className="glass-panel" style={{ padding: '1.5rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.2rem', background: 'rgba(255, 255, 255, 0.01)', border: '1px solid var(--border-color)' }}>
                 <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--primary)' }}>
-                  <ShieldCheck size={18} /> Credenciales de Instancia
+                  <ShieldCheck size={18} /> Credenciales de Evolution API
                 </h4>
 
                 <div className="form-group">
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>ID Instancia (idInstance) *</label>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>URL de la API (apiBaseUrl) *</label>
                   <input 
                     type="text" 
-                    value={idInstanceInput} 
-                    onChange={e => setIdInstanceInput(e.target.value)}
-                    placeholder="Ej. 710722683088" 
+                    value={apiBaseUrlInput} 
+                    onChange={e => setApiBaseUrlInput(e.target.value)}
+                    placeholder="Ej. https://api.santiagohorianski.com" 
                     className="form-input"
                     required
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Token de API (apiTokenInstance) *</label>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Nombre de Instancia (instanceName) *</label>
+                  <input 
+                    type="text" 
+                    value={instanceNameInput} 
+                    onChange={e => setInstanceNameInput(e.target.value)}
+                    placeholder="Ej. buzon_ciudadano" 
+                    className="form-input"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>API Key Global (apiKey) *</label>
                   <input 
                     type="password" 
-                    value={apiTokenInput} 
-                    onChange={e => setApiTokenInput(e.target.value)}
-                    placeholder="Token largo de Green API" 
+                    value={apiKeyInput} 
+                    onChange={e => setApiKeyInput(e.target.value)}
+                    placeholder="Token de acceso de Evolution API" 
                     className="form-input"
                     required
                   />
@@ -1305,7 +1359,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                   <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '0.6rem' }}>
                     Guardar y Conectar
                   </button>
-                  {(localStorage.getItem('override_green_api_id') || localStorage.getItem('override_green_api_token')) && (
+                  {(localStorage.getItem('override_evolution_api_url') || localStorage.getItem('override_evolution_instance_name') || localStorage.getItem('override_evolution_api_key')) && (
                     <button type="button" onClick={handleClearCredentials} className="btn btn-secondary" style={{ padding: '0.6rem', color: 'var(--danger)', borderColor: 'var(--danger)' }}>
                       Restablecer
                     </button>

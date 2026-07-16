@@ -521,20 +521,27 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           
           const msg = `👋 Hola *${reportData.anonymousName || 'vecino'}*,\n\nRecibimos con éxito tu reclamo sobre *"${reportData.category}"* en el *Buzón Ciudadano de Santiago Horianski*.\n\nEste es tu código único de seguimiento: *${code}*\n\n🔍 Podés seguir los avances de tu trámite en tiempo real ingresando a este enlace directo:\nhttps://santiagohorianski.com/gestion?codigo=${code}\n\n¡Muchas gracias por involucrarte para mejorar nuestro municipio! 💪`;
           
-          const idInstance = import.meta.env.VITE_GREEN_API_ID || "710722683088";
-          const apiToken = import.meta.env.VITE_GREEN_API_TOKEN || "dc4c710bbc6042e28a74919badcb451119dded45a4a84367a9";
+          const apiBaseUrl = localStorage.getItem('override_evolution_api_url') || import.meta.env.VITE_EVOLUTION_API_URL || "https://api.santiagohorianski.com";
+          const instanceName = localStorage.getItem('override_evolution_instance_name') || import.meta.env.VITE_EVOLUTION_INSTANCE_NAME || "buzon_ciudadano";
+          const apiKey = localStorage.getItem('override_evolution_api_key') || import.meta.env.VITE_EVOLUTION_API_KEY || "my_secure_evolution_api_global_key";
           
-          if (idInstance && apiToken) {
-            const cluster = idInstance.substring(0, 4);
-            const url = `https://${cluster}.api.greenapi.com/waInstance${idInstance}/sendMessage/${apiToken}`;
+          if (apiBaseUrl && instanceName && apiKey) {
+            const cleanUrl = apiBaseUrl.replace(/\/$/, "");
+            const url = `${cleanUrl}/message/sendText/${instanceName}`;
             const res = await fetch(url, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ chatId, message: msg })
+              headers: { 
+                'Content-Type': 'application/json',
+                'apikey': apiKey
+              },
+              body: JSON.stringify({ 
+                number: formatted, 
+                text: msg 
+              })
             });
             const data = await res.json();
-            if (data && data.idMessage) {
-              console.log("✅ ¡WhatsApp de Bienvenida enviado!", data.idMessage);
+            if (data && data.key && data.key.id) {
+              console.log("✅ ¡WhatsApp de Bienvenida enviado!", data.key.id);
             } else {
               console.error("❌ Error enviando WhatsApp de Bienvenida:", data);
             }

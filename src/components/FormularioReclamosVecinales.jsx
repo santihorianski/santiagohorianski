@@ -509,49 +509,8 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
     onSubmitReport(reportData);
     
-    // Enviar WhatsApp de Bienvenida Automático
-    if (reportData.phone) {
-      const sendWelcomeWhatsApp = async () => {
-        try {
-          console.log("Welcome WA -> Iniciando con:", reportData.phone);
-          const cleaned = reportData.phone.toString().replace(/\D/g, '');
-          const formatted = cleaned.startsWith('54') ? cleaned : cleaned.startsWith('9') ? '54' + cleaned : '549' + (cleaned.startsWith('0') ? cleaned.slice(1) : cleaned);
-          const chatId = `${formatted}@c.us`;
-          console.log("Welcome WA -> ChatID:", chatId);
-          
-          const msg = `👋 Hola *${reportData.anonymousName || 'vecino'}*,\n\nRecibimos con éxito tu reclamo sobre *"${reportData.category}"* en el *Buzón Ciudadano de Santiago Horianski*.\n\nEste es tu código único de seguimiento: *${code}*\n\n🔍 Podés seguir los avances de tu trámite en tiempo real ingresando a este enlace directo:\nhttps://santiagohorianski.com/gestion?codigo=${code}\n\n¡Muchas gracias por involucrarte para mejorar nuestro municipio! 💪`;
-          
-          const apiBaseUrl = localStorage.getItem('override_evolution_api_url') || import.meta.env.VITE_EVOLUTION_API_URL || "https://api.santiagohorianski.com";
-          const instanceName = localStorage.getItem('override_evolution_instance_name') || import.meta.env.VITE_EVOLUTION_INSTANCE_NAME || "buzon_ciudadano";
-          const apiKey = localStorage.getItem('override_evolution_api_key') || import.meta.env.VITE_EVOLUTION_API_KEY || "my_secure_evolution_api_global_key";
-          
-          if (apiBaseUrl && instanceName && apiKey) {
-            const cleanUrl = apiBaseUrl.replace(/\/$/, "");
-            const url = `${cleanUrl}/message/sendText/${instanceName}`;
-            const res = await fetch(url, {
-              method: 'POST',
-              headers: { 
-                'Content-Type': 'application/json',
-                'apikey': apiKey
-              },
-              body: JSON.stringify({ 
-                number: formatted, 
-                text: msg 
-              })
-            });
-            const data = await res.json();
-            if (data && data.key && data.key.id) {
-              console.log("✅ ¡WhatsApp de Bienvenida enviado!", data.key.id);
-            } else {
-              console.error("❌ Error enviando WhatsApp de Bienvenida:", data);
-            }
-          }
-        } catch (err) {
-          console.error("Error sending welcome WA:", err);
-        }
-      };
-      sendWelcomeWhatsApp();
-    }
+    // Enviar WhatsApp de Bienvenida Automático desactivado debido a baneo de cuenta.
+    // La notificación se gestiona de forma manual desde el panel de administración.
 
     setIsSuccess(true);
     setStep(1);
@@ -575,14 +534,6 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
             Se ha enviado al equipo de trabajo de Santiago Horianski. Conserva este número para auditar su estado.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem', flexWrap: 'wrap' }}>
-            <button 
-              className="btn btn-secondary wizard-btn-prev" 
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.2rem', borderColor: 'var(--primary)', color: 'var(--primary)' }} 
-              onClick={handleDownloadReceipt}
-              disabled={isGeneratingReceipt}
-            >
-              {isGeneratingReceipt ? 'Generando...' : 'Descargar Comprobante PDF'}
-            </button>
             <button className="btn btn-primary wizard-btn-next" style={{ margin: 0, padding: '0.65rem 1.5rem' }} onClick={handleCloseWizard}>
               Volver al Portal
             </button>

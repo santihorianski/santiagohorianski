@@ -92,9 +92,6 @@ export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, on
         if (state === 'open') {
           setWaStatus('authorized');
           setQrCodeData('');
-        } else if (state === 'connecting') {
-          setWaStatus('connecting');
-          setQrCodeData('');
         } else {
           setWaStatus('notAuthorized');
           fetchQrCode(apiBaseUrl, instanceName, apiKey);
@@ -119,8 +116,12 @@ export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, on
         headers: { 'apikey': apiKey }
       });
       const data = await res.json();
-      if (data && data.code) {
+      if (data && data.base64) {
         // Limpiamos prefijo base64 si ya lo incluye.
+        const cleanCode = data.base64.startsWith('data:image') ? data.base64.split(',')[1] : data.base64;
+        setQrCodeData(cleanCode);
+      } else if (data && data.code) {
+        // Fallback por si la versión de la API responde con la imagen en el campo code
         const cleanCode = data.code.startsWith('data:image') ? data.code.split(',')[1] : data.code;
         setQrCodeData(cleanCode);
       }
@@ -533,10 +534,7 @@ Párrafo final o conclusión de la noticia.`);
 
     onUpdateReport(updated);
     
-    // Disparar WhatsApp de forma silenciosa (silent = true) si el estado cambió
-    if (updated.phone && updated.status !== selectedReport.status) {
-      sendWhatsAppNotification(updated, true); 
-    }
+    // Disparar WhatsApp automático suspendido por baneo de cuenta. Se gestiona de forma manual.
     
     setIsSaveSuccess(true);
     
@@ -801,14 +799,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 onClick={() => setActiveTab('mapa')}
                 className={`btn ${activeTab === 'mapa' ? 'btn-primary' : 'btn-secondary'}`}
               >Mapa Interactivo</button>
-              <button 
-                onClick={() => setActiveTab('whatsapp')}
-                className={`btn ${activeTab === 'whatsapp' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-              >
-                <MessageSquare size={18} />
-                WhatsApp QR
-              </button>
+
             </div>
           </div>
         </div>
@@ -966,9 +957,9 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                           )}
                           {rep.phone && (
                             <>
-                              <button onClick={() => sendWhatsAppNotification(rep, false)} disabled={isSendingWA} className="btn btn-table-action" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '0.35rem 0.5rem', opacity: isSendingWA ? 0.5 : 1 }} title="Enviar WhatsApp Automático">
-                                {isSendingWA ? <RefreshCw size={14} className="spin-animation" /> : <Phone size={14} />}
-                              </button>
+                              <a href={getWhatsAppLink(rep)} target="_blank" rel="noopener noreferrer" className="btn btn-table-action" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '0.35rem 0.5rem', display: 'inline-flex', alignItems: 'center' }} title="Enviar WhatsApp Manual">
+                                <Phone size={14} />
+                              </a>
                               <button onClick={() => handleCopyMessage(rep)} className="btn btn-secondary btn-table-action" style={{ padding: '0.35rem 0.5rem' }} title="Copiar estado para enviar">
                                 <Copy size={14} />
                               </button>
@@ -1006,17 +997,17 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                     
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                       {selectedReport.phone && (
-                        <button 
-                          type="button" 
-                          onClick={() => sendWhatsAppNotification(selectedReport, false)}
-                          disabled={isSendingWA}
+                        <a 
+                          href={getWhatsAppLink(selectedReport)}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="btn btn-accent" 
-                          style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#25D366', borderColor: '#25D366', color: '#fff', opacity: isSendingWA ? 0.7 : 1 }}
-                          title="Enviar WhatsApp automático con el estado actual del reclamo"
+                          style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: '#25D366', borderColor: '#25D366', color: '#fff', textDecoration: 'none' }}
+                          title="Enviar WhatsApp manual con el estado actual del reclamo"
                         >
-                          {isSendingWA ? <RefreshCw size={16} className="spin-animation" /> : <MessageSquare size={16} />}
-                          {isSendingWA ? 'Enviando...' : 'Enviar Notificación'}
-                        </button>
+                          <MessageSquare size={16} />
+                          Enviar Notificación
+                        </a>
                       )}
                       <button 
                         type="button" 
@@ -1374,7 +1365,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 {isCheckingStatus ? (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                     <RefreshCw size={40} className="spin-animation" style={{ color: 'var(--primary)' }} />
-                    <p style={{ fontSize: '0.9rem' }}>Verificando conexión con Green API...</p>
+                    <p style={{ fontSize: '0.9rem' }}>Verificando conexión con Evolution API...</p>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', width: '100%' }}>

@@ -9,6 +9,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
   const [isSuccess, setIsSuccess] = useState(false);
   const [createdTrackingCode, setCreatedTrackingCode] = useState('');
   const [gpsCoordinates, setGpsCoordinates] = useState(null);
+  const [locationSource, setLocationSource] = useState(null); // 'gps' | 'google' | null
   const [gpsLoading, setGpsLoading] = useState(false);
   const [isLocationLocked, setIsLocationLocked] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -151,6 +152,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       photos: []
     });
     setGpsCoordinates(null);
+    setLocationSource(null);
     setIsSuccess(false);
     onClose();
   };
@@ -238,7 +240,11 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           result.address_components.forEach(comp => {
             if (comp.types.includes('route')) street = comp.long_name;
             if (comp.types.includes('street_number')) number = comp.long_name;
-            if (comp.types.includes('neighborhood') || comp.types.includes('sublocality')) {
+            if (comp.types.includes('neighborhood') || 
+                comp.types.includes('sublocality') || 
+                comp.types.includes('sublocality_level_1') || 
+                comp.types.includes('sublocality_level_2') || 
+                comp.types.includes('colloquial_area')) {
               neighborhood = comp.long_name;
             }
           });
@@ -255,6 +261,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
             lat: result.geometry.location.lat().toFixed(6),
             lng: result.geometry.location.lng().toFixed(6)
           });
+          setLocationSource('google');
         }
       });
     }
@@ -327,17 +334,26 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
             
             let street = '';
             let houseNumber = '';
+            let neighborhood = '';
 
             result.address_components.forEach(comp => {
               if (comp.types.includes('route')) street = comp.long_name;
               if (comp.types.includes('street_number')) houseNumber = comp.long_name;
+              if (comp.types.includes('neighborhood') || 
+                  comp.types.includes('sublocality') || 
+                  comp.types.includes('sublocality_level_1') || 
+                  comp.types.includes('sublocality_level_2') || 
+                  comp.types.includes('colloquial_area')) {
+                neighborhood = comp.long_name;
+              }
             });
 
             setFormData(prev => ({
               ...prev,
-              barrio: prev.barrio || '', // Keep empty so they must fill it manually
+              barrio: neighborhood || prev.barrio || '',
               callePrincipal: `${street} ${houseNumber}`.trim() || result.formatted_address
             }));
+            setLocationSource('gps');
             setIsLocationLocked(false);
           } else {
             throw new Error('Google Maps API Error: ' + data.status);
@@ -606,15 +622,37 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
               </button>
 
               {gpsCoordinates && (
-                <div className="gps-success-badge animate-fade-in">
-                  <Check size={14} style={{ color: 'var(--success)' }} />
-                  <span>GPS: Lat {gpsCoordinates.lat}, Lng {gpsCoordinates.lng} (Precisión guardada)</span>
-                </div>
+                <>
+                  <div className="gps-success-badge animate-fade-in">
+                    <Check size={14} style={{ color: 'var(--success)' }} />
+                    <span>GPS: Lat {gpsCoordinates.lat}, Lng {gpsCoordinates.lng} (Precisión guardada)</span>
+                  </div>
+                  
+                  <div className="map-preview-container animate-fade-in" style={{ margin: '1rem 0', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--overlay-medium)', position: 'relative', height: '160px', background: '#1e1b4b' }}>
+                    <img 
+                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${gpsCoordinates.lat},${gpsCoordinates.lng}&zoom=16&size=600x300&scale=2&maptype=roadmap&markers=color:0xd9a024%7C${gpsCoordinates.lat},${gpsCoordinates.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyCpqNAb7azBFU32oxAgSDCxnIFZFI_tAfA"}`}
+                      alt="Vista previa de Google Maps"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                    <div style={{ position: 'absolute', bottom: '8px', left: '8px', background: 'rgba(22, 16, 34, 0.85)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <MapPin size={12} style={{ color: 'var(--primary)' }} />
+                      <span>Ubicación detectada</span>
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="form-group" style={{ marginTop: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
-                  <label className="form-label" style={{ marginBottom: 0 }}>Barrio *</label>
+                  <label className="form-label" style={{ marginBottom: 0, display: 'flex', alignItems: 'center' }}>
+                    Barrio *
+                    {locationSource && formData.barrio && (
+                      <span className="auto-badge" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem', borderRadius: '4px', background: 'rgba(217, 160, 36, 0.15)', color: 'var(--primary)', marginLeft: '0.5rem', fontWeight: 'bold' }}>
+                        Autodetectado
+                      </span>
+                    )}
+                  </label>
                 </div>
                 <input 
                   type="text" 
@@ -628,13 +666,21 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
               </div>
 
               <div className="form-group" style={{ position: 'relative' }}>
-                <label className="form-label">Calle principal o referencia *</label>
+                <label className="form-label" style={{ display: 'flex', alignItems: 'center' }}>
+                  Calle principal o referencia *
+                  {locationSource && formData.callePrincipal && (
+                    <span className="auto-badge" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem', borderRadius: '4px', background: 'rgba(217, 160, 36, 0.15)', color: 'var(--primary)', marginLeft: '0.5rem', fontWeight: 'bold' }}>
+                      Autodetectado
+                    </span>
+                  )}
+                </label>
                 <input 
                   type="text" 
                   name="callePrincipal"
                   value={formData.callePrincipal}
                   onChange={(e) => {
                     isSuggestionSelectedRef.current = false;
+                    setLocationSource(null); // Clear status if they manually edit
                     handleInputChange(e);
                   }}
                   placeholder="Ej. Avenida Tambor de Tacuarí o 'Frente a la plaza'"

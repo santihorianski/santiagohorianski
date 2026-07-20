@@ -155,6 +155,7 @@ export default function App() {
     entre_calle_1: rep.entreCalle1 || null,
     entre_calle_2: rep.entreCalle2 || null,
     phone: rep.phone || null,
+    email: rep.email || null,
     anonymous_name: rep.anonymousName || null,
     gps_lat: rep.gpsLat || null,
     gps_lng: rep.gpsLng || null,

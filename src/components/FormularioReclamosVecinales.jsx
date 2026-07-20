@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, AlertCircle, Trash2, Shield, Search, FileText } from 'lucide-react';
+import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, AlertCircle, Trash2, Shield, Search, FileText, Mail } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { uploadFileToR2, isR2Configured } from '../r2Client';
 
@@ -141,6 +141,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
     setFormData({
       name: '',
       phone: '',
+      email: '',
       category: '',
       barrio: '',
       callePrincipal: '',
@@ -158,6 +159,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
+    email: '',
     category: '',
     barrio: '',
     callePrincipal: '',
@@ -503,14 +505,28 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       coordinates: gpsCoordinates, // Se guarda lat/lng si el usuario usó GPS
       anonymousName: isAnonymous ? 'Vecino Anónimo' : formData.name,
       phone: isAnonymous ? null : formData.phone,
+      email: isAnonymous ? null : (formData.email || null),
       photos: formData.photos,
       trackingCode: code
     };
 
     onSubmitReport(reportData);
     
-    // Enviar WhatsApp de Bienvenida Automático desactivado debido a baneo de cuenta.
-    // La notificación se gestiona de forma manual desde el panel de administración.
+    // Enviar correo de confirmación si no es anónimo y proporcionó email
+    if (!isAnonymous && formData.email && formData.email.trim()) {
+      fetch('https://buzon-ciudadano-mail-api.horianskiseguros.workers.dev/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formData.email.trim(),
+          trackingCode: code,
+          category: reportData.category,
+          anonymousName: formData.name
+        })
+      }).catch(err => console.error("Error al enviar correo de bienvenida:", err));
+    }
 
     setIsSuccess(true);
     setStep(1);
@@ -809,6 +825,21 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                         placeholder="Ej. 3764-123456"
                         className="form-input padding-left-icon"
                         required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group animate-fade-in">
+                    <label className="form-label">Correo Electrónico (Opcional - Para recibir código de seguimiento)</label>
+                    <div className="input-with-icon">
+                      <Mail size={16} className="input-icon" />
+                      <input 
+                        type="email" 
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="Ej. vecino@correo.com"
+                        className="form-input padding-left-icon"
                       />
                     </div>
                   </div>

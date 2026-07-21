@@ -118,7 +118,7 @@ export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
       const isExactTrackingSearch = cleanSearch !== '' && rep.trackingCode?.toString() === cleanSearch;
       
       // Ocultar si no está aprobado y no es una búsqueda directa por código
-      if (rep.isVisible === false && !isExactTrackingSearch) {
+      if (rep.status !== 'aprobado' && !isExactTrackingSearch) {
         return false;
       }
 
@@ -295,17 +295,7 @@ export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
               </div>
 
               <div className="feed-footer-controls">
-                <div className="status-filters">
-                  {statuses.map(st => (
-                    <button
-                      key={st}
-                      onClick={() => setSelectedStatus(st)}
-                      className={`status-btn ${selectedStatus === st ? 'active' : ''}`}
-                    >
-                      {st === 'Todos' ? 'Todos los Estados' : getStatusDetails({ status: st }).shortText}
-                    </button>
-                  ))}
-                </div>
+                {/* Status filters removidos porque la vista pública sólo muestra reclamos aprobados */}
 
                 <div className="sort-box">
                   <label>Ordenar:</label>
@@ -368,20 +358,7 @@ export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
                       {/* Description */}
                       <p className="report-card-desc">{rep.description}</p>
 
-                      {/* Attached Photos */}
-                      {rep.photos && rep.photos.length > 0 && (
-                        <div className="report-photos-preview" style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-                          {rep.photos.map((photo, idx) => (
-                            <img 
-                              key={idx} 
-                              src={photo.preview} 
-                              alt={`Evidencia ${idx + 1}`} 
-                              loading="lazy"
-                              style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '12px', border: '1px solid var(--overlay-medium)' }} 
-                            />
-                          ))}
-                        </div>
-                      )}
+                      {/* Fotos de Evidencia (Removidas de la vista pública por pedido de privacidad) */}
 
                       {/* Footer Actions / Author */}
                       <div className="report-card-footer">

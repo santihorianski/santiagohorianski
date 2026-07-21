@@ -535,20 +535,21 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
     onSubmitReport(reportData);
     
-    // Enviar correo de confirmación si no es anónimo y proporcionó email
-    if (!isAnonymous && formData.email && formData.email.trim()) {
+    // Enviar correo de confirmación y/o WhatsApp si no es anónimo y proporcionó contacto
+    if (!isAnonymous && (formData.email?.trim() || formData.phone?.trim())) {
       fetch('https://buzon-ciudadano-mail-api.horianskiseguros.workers.dev/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          email: formData.email.trim(),
+          email: formData.email ? formData.email.trim() : null,
+          phone: formData.phone ? formData.phone.trim() : null,
           trackingCode: code,
           category: reportData.category,
           anonymousName: formData.name
         })
-      }).catch(err => console.error("Error al enviar correo de bienvenida:", err));
+      }).catch(err => console.error("Error al enviar notificaciones:", err));
     }
 
     setIsSuccess(true);

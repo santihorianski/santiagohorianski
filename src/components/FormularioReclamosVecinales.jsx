@@ -396,6 +396,13 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       return;
     }
 
+    const maxSize = 5 * 1024 * 1024; // 5 MB
+    const oversizedFiles = files.filter(file => file.size > maxSize);
+    if (oversizedFiles.length > 0) {
+      setErrorMessage('Los archivos no deben superar el límite de 5 MB por cada uno.');
+      return;
+    }
+
     if (formData.photos.length + files.length > 3) {
       setErrorMessage('Solo podés subir hasta un máximo de 3 archivos de evidencia en total.');
       return;
@@ -589,15 +596,56 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
               <div className="category-selection-grid">
                 {categories.map((cat) => {
                   const isSelected = formData.category === cat.title;
+                  // Extract emoji (first characters up to space) and text
+                  const firstSpaceIdx = cat.title.indexOf(' ');
+                  const emoji = cat.title.substring(0, firstSpaceIdx);
+                  const titleText = cat.title.substring(firstSpaceIdx + 1);
+                  
                   return (
                     <div 
                       key={cat.id}
                       className={`category-item-card ${isSelected ? 'selected' : ''}`}
                       onClick={() => handleSelectCategory(cat.title)}
+                      style={{
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '1rem',
+                        padding: '1rem',
+                        borderRadius: '16px',
+                        border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                        background: isSelected ? 'rgba(217, 160, 36, 0.08)' : 'var(--bg-card)',
+                        boxShadow: isSelected ? '0 4px 15px rgba(217, 160, 36, 0.15)' : '0 2px 8px rgba(0,0,0,0.1)',
+                        transition: 'all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)',
+                        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                        cursor: 'pointer'
+                      }}
                     >
-                      <span className="cat-card-title">{cat.title}</span>
-                      <span className="cat-card-desc">{cat.desc}</span>
-                      {isSelected && <div className="selected-badge-check"><Check size={10} /></div>}
+                      <div className="cat-icon-container" style={{
+                        fontSize: '1.8rem',
+                        width: '50px',
+                        height: '50px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: isSelected ? 'var(--primary)' : 'rgba(150, 150, 150, 0.1)',
+                        borderRadius: '12px',
+                        flexShrink: 0,
+                        transition: 'all 0.3s ease',
+                        filter: isSelected ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' : 'none'
+                      }}>
+                        {emoji}
+                      </div>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                        <span className="cat-card-title" style={{ fontSize: '1.05rem', fontWeight: 'bold', color: isSelected ? 'var(--primary)' : 'var(--text-primary)' }}>
+                          {titleText}
+                        </span>
+                        <span className="cat-card-desc" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.3' }}>
+                          {cat.desc}
+                        </span>
+                      </div>
+                      <div style={{ width: '24px', display: 'flex', justifyContent: 'flex-end', color: isSelected ? 'var(--primary)' : 'transparent' }}>
+                        <Check size={20} strokeWidth={3} />
+                      </div>
                     </div>
                   );
                 })}
@@ -760,7 +808,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                   ) : (
                     <span>Arrastrá tus fotos o PDFs acá o <strong>hacé clic para subir</strong></span>
                   )}
-                  <span className="file-limit-subtitle">Imágenes o PDFs (Máx. 3 archivos en total)</span>
+                  <span className="file-limit-subtitle">Imágenes o PDFs (Máx. 3 archivos en total, hasta 5 MB c/u)</span>
                 </label>
               </div>
 
@@ -933,12 +981,24 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
               </button>
             )}
             {step < 4 ? (
-              <button type="button" onClick={nextStep} className="btn btn-primary wizard-btn-next">
-                Siguiente <ChevronRight size={16} />
+              <button 
+                type="button" 
+                onClick={nextStep} 
+                className="btn btn-primary wizard-btn-next"
+                disabled={isUploadingFile}
+                style={{ opacity: isUploadingFile ? 0.7 : 1, cursor: isUploadingFile ? 'not-allowed' : 'pointer' }}
+              >
+                {isUploadingFile ? 'Cargando archivo...' : <>Siguiente <ChevronRight size={16} /></>}
               </button>
             ) : (
-              <button type="button" onClick={handleSubmit} className="btn btn-accent wizard-btn-next">
-                Enviar Reclamo <Check size={16} />
+              <button 
+                type="button" 
+                onClick={handleSubmit} 
+                className="btn btn-accent wizard-btn-next"
+                disabled={isUploadingFile}
+                style={{ opacity: isUploadingFile ? 0.7 : 1, cursor: isUploadingFile ? 'not-allowed' : 'pointer' }}
+              >
+                {isUploadingFile ? 'Cargando archivo...' : <>Enviar Reclamo <Check size={16} /></>}
               </button>
             )}
           </div>

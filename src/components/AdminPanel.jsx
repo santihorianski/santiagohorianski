@@ -450,6 +450,16 @@ Párrafo final o conclusión de la noticia.`);
 
     const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
     const url = URL.createObjectURL(blob);
+    selectedReport.photos.forEach((photo, i) => {
+      const url = typeof photo === 'string' ? photo : photo.preview;
+      const link = document.createElement('a');
+      link.href = url;
+      // Extract the file extension from the URL (fallback to jpg)
+      const extMatch = url.match(/\.([a-zA-Z0-9]+)(?:\?|$)/);
+      const ext = extMatch ? extMatch[1] : 'jpg';
+      link.download = `evidencia-${selectedReport.id}-${i+1}.${ext}`;
+      link.click();
+    });
     const link = document.createElement("a");
     link.href = url;
     link.download = `Reclamos_Posadas_${new Date().toLocaleDateString('es-ES')}.xls`;
@@ -1075,10 +1085,13 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                             <button 
                               type="button"
                               onClick={() => {
-                                selectedReport.photos.forEach((photoUrl, i) => {
+                                selectedReport.photos.forEach((photo, i) => {
+                                  const url = typeof photo === 'string' ? photo : photo.preview;
                                   const link = document.createElement('a');
-                                  link.href = photoUrl;
-                                  link.download = `evidencia-${selectedReport.id}-${i+1}.jpg`;
+                                  link.href = url;
+                                  const extMatch = url.match(/\.([a-zA-Z0-9]+)(?:\?|$)/);
+                                  const ext = extMatch ? extMatch[1] : 'jpg';
+                                  link.download = `evidencia-${selectedReport.id}-${i+1}.${ext}`;
                                   link.click();
                                 });
                               }}
@@ -1090,20 +1103,47 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                             </button>
                           </div>
                           <div className="drawer-photos-grid">
-                            {selectedReport.photos.map((photoUrl, i) => (
-                              <button 
-                                key={i} 
-                                type="button"
-                                className="drawer-photo-item"
-                                onClick={() => setSelectedPhoto(photoUrl)}
-                                style={{ border: 'none', background: 'transparent', cursor: 'zoom-in', position: 'relative', width: '100%' }}
-                              >
-                                <img src={photoUrl} alt={`Evidencia ${i + 1}`} className="photo-src-img" />
-                                <div className="photo-zoom-overlay">
-                                  <ZoomIn size={20} />
-                                </div>
-                              </button>
-                            ))}
+                            {selectedReport.photos.map((photo, i) => {
+                              const url = typeof photo === 'string' ? photo : photo.preview;
+                              const isPdf = typeof photo === 'object' ? 
+                                (photo.type === 'application/pdf' || photo.preview?.startsWith('data:application/pdf') || photo.name?.toLowerCase().endsWith('.pdf')) : 
+                                url.toLowerCase().endsWith('.pdf');
+                              
+                              return (
+                                <button 
+                                  key={i} 
+                                  type="button"
+                                  className="drawer-photo-item"
+                                  onClick={() => isPdf ? window.open(url, '_blank') : setSelectedPhoto(url)}
+                                  style={{ border: 'none', background: 'transparent', cursor: isPdf ? 'pointer' : 'zoom-in', position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}
+                                >
+                                  {isPdf ? (
+                                    <div style={{
+                                      width: '100%',
+                                      aspectRatio: '1',
+                                      borderRadius: '12px',
+                                      background: 'rgba(239, 68, 68, 0.1)',
+                                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      padding: '4px'
+                                    }}>
+                                      <FileText size={32} style={{ color: 'var(--danger)', marginBottom: '8px' }} />
+                                      <span style={{ fontSize: '10px', color: 'var(--text-secondary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', width: '100%' }}>PDF</span>
+                                    </div>
+                                  ) : (
+                                    <img src={url} alt={`Evidencia ${i + 1}`} className="photo-src-img" />
+                                  )}
+                                  {!isPdf && (
+                                    <div className="photo-zoom-overlay">
+                                      <ZoomIn size={20} />
+                                    </div>
+                                  )}
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
                       )}

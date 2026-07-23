@@ -153,19 +153,22 @@ var worker_default = {
           <html lang="es">
           <head>
             <meta charset="UTF-8">
+            <meta name="color-scheme" content="dark">
+            <meta name="supported-color-schemes" content="dark">
             <style>
+              :root { color-scheme: dark; }
               body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0a0e; color: #e2dfeb; margin: 0; padding: 0; }
-              .container { max-width: 600px; margin: 40px auto; background-color: #121016; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-              .header { background: linear-gradient(135deg, #743bbc 0%, #3a1d5e 100%); padding: 40px 20px; text-align: center; color: #ffffff; border-bottom: 2px solid #e8b923; }
-              .header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+              .container { max-width: 600px; margin: 40px auto; background-color: #121016; border-radius: 16px; border: 1px solid #222222; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+              .header { background-color: #3a1d5e; background-image: linear-gradient(135deg, #743bbc 0%, #3a1d5e 100%); padding: 40px 20px; text-align: center; color: #ffffff; border-bottom: 2px solid #e8b923; }
+              .header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; }
               .content { padding: 40px 30px; line-height: 1.6; }
               .content p { margin: 0 0 20px 0; font-size: 16px; color: #e2dfeb; }
-              .code-box { background: rgba(232, 185, 35, 0.1); border: 1px solid rgba(232, 185, 35, 0.2); border-radius: 12px; padding: 20px; text-align: center; margin: 30px 0; }
+              .code-box { background-color: #1f1b13; border: 1px solid #332a13; border-radius: 12px; padding: 20px; text-align: center; margin: 30px 0; }
               .code-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #e8b923; font-weight: 600; margin-bottom: 8px; }
               .code-value { font-size: 36px; font-weight: 800; color: #ffffff; font-family: monospace; margin: 0; letter-spacing: 2px; }
-              .btn { display: inline-block; background-color: #e8b923; color: #000000; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; margin: 20px 0; text-align: center; box-shadow: 0 4px 15px rgba(232, 185, 35, 0.3); transition: all 0.2s; }
+              .btn { display: inline-block; background-color: #e8b923; color: #000000 !important; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; margin: 20px 0; text-align: center; box-shadow: 0 4px 15px rgba(232, 185, 35, 0.3); transition: all 0.2s; }
               .btn:hover { background-color: #fbd34d; }
-              .footer { background-color: #0b0a0e; padding: 30px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: #888398; }
+              .footer { background-color: #0b0a0e; padding: 30px 20px; text-align: center; border-top: 1px solid #222222; font-size: 12px; color: #888398; }
             </style>
           </head>
           <body>

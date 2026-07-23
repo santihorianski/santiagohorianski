@@ -170,14 +170,16 @@ var worker_default = {
               
               .chat-bubble p { margin: 0 0 10px 0; }
               
-              .code-box { background-color: #111b21; border: 1px dashed #00a884; border-radius: 8px; padding: 15px; text-align: center; margin: 15px 0; }
-              .code-label { font-size: 12px; color: #00a884; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
-              .code-value { font-size: 28px; font-weight: bold; color: #ffffff; margin: 0; letter-spacing: 1px; }
+              .code-box { background-color: #111b21; border: 1px dashed #e8b923; border-radius: 8px; padding: 15px; text-align: center; margin: 15px 0; }
+              .code-label { font-size: 13px; color: #e8b923; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+              .code-value { font-size: 32px; font-weight: 900; color: #ffffff; margin: 0; letter-spacing: 2px; }
               
-              .btn-wa { display: inline-block; background-color: #00a884; color: #111b21 !important; padding: 12px 24px; border-radius: 24px; text-decoration: none; font-weight: 600; font-size: 15px; text-align: center; margin-top: 10px; }
-              .btn-wa:hover { background-color: #02c098; }
+              .btn-wa { display: inline-block; background-color: #e8b923; color: #000000 !important; padding: 12px 24px; border-radius: 24px; text-decoration: none; font-weight: 800; font-size: 16px; text-align: center; margin-top: 10px; }
+              .btn-wa:hover { background-color: #fbd34d; }
               
               .time-stamp { text-align: right; font-size: 11px; color: #8696a0; margin-top: 5px; display: block; }
+              
+              .social-links { margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
               
               .footer { text-align: center; font-size: 12px; color: #8696a0; margin-top: 30px; }
             </style>
@@ -187,14 +189,14 @@ var worker_default = {
               <div class="chat-header">
                 <img src="https://santiagohorianski.com/favicon.png" alt="Santi" />
                 <div>
-                  <h1>Buzón Ciudadano</h1>
+                  <h1 style="font-weight: 800;">Buzón Ciudadano</h1>
                   <p>Santiago Horianski • Cuenta oficial</p>
                 </div>
               </div>
               
               <div class="chat-bubble">
-                <p>¡Hola <strong>${recipientName}</strong>! 👋</p>
-                <p>Gracias por comprometerte y ayudarnos a mejorar nuestra ciudad. Ya registramos tu reporte sobre <strong>"${category}"</strong> y lo tenemos agendado.</p>
+                <p style="font-size: 16px;">¡Hola <strong style="font-size: 17px; color: #e8b923;">${recipientName}</strong>! 👋</p>
+                <p>Gracias por comprometerte y ayudarnos a mejorar nuestra ciudad. Ya registramos tu reporte sobre <strong style="color: #ffffff;">"${category}"</strong> y lo tenemos agendado.</p>
                 
                 <div class="code-box">
                   <div class="code-label">Tu Código de Seguimiento</div>
@@ -207,8 +209,13 @@ var worker_default = {
                   <a href="https://santiagohorianski.com/gestion?codigo=${trackingCode}" class="btn-wa">Seguir mi Reclamo</a>
                 </div>
                 
-                <p>La política real se hace escuchando. ¡Un abrazo grande!</p>
+                <p style="font-weight: bold;">La política real se hace escuchando. ¡Un abrazo grande!</p>
                 
+                <div class="social-links">
+                  <a href="https://instagram.com/santi.horianski" target="_blank" style="display: inline-block; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 8px 18px; border-radius: 20px; color: white; text-decoration: none; font-weight: bold; font-size: 13px; margin: 5px;">📸 Instagram</a>
+                  <a href="https://www.tiktok.com/@santiagohorianski" target="_blank" style="display: inline-block; background: #222222; border: 1px solid #444; padding: 8px 18px; border-radius: 20px; color: white; text-decoration: none; font-weight: bold; font-size: 13px; margin: 5px;">🎵 TikTok</a>
+                </div>
+
                 <span class="time-stamp">Leído ✓✓</span>
               </div>
               

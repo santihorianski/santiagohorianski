@@ -915,17 +915,10 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                 <span>Tu información de contacto se procesará de forma segura y confidencial.</span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem', background: 'var(--bg-card-elevated)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                <input 
-                  type="checkbox" 
-                  id="terms-checkbox" 
-                  checked={acceptedTerms} 
-                  onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer', accentColor: 'var(--primary)', flexShrink: 0 }}
-                />
-                <label htmlFor="terms-checkbox" style={{ fontSize: '0.9rem', color: 'var(--text-primary)', cursor: 'pointer', flex: 1, lineHeight: '1.5' }}>
-                  He leído y acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: 'var(--primary)', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '800' }}>Términos y Condiciones</button> para el tratamiento de mis datos y gestión del reclamo.
-                </label>
+              <div style={{ marginTop: '1.5rem', background: 'rgba(217, 160, 36, 0.05)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(217, 160, 36, 0.2)', textAlign: 'center' }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
+                  Al hacer clic en "Enviar Reclamo", declarás haber leído y aceptado de forma automática los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: 'var(--primary)', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '800' }}>Términos y Condiciones</button> para la gestión de este reporte.
+                </p>
               </div>
             </div>
           )}
@@ -987,8 +980,8 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                 type="submit" 
                 className="btn btn-primary wizard-btn-next"
                 onClick={handleSubmit}
-                disabled={isUploadingFile || !acceptedTerms}
-                style={{ opacity: (!acceptedTerms || isUploadingFile) ? 0.6 : 1, cursor: (!acceptedTerms || isUploadingFile) ? 'not-allowed' : 'pointer', flex: 1 }}
+                disabled={isUploadingFile}
+                style={{ opacity: isUploadingFile ? 0.6 : 1, cursor: isUploadingFile ? 'not-allowed' : 'pointer', flex: 1 }}
               >
                 {isUploadingFile ? 'Cargando...' : <>Enviar Reclamo <Check size={16} /></>}
               </button>

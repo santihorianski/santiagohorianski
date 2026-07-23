@@ -42,6 +42,7 @@ export default function Footer() {
               <li><Link to="/proyectos" onClick={handleNavClick}>Propuestas</Link></li>
               <li><Link to="/gestion" onClick={handleNavClick}>Gestión Territorial</Link></li>
               <li><Link to="/noticias" onClick={handleNavClick}>Prensa / Descargables</Link></li>
+              <li><Link to="/privacidad" onClick={handleNavClick}>Políticas de Privacidad</Link></li>
             </ul>
           </div>
 

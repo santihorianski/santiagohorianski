@@ -18,6 +18,7 @@ const ReportsPortal = lazy(() => import('./components/ReportsPortal'));
 const PressKit = lazy(() => import('./components/PressKit'));
 const AdminPanel = lazy(() => import('./components/AdminPanel'));
 const ReclamoPage = lazy(() => import('./components/ReclamoPage'));
+const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
 
 // Seed inicial de reportes
 const INITIAL_REPORTS = [
@@ -548,6 +549,7 @@ export default function App() {
             <Route path="/reclamo" element={<ReclamoPage onSubmitReport={handleAddReport} />} />
             <Route path="/noticias" element={<PressKit newsList={newsList} />} />
             <Route path="/contacto" element={<ContactPage />} />
+            <Route path="/privacidad" element={<PrivacyPolicy />} />
             <Route path="/login" element={<Navigate to="/admin" replace />} />
             <Route path="/admin" element={
               <AdminPanel 

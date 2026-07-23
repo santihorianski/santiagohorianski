@@ -96,15 +96,7 @@ export default function Header({ theme, toggleTheme }) {
               <span>{item.label}</span>
             </NavLink>
           ))}
-          <Link 
-            to="/admin"
-            onClick={handleNavClick}
-            className="mobile-nav-link mobile-nav-admin"
-            style={{ textDecoration: 'none' }}
-          >
-            <Lock size={20} className="mobile-nav-icon" />
-            <span>Acceso Administrador</span>
-          </Link>
+
         </nav>
         <div className="mobile-drawer-footer">
           <Link 

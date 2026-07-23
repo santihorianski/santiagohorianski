@@ -24,3 +24,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </HelmetProvider>
   </React.StrictMode>,
 )
+
+// Remove initial loader smoothly after mount
+const initialLoader = document.getElementById('initial-loader');
+if (initialLoader) {
+  setTimeout(() => {
+    initialLoader.style.opacity = '0';
+    setTimeout(() => {
+      initialLoader.remove();
+    }, 500); // Wait for transition
+  }, 100); // Small delay to ensure React has painted
+}

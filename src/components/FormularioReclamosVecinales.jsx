@@ -965,8 +965,8 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                   onChange={(e) => setAcceptedTerms(e.target.checked)}
                   style={{ width: '1.5rem', height: '1.5rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
                 />
-                <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '1.1rem', color: 'var(--text-primary)', cursor: 'pointer', margin: 0, fontWeight: '700' }}>
-                  Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: '4px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900' }}>Términos y Condiciones</button>
+                <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '1.1rem', color: '#ffffff', cursor: 'pointer', margin: 0, fontWeight: '700' }}>
+                  Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: '#ffffff', textDecoration: 'underline', textUnderlineOffset: '4px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900' }}>Términos y Condiciones</button>
                 </label>
               </div>
             )}

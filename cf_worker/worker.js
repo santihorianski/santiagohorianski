@@ -174,6 +174,7 @@ var worker_default = {
           <body>
             <div class="container">
               <div class="header">
+                <img src="https://santiagohorianski.com/favicon.png" alt="Logo Santiago Horianski" style="width: 80px; height: 80px; margin-bottom: 15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));" />
                 <h1>Reclamos con Santiago Horianski</h1>
                 <p style="margin: 10px 0 0 0; font-size: 15px; color: #f3d78c; font-weight: 500;">Tu voz en el Concejo</p>
               </div>

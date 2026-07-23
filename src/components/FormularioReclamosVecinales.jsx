@@ -636,12 +636,6 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                   );
                 })}
               </div>
-
-              {/* Scroll Indicator */}
-              <div className="scroll-indicator">
-                <span style={{ fontSize: '0.85rem', marginBottom: '0.2rem' }}>Más opciones abajo</span>
-                <ChevronDown size={20} />
-              </div>
             </div>
           )}
 
@@ -943,6 +937,13 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       {/* FIXED BOTTOM BAR WIZARD */}
       {!isSuccess && (
         <div className="wizard-bottom-bar">
+          {step === 1 && (
+            <div className="scroll-indicator" style={{ opacity: 1, fontWeight: 'bold' }}>
+              <span style={{ fontSize: '0.9rem', marginBottom: '0.2rem' }}>Deslizá para ver más opciones</span>
+              <ChevronDown size={24} />
+            </div>
+          )}
+          
           <div className="wizard-progress-bar">
             <div className="progress-line-bg">
               <div className="progress-line-fill" style={{ width: `${((step - 1) / 3) * 100}%` }}></div>

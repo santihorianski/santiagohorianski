@@ -635,7 +635,7 @@ input, textarea, select {
   align-items: center;
   justify-content: center;
   color: var(--primary);
-  opacity: 0.8;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
   animation: bounceDown 2s infinite;
   pointer-events: none;
   z-index: 50;

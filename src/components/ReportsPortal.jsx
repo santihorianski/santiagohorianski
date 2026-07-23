@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Search, MapPin, ThumbsUp, Check, MessageSquare, AlertCircle, Calendar, PlusCircle, Filter } from 'lucide-react';
 import santiagoImg from '../assets/santiago.jpg';
-import FormularioReclamosVecinales from './FormularioReclamosVecinales';
 
 const formatAnonymousName = (fullName) => {
   if (!fullName) return 'Vecino Anónimo';
@@ -69,9 +68,9 @@ const getStatusDetails = (report) => {
   }
 };
 
-export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
+export default function ReportsPortal({ reports, onUpvote }) {
   const location = useLocation();
-  const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const navigate = useNavigate();
   const [trackingInput, setTrackingInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todas');
@@ -208,7 +207,7 @@ export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
                   </button>
                 </form>
                 <button 
-                  onClick={() => setIsWizardOpen(true)}
+                  onClick={() => navigate('/reclamo')}
                   className="btn btn-primary" 
                   style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', boxShadow: '0 4px 15px rgba(217, 160, 36, 0.3)' }}
                 >
@@ -241,24 +240,7 @@ export default function ReportsPortal({ reports, onUpvote, onSubmitReport }) {
           </div>
         </div>
 
-        {/* Dashboard Stacked Layout */}
         <div className="portal-grid" style={{ display: 'flex', justifyContent: 'center' }}>
-          
-          {isWizardOpen && (
-            <FormularioReclamosVecinales 
-              onSubmitReport={(data) => {
-                onSubmitReport(data);
-                if (data.trackingCode) {
-                  setTrackingInput(data.trackingCode.toString());
-                  setSearchTerm(data.trackingCode.toString());
-                  setTimeout(() => {
-                    scrollToReports();
-                  }, 400);
-                }
-              }}
-              onClose={() => setIsWizardOpen(false)}
-            />
-          )}
 
           {/* Feed list & Filters */}
           <div className="portal-feed-container" style={{ width: '100%', maxWidth: '1000px' }}>

@@ -1,9 +1,21 @@
-import React, { useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useMemo, useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Eye, Edit3, Filter, MapPin } from 'lucide-react';
+import 'leaflet.heat';
+import { Eye, Edit3, Filter, MapPin, Layers } from 'lucide-react';
+
+function HeatmapLayer({ points }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!map) return;
+    const heat = L.heatLayer(points, { radius: 25, blur: 15, maxZoom: 15 }).addTo(map);
+    return () => map.removeLayer(heat);
+  }, [map, points]);
+  return null;
+}
+
 
 // Fix for default Leaflet icons in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -59,6 +71,7 @@ export default function AdminMap({ reports, onOpenDetail }) {
   const [filterCategory, setFilterCategory] = useState('Todas');
   const [filterStatus, setFilterStatus] = useState('Todos');
   const [showFilters, setShowFilters] = useState(false);
+  const [mapMode, setMapMode] = useState('markers'); // 'markers' | 'heatmap'
 
   // Mapeo de estados para visualización de pills
   const statusLabels = {
@@ -111,71 +124,83 @@ export default function AdminMap({ reports, onOpenDetail }) {
   return (
     <div className="relative w-full h-full flex flex-col font-sans" style={{ minHeight: '450px' }}>
       
-      {/* Botón flotante de Filtros */}
-      <button 
-        onClick={() => setShowFilters(!showFilters)}
-        className="absolute top-2 right-2 z-[1000] flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/90 text-white text-xs border border-slate-700 shadow-lg hover:bg-slate-800 transition"
-      >
-        <Filter size={14} />
-        Filtros {filterCategory !== 'Todas' || filterStatus !== 'Todos' ? '(Activos)' : ''}
-      </button>
+      {/* Botones Flotantes Superiores */}
+      <div className="absolute top-4 right-4 z-[1000] flex gap-3">
+        <button 
+          onClick={() => setMapMode(mapMode === 'markers' ? 'heatmap' : 'markers')}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/90 backdrop-blur-md text-slate-700 text-sm font-semibold border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-white transition-all duration-300 hover:scale-105"
+          title="Alternar Modo de Mapa"
+        >
+          <Layers size={16} className={mapMode === 'heatmap' ? 'text-indigo-600' : 'text-slate-500'} />
+          {mapMode === 'markers' ? 'Ver Mapa de Calor' : 'Ver Marcadores'}
+        </button>
+        <button 
+          onClick={() => setShowFilters(!showFilters)}
+          className={`relative flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md text-sm font-semibold border shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 hover:scale-105 ${showFilters ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-white/90 border-white/50 text-slate-700 hover:bg-white'}`}
+        >
+          <Filter size={16} />
+          Filtros {filterCategory !== 'Todas' || filterStatus !== 'Todos' ? <span className="flex h-2.5 w-2.5 rounded-full bg-red-500 absolute -top-1 -right-1 shadow-sm border border-white border-2"></span> : ''}
+        </button>
+      </div>
 
       {/* Panel flotante de Filtros */}
       {showFilters && (
-        <div className="absolute top-12 right-2 z-[1000] p-4 rounded-xl bg-slate-900/95 border border-slate-700 shadow-2xl text-white text-xs w-64 animate-fade-in flex flex-col gap-3">
-          <h4 className="font-bold text-slate-200 border-b border-slate-700 pb-1.5 flex items-center gap-1.5">
-            <Filter size={12} /> Filtrar en Mapa
+        <div className="absolute top-16 right-4 z-[1000] p-5 rounded-2xl bg-white/95 backdrop-blur-xl border border-white shadow-[0_20px_40px_rgb(0,0,0,0.15)] text-slate-700 text-sm w-72 animate-fade-in flex flex-col gap-4">
+          <h4 className="font-bold text-slate-800 border-b border-slate-200 pb-2 flex items-center gap-2 text-base">
+            <Filter size={16} className="text-indigo-600" /> Filtrar Reclamos
           </h4>
           
-          <div>
-            <label className="text-slate-400 block mb-1">Categoría</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-slate-500 font-medium text-xs uppercase tracking-wider">Categoría</label>
             <select 
               value={filterCategory} 
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 text-white rounded p-1.5 outline-none"
+              className="w-full bg-slate-50/50 border border-slate-200 text-slate-700 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer hover:bg-slate-50 font-medium"
             >
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
 
-          <div>
-            <label className="text-slate-400 block mb-1">Estado de Gestión</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-slate-500 font-medium text-xs uppercase tracking-wider">Estado de Gestión</label>
             <select 
               value={filterStatus} 
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 text-white rounded p-1.5 outline-none"
+              className="w-full bg-slate-50/50 border border-slate-200 text-slate-700 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer hover:bg-slate-50 font-medium"
             >
               {statuses.map(st => (
                 <option key={st} value={st}>
-                  {st === 'Todos' ? 'Todos' : statusLabels[st]?.text || st}
+                  {st === 'Todos' ? 'Todos los Estados' : statusLabels[st]?.text || st}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="text-slate-400 text-[10px] mt-1">
-            Mostrando <strong>{filteredReports.length}</strong> de {processedReports.length} reclamos.
+          <div className="text-slate-500 text-xs mt-2 bg-slate-100/50 p-3 rounded-xl border border-slate-100 flex justify-between items-center font-medium">
+            <span>Resultados de Búsqueda:</span>
+            <strong className="text-indigo-600 text-base">{filteredReports.length}</strong>
           </div>
         </div>
       )}
 
       {/* Contenedor del Mapa Leaflet */}
-      <div className="w-full h-full flex-1 rounded-xl overflow-hidden relative">
+      <div className="w-full h-full flex-1 rounded-2xl overflow-hidden relative shadow-[inset_0_2px_10px_rgba(0,0,0,0.05)] border border-slate-200">
         <MapContainer 
           center={POSADAS_CENTER} 
           zoom={13} 
           minZoom={12}
           maxBounds={POSADAS_BOUNDS}
           maxBoundsViscosity={1.0}
-          style={{ height: '100%', width: '100%', minHeight: '400px' }}
+          style={{ height: '100%', width: '100%', minHeight: '500px' }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           />
           
-          <MarkerClusterGroup
-            chunkedLoading
+          {mapMode === 'markers' ? (
+            <MarkerClusterGroup
+              chunkedLoading
             maxClusterRadius={45}
             spiderfyOnMaxZoom={true}
           >
@@ -187,53 +212,60 @@ export default function AdminMap({ reports, onOpenDetail }) {
                   position={[report.lat, report.lng]}
                   icon={getCategoryIcon(report.category)}
                 >
-                  <Popup>
-                    <div className="font-sans text-slate-800 w-64 p-0.5">
-                      <div className="flex justify-between items-start gap-2 mb-2">
-                        <strong className="block text-slate-900 text-sm font-bold leading-tight flex-1">
+                  <Popup className="premium-popup">
+                    <div className="font-sans text-slate-800 w-[280px] p-1 flex flex-col gap-3">
+                      
+                      {/* Header */}
+                      <div className="flex justify-between items-start gap-3">
+                        <strong className="block text-slate-800 text-[15px] font-extrabold leading-tight flex-1" style={{ letterSpacing: '-0.01em' }}>
                           {report.title}
                         </strong>
                         <span 
-                          style={{ color: statusInfo.color, backgroundColor: statusInfo.bg }}
-                          className="text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase shrink-0"
+                          style={{ color: statusInfo.color, backgroundColor: statusInfo.bg, border: `1px solid ${statusInfo.color}30` }}
+                          className="text-[10px] px-2 py-1 rounded-full font-bold uppercase shrink-0 shadow-sm"
                         >
                           {statusInfo.text}
                         </span>
                       </div>
 
-                      <div className="flex gap-2 items-center text-xs text-slate-500 mb-2">
-                        <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-semibold">
+                      {/* Meta */}
+                      <div className="flex gap-2 items-center text-[11px] font-medium text-slate-500">
+                        <span className="bg-slate-100 px-2 py-1 rounded-md text-slate-700 border border-slate-200 shadow-sm">
                           {report.category || 'Reclamo'}
                         </span>
-                        <span className="font-mono">#{report.trackingCode || '----'}</span>
+                        <span className="bg-slate-50 px-2 py-1 rounded-md border border-slate-200">
+                          ID: <span className="font-mono text-slate-700">#{report.trackingCode || report.id}</span>
+                        </span>
                       </div>
 
-                      <div className="flex items-start gap-1.5 text-xs text-slate-600 mb-2.5">
-                        <MapPin size={12} className="text-slate-400 mt-0.5 shrink-0" />
-                        <span>{report.location}</span>
+                      {/* Location */}
+                      <div className="flex items-start gap-1.5 text-xs text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                        <MapPin size={14} className="text-indigo-500 shrink-0 mt-0.5" />
+                        <span className="leading-snug">{report.location}</span>
                       </div>
 
                       {/* Vista previa de foto si existe */}
                       {report.photos && report.photos.length > 0 && (
-                        <div className="mb-2.5 w-full h-20 rounded-lg overflow-hidden border border-slate-200">
+                        <div className="w-full h-32 rounded-xl overflow-hidden border border-slate-200 shadow-sm relative group">
                           <img 
                             src={report.photos[0].preview} 
                             alt="Previsualización" 
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </div>
                       )}
 
-                      <p className="text-xs text-slate-500 italic bg-slate-50 p-2 rounded border border-slate-100 mb-3 max-h-16 overflow-y-auto">
+                      <p className="text-sm text-slate-600 bg-slate-50/80 p-3 rounded-xl border border-slate-100 max-h-24 overflow-y-auto leading-relaxed italic">
                         "{report.description || 'Sin descripción adicional.'}"
                       </p>
 
                       {onOpenDetail && (
                         <button 
                           onClick={() => onOpenDetail(report)}
-                          className="w-full py-1.5 flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md transition"
+                          className="w-full mt-1 py-2.5 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:-translate-y-0.5 transition-all duration-300"
                         >
-                          <Edit3 size={12} />
+                          <Edit3 size={16} />
                           Gestionar Reclamo
                         </button>
                       )}
@@ -243,17 +275,23 @@ export default function AdminMap({ reports, onOpenDetail }) {
               );
             })}
           </MarkerClusterGroup>
+          ) : (
+            <HeatmapLayer points={filteredReports.map(rep => [rep.lat, rep.lng, 1])} />
+          )}
         </MapContainer>
-      </div>
 
-      {/* Leyenda e Indicadores */}
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-slate-400 border-t border-slate-800/20 pt-3">
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-500 block shrink-0"></span> Calles y Asfalto</div>
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-orange-500 block shrink-0"></span> Iluminación</div>
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-green-500 block shrink-0"></span> Espacios Verdes</div>
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 block shrink-0"></span> Seguridad</div>
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-500 block shrink-0"></span> Limpieza / Residuos</div>
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-yellow-500 block shrink-0"></span> Tránsito</div>
+        {/* Leyenda Flotante (Glassmorphism) */}
+        <div className="absolute bottom-6 left-6 z-[1000] bg-white/90 backdrop-blur-xl p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 animate-fade-in hidden sm:block">
+          <h5 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center gap-1.5"><MapPin size={12} className="text-indigo-600"/> Leyenda de Categorías</h5>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-[11px] font-medium text-slate-600">
+            <div className="flex items-center gap-2 hover:text-slate-900 transition-colors cursor-default"><span className="w-3 h-3 rounded-full shadow-sm" style={{ background: 'linear-gradient(135deg, #fca5a5, #ef4444)' }}></span> Calles y Asfalto</div>
+            <div className="flex items-center gap-2 hover:text-slate-900 transition-colors cursor-default"><span className="w-3 h-3 rounded-full shadow-sm" style={{ background: 'linear-gradient(135deg, #fdba74, #f97316)' }}></span> Iluminación</div>
+            <div className="flex items-center gap-2 hover:text-slate-900 transition-colors cursor-default"><span className="w-3 h-3 rounded-full shadow-sm" style={{ background: 'linear-gradient(135deg, #86efac, #22c55e)' }}></span> Espacios Verdes</div>
+            <div className="flex items-center gap-2 hover:text-slate-900 transition-colors cursor-default"><span className="w-3 h-3 rounded-full shadow-sm" style={{ background: 'linear-gradient(135deg, #93c5fd, #3b82f6)' }}></span> Seguridad</div>
+            <div className="flex items-center gap-2 hover:text-slate-900 transition-colors cursor-default"><span className="w-3 h-3 rounded-full shadow-sm" style={{ background: 'linear-gradient(135deg, #d8b4fe, #a855f7)' }}></span> Residuos</div>
+            <div className="flex items-center gap-2 hover:text-slate-900 transition-colors cursor-default"><span className="w-3 h-3 rounded-full shadow-sm" style={{ background: 'linear-gradient(135deg, #fde047, #eab308)' }}></span> Tránsito</div>
+          </div>
+        </div>
       </div>
     </div>
   );

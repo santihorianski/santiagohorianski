@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Lock, LogOut, Check, Search, MapPin, Eye, Calendar, AlertCircle, FileText, Phone, MessageSquare, ExternalLink, ShieldCheck, Trash2, Clock, EyeOff, Edit3, X, Download, RefreshCw, Copy, Plus, Image, ZoomIn } from 'lucide-react';
+import { Lock, LogOut, Check, Search, MapPin, Eye, Calendar, AlertCircle, FileText, Phone, MessageSquare, ExternalLink, ShieldCheck, Trash2, Clock, EyeOff, Edit3, X, Download, RefreshCw, Copy, Plus, Image, ZoomIn, List, Grid, Inbox, Activity, CheckCircle, TrendingUp } from 'lucide-react';
 import { SignedIn, SignedOut, SignIn, UserButton, useUser } from '@clerk/clerk-react';
 import santiagoImg from '../assets/santiago.jpg';
 import { generateLegislativeProject } from '../utils/wordGenerator';
@@ -28,12 +28,84 @@ export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, on
 
   // Tab state
   const [activeTab, setActiveTab] = useState('reclamos'); // 'reclamos' | 'noticias' | 'mapa' | 'whatsapp'
+  const [newsTab, setNewsTab] = useState('write'); // 'write' | 'preview'
   
   const pdfRef = useRef(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isSendingWA, setIsSendingWA] = useState(false);
+  // WhatsApp Inbox states
+  const [whatsappMessages, setWhatsappMessages] = useState([]);
+  const [isLoadingWA, setIsLoadingWA] = useState(false);
+  const [replyText, setReplyText] = useState({});
 
-  // WhatsApp (Evolution API) config states
+  const fetchWhatsappMessages = async () => {
+    setIsLoadingWA(true);
+    try {
+      const { supabase, isSupabaseConfigured } = await import('../supabaseClient');
+      if (isSupabaseConfigured) {
+        const { data, error } = await supabase
+          .from('whatsapp_messages')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data) {
+          setWhatsappMessages(data);
+        }
+      }
+    } catch (e) {
+      console.error("Error fetching WA:", e);
+    }
+    setIsLoadingWA(false);
+  };
+
+  useEffect(() => {
+    let subscription = null;
+    if (activeTab === 'whatsapp') {
+      fetchWhatsappMessages();
+
+      import('../supabaseClient').then(({ supabase, isSupabaseConfigured }) => {
+        if (isSupabaseConfigured) {
+          subscription = supabase
+            .channel('whatsapp-channel')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'whatsapp_messages' }, payload => {
+              setWhatsappMessages(prev => [payload.new, ...prev]);
+            })
+            .subscribe();
+        }
+      });
+    }
+
+    return () => {
+      if (subscription) {
+        import('../supabaseClient').then(({ supabase }) => {
+          supabase.removeChannel(subscription);
+        });
+      }
+    };
+  }, [activeTab]);
+
+  const handleSendReply = async (phoneTo) => {
+    const text = replyText[phoneTo];
+    if (!text) return;
+    
+    setIsSendingWA(true);
+    try {
+      const res = await fetch('https://buzon-ciudadano-mail-api.horianskiseguros.workers.dev/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: phoneTo, text })
+      });
+      if (res.ok) {
+        setReplyText(prev => ({ ...prev, [phoneTo]: '' }));
+        fetchWhatsappMessages();
+      } else {
+        alert("Error al enviar mensaje");
+      }
+    } catch (e) {
+      alert("Error de conexión");
+    }
+    setIsSendingWA(false);
+  };
+
   const [apiBaseUrlInput, setApiBaseUrlInput] = useState(() => localStorage.getItem('override_evolution_api_url') || '');
   const [instanceNameInput, setInstanceNameInput] = useState(() => localStorage.getItem('override_evolution_instance_name') || '');
   const [apiKeyInput, setApiKeyInput] = useState(() => localStorage.getItem('override_evolution_api_key') || '');
@@ -169,6 +241,7 @@ export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, on
 
   // Dashboard states
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('table'); // 'table' | 'grid'
   const [statusFilter, setStatusFilter] = useState('Todos');
   const [categoryFilter, setCategoryFilter] = useState('Todas');
   const [selectedReport, setSelectedReport] = useState(null);
@@ -504,7 +577,14 @@ Párrafo final o conclusión de la noticia.`);
   };
 
   const formatDate = (dateStr) => {
-    const d = new Date(dateStr);
+    if (!dateStr) return '';
+    let d;
+    if (dateStr.toDate && typeof dateStr.toDate === 'function') {
+      d = dateStr.toDate();
+    } else {
+      d = new Date(dateStr);
+    }
+    if (isNaN(d)) return '';
     return d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
@@ -717,6 +797,67 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location + ', Posadas, Misiones')}`;
   };
 
+  // Funciones auxiliares para el editor de Noticias
+  const insertMarkdown = (syntax) => {
+    const textarea = document.getElementById('news-content-textarea');
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = newsContent;
+    let newText = text;
+    let newCursorPos = start;
+
+    if (syntax === 'bold') {
+      newText = text.substring(0, start) + '**' + text.substring(start, end) + '**' + text.substring(end);
+      newCursorPos = start + 2;
+    } else if (syntax === 'italic') {
+      newText = text.substring(0, start) + '_' + text.substring(start, end) + '_' + text.substring(end);
+      newCursorPos = start + 1;
+    } else if (syntax === 'list') {
+      newText = text.substring(0, start) + '\n- ' + text.substring(start, end) + text.substring(end);
+      newCursorPos = start + 3;
+    } else if (syntax === 'quote') {
+      newText = text.substring(0, start) + '\n> ' + text.substring(start, end) + text.substring(end);
+      newCursorPos = start + 3;
+    }
+    
+    setNewsContent(newText);
+    setTimeout(() => {
+      textarea.focus();
+      if (start === end) {
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+      }
+    }, 0);
+  };
+
+  const renderContentPreview = (text) => {
+    if (!text) return <p style={{ color: 'var(--text-muted)' }}>La vista previa aparecerá aquí...</p>;
+    const blocks = text.split(/\n\s*\n/);
+    return blocks.map((block, index) => {
+      const trimmedBlock = block.trim();
+      if (trimmedBlock.startsWith('> ')) {
+        return <blockquote key={index} style={{ borderLeft: '4px solid var(--primary)', paddingLeft: '1rem', fontStyle: 'italic', color: 'var(--text-secondary)', background: 'var(--overlay-light)', padding: '0.5rem 1rem', borderRadius: '0 8px 8px 0' }}>{trimmedBlock.replace(/^>\s*/, '')}</blockquote>;
+      }
+      if (trimmedBlock.includes('\n- ') || trimmedBlock.startsWith('- ')) {
+        const lines = trimmedBlock.split('\n');
+        const listItems = lines.filter(l => l.trim().startsWith('- ')).map((l, i) => {
+          const content = l.replace(/^- /, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+          return <li key={i} dangerouslySetInnerHTML={{__html: content}} style={{ marginLeft: '1.5rem', marginBottom: '0.5rem' }}></li>;
+        });
+        const titleLines = lines.filter(l => !l.trim().startsWith('- '));
+        const titleContent = titleLines.join(' ').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        return (
+          <div key={index} style={{ marginBottom: '1rem' }}>
+            {titleContent && <h5 dangerouslySetInnerHTML={{__html: titleContent}} style={{ marginBottom: '0.5rem', fontSize: '1.1rem' }}></h5>}
+            <ul style={{ listStyleType: 'disc' }}>{listItems}</ul>
+          </div>
+        );
+      }
+      const htmlContent = trimmedBlock.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/_(.*?)_/g, '<em>$1</em>');
+      return <p key={index} dangerouslySetInnerHTML={{__html: htmlContent}} style={{ marginBottom: '1rem', lineHeight: '1.6' }}></p>;
+    });
+  };
+
   return (
     <>
       <Helmet>
@@ -810,6 +951,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 className={`btn ${activeTab === 'mapa' ? 'btn-primary' : 'btn-secondary'}`}
               >Mapa Interactivo</button>
 
+
             </div>
           </div>
         </div>
@@ -817,26 +959,51 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
         {activeTab === 'reclamos' && (
           <>
             {/* Dashboard KPIs Grid */}
-            <div className="admin-kpis-grid">
-              <div className="kpi-card card glass-panel">
-                <span className="kpi-num gradient-text">{totalReports}</span>
-                <span className="kpi-label">Reclamos Recibidos</span>
+            <div className="admin-kpis-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+              
+              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.15)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
+                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><Inbox size={48} /></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                  <Inbox size={16} className="text-indigo-400" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Recibidos</span>
+                </div>
+                <span style={{ fontSize: '2.5rem', fontWeight: 800, background: 'linear-gradient(to right, #a8c0ff, #3f2b96)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1 }}>{totalReports}</span>
               </div>
-              <div className="kpi-card card glass-panel" style={{ borderColor: 'rgba(239, 68, 68, 0.2)' }}>
-                <span className="kpi-num" style={{ color: 'var(--danger)' }}>{receivedReports}</span>
-                <span className="kpi-label">Pendientes (Recibidos)</span>
+
+              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
+                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><AlertCircle size={48} color="var(--danger)" /></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                  <AlertCircle size={16} color="var(--danger)" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pendientes</span>
+                </div>
+                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--danger)', lineHeight: 1 }}>{receivedReports}</span>
               </div>
-              <div className="kpi-card card glass-panel" style={{ borderColor: 'rgba(116, 59, 188, 0.2)' }}>
-                <span className="kpi-num" style={{ color: 'var(--warning)' }}>{reviewReports}</span>
-                <span className="kpi-label">En Trámite Legislativo</span>
+
+              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(168, 85, 247, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
+                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><Activity size={48} color="var(--warning)" /></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                  <Activity size={16} color="var(--warning)" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>En Trámite</span>
+                </div>
+                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--warning)', lineHeight: 1 }}>{reviewReports}</span>
               </div>
-              <div className="kpi-card card glass-panel" style={{ borderColor: 'rgba(16, 185, 129, 0.2)' }}>
-                <span className="kpi-num" style={{ color: 'var(--success)' }}>{resolvedReports}</span>
-                <span className="kpi-label">Proyectos Aprobados</span>
+
+              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(16, 185, 129, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
+                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><CheckCircle size={48} color="var(--success)" /></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                  <CheckCircle size={16} color="var(--success)" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Aprobados</span>
+                </div>
+                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--success)', lineHeight: 1 }}>{resolvedReports}</span>
               </div>
-              <div className="kpi-card card glass-panel" style={{ borderColor: 'rgba(116, 59, 188, 0.2)' }}>
-                <span className="kpi-num" style={{ color: '#c4a7e7' }}>{calculateAverageResolutionTime()}</span>
-                <span className="kpi-label">Tiempo Promedio Resolución</span>
+
+              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(116, 59, 188, 0.08), rgba(116, 59, 188, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(116, 59, 188, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
+                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><TrendingUp size={48} color="#c4a7e7" /></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                  <TrendingUp size={16} color="#c4a7e7" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Resolución</span>
+                </div>
+                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: '#c4a7e7', lineHeight: 1 }}>{calculateAverageResolutionTime()}</span>
               </div>
             </div>
 
@@ -885,6 +1052,14 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                     <option value="aprobado">Aprobado</option>
                   </select>
                 </div>
+
+                <div className="filter-select-group">
+                  <label>Vista:</label>
+                  <div style={{ display: 'flex', background: 'var(--bg-base)', borderRadius: '6px', padding: '2px' }}>
+                    <button onClick={() => setViewMode('table')} className={`btn-sm ${viewMode === 'table' ? 'bg-white shadow-sm' : 'text-gray-500'}`} style={{ padding: '4px 8px', borderRadius: '4px', border: 'none', background: viewMode === 'table' ? 'var(--primary)' : 'transparent', color: viewMode === 'table' ? 'white' : 'var(--text-muted)', cursor: 'pointer' }} title="Vista Tabla"><List size={16} /></button>
+                    <button onClick={() => setViewMode('grid')} className={`btn-sm ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-500'}`} style={{ padding: '4px 8px', borderRadius: '4px', border: 'none', background: viewMode === 'grid' ? 'var(--primary)' : 'transparent', color: viewMode === 'grid' ? 'white' : 'var(--text-muted)', cursor: 'pointer' }} title="Vista Grilla (Tarjetas)"><Grid size={16} /></button>
+                  </div>
+                </div>
                 
                 <button 
                   onClick={handleRefresh} 
@@ -897,93 +1072,156 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
               </div>
             </div>
 
-            {/* Table */}
-            <div className="admin-table-wrapper glass-panel">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>ID / Nº</th>
-                    <th>Fecha</th>
-                    <th>Código Vecino</th>
-                    <th>Vecino</th>
-                    <th>Categoría</th>
-                    <th>Ubicación / Barrio</th>
-                    <th>Estado Interno</th>
-                    <th>Visibilidad</th>
-                    <th>Acción</th>
-                  </tr>
-                </thead>
-                <tbody>
+            {/* Table / Grid */}
+            <div className="admin-table-wrapper glass-panel" style={viewMode === 'grid' ? { background: 'transparent', border: 'none', padding: 0 } : {}}>
+              {viewMode === 'table' ? (
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>ID / Nº</th>
+                      <th>Fecha</th>
+                      <th>Código Vecino</th>
+                      <th>Vecino</th>
+                      <th>Categoría</th>
+                      <th>Ubicación / Barrio</th>
+                      <th>Estado Interno</th>
+                      <th>Visibilidad</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredReports.map((rep) => {
+                      const statusDetails = getStatusDetails(rep);
+                      return (
+                        <tr key={rep.id} className="table-row-item">
+                          <td data-label="ID / Nº" className="font-display-bold" style={{ color: 'var(--text-muted)' }}>
+                            # {rep.id}
+                          </td>
+                          <td data-label="Fecha" className="td-date">
+                            <div className="date-wrapper">
+                              <Calendar size={12} />
+                              <span>{formatDate(rep.createdAt)}</span>
+                            </div>
+                          </td>
+                          <td data-label="Código" className="font-display-bold" style={{ color: 'var(--primary)' }}>
+                            {rep.trackingCode || '----'}
+                          </td>
+                          <td data-label="Vecino" className="td-name font-display-bold">
+                            {rep.anonymousName || 'Vecino Anónimo'}
+                          </td>
+                          <td data-label="Categoría" className="td-cat">
+                            <span className="badge badge-accent">{rep.category}</span>
+                          </td>
+                          <td data-label="Ubicación" className="td-loc">
+                            <div className="location-text-wrap" title={rep.location}>
+                              <MapPin size={12} className="loc-icon" />
+                              <span>{rep.location}</span>
+                            </div>
+                          </td>
+                          <td data-label="Estado">
+                            <span className={`badge ${statusDetails.badgeClass}`}>
+                              {statusDetails.shortText}
+                            </span>
+                          </td>
+                          <td data-label="Visibilidad">
+                            {rep.isVisible !== false ? (
+                              <span className="badge admin-badge-publicado">Publicado</span>
+                            ) : (
+                              <span className="badge admin-badge-oculto">Oculto</span>
+                            )}
+                          </td>
+                          <td data-label="Acción" style={{ display: 'flex', gap: '0.5rem' }}>
+                            {userRole === 'admin' && (
+                              <>
+                                <button onClick={() => handleToggleReportVisibility(rep.id)} className="action-btn-circle outline" title={rep.isVisible !== false ? "Ocultar al público" : "Hacer visible"}>
+                                  {rep.isVisible !== false ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                                <button onClick={() => handleDelete(rep.id)} className="action-btn-circle danger" title="Eliminar definitivamente">
+                                  <Trash2 size={16} />
+                                </button>
+                              </>
+                            )}
+                            {rep.phone && (
+                              <>
+                                <a href={getWhatsAppLink(rep)} target="_blank" rel="noopener noreferrer" className="btn btn-table-action" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '0.35rem 0.5rem', display: 'inline-flex', alignItems: 'center' }} title="Enviar WhatsApp Manual">
+                                  <Phone size={14} />
+                                </a>
+                                <button onClick={() => handleCopyMessage(rep)} className="btn btn-secondary btn-table-action" style={{ padding: '0.35rem 0.5rem' }} title="Copiar estado para enviar">
+                                  <Copy size={14} />
+                                </button>
+                              </>
+                            )}
+                            <button onClick={() => handleOpenDetail(rep)} className="btn btn-secondary btn-table-action" style={{ padding: '0.35rem 0.5rem' }} title="Gestionar detalle">
+                              <Edit3 size={14} />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="reclamos-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
                   {filteredReports.map((rep) => {
                     const statusDetails = getStatusDetails(rep);
+                    let photoUrl = null;
+                    if (rep.photos && rep.photos.length > 0) {
+                      photoUrl = rep.photos[0];
+                    }
                     return (
-                      <tr key={rep.id} className="table-row-item">
-                        <td data-label="ID / Nº" className="font-display-bold" style={{ color: 'var(--text-muted)' }}>
-                          # {rep.id}
-                        </td>
-                        <td data-label="Fecha" className="td-date">
-                          <div className="date-wrapper">
-                            <Calendar size={12} />
-                            <span>{formatDate(rep.createdAt)}</span>
+                      <div key={rep.id} className="reclamo-card card glass-panel" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        {photoUrl && (
+                          <div style={{ height: '180px', width: '100%', overflow: 'hidden', position: 'relative' }}>
+                            <img src={photoUrl} alt="Evidencia" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+                              <span className={`badge ${statusDetails.badgeClass}`} style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+                                {statusDetails.shortText}
+                              </span>
+                            </div>
                           </div>
-                        </td>
-                        <td data-label="Código" className="font-display-bold" style={{ color: 'var(--primary)' }}>
-                          {rep.trackingCode || '----'}
-                        </td>
-                        <td data-label="Vecino" className="td-name font-display-bold">
-                          {rep.anonymousName || 'Vecino Anónimo'}
-                        </td>
-                        <td data-label="Categoría" className="td-cat">
-                          <span className="badge badge-accent">{rep.category}</span>
-                        </td>
-                        <td data-label="Ubicación" className="td-loc">
-                          <div className="location-text-wrap" title={rep.location}>
-                            <MapPin size={12} className="loc-icon" />
-                            <span>{rep.location}</span>
+                        )}
+                        <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                          {!photoUrl && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                              <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600 }}># {rep.id}</span>
+                              <span className={`badge ${statusDetails.badgeClass}`}>
+                                {statusDetails.shortText}
+                              </span>
+                            </div>
+                          )}
+                          {photoUrl && (
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}># {rep.id}</div>
+                          )}
+                          
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                            <Calendar size={14} /> <span>{formatDate(rep.createdAt)}</span>
                           </div>
-                        </td>
-                        <td data-label="Estado">
-                          <span className={`badge ${statusDetails.badgeClass}`}>
-                            {statusDetails.shortText}
-                          </span>
-                        </td>
-                        <td data-label="Visibilidad">
-                          {rep.isVisible !== false ? (
-                            <span className="badge admin-badge-publicado">Publicado</span>
-                          ) : (
-                            <span className="badge admin-badge-oculto">Oculto</span>
-                          )}
-                        </td>
-                        <td data-label="Acción" style={{ display: 'flex', gap: '0.5rem' }}>
-                          {userRole === 'admin' && (
-                            <>
-                              <button onClick={() => handleToggleReportVisibility(rep.id)} className="action-btn-circle outline" title={rep.isVisible !== false ? "Ocultar al público" : "Hacer visible"}>
-                                {rep.isVisible !== false ? <EyeOff size={16} /> : <Eye size={16} />}
+                          
+                          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: 'var(--text-primary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{rep.description}</h4>
+                          
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0.5rem 0', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                            <MapPin size={14} style={{ color: 'var(--primary)' }} /> <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{rep.location}</span>
+                          </div>
+                          
+                          <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--overlay-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span className="badge badge-accent" style={{ fontSize: '0.75rem' }}>{rep.category}</span>
+                            <div style={{ display: 'flex', gap: '0.4rem' }}>
+                              <button onClick={() => handleOpenDetail(rep)} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem', borderRadius: '6px' }} title="Gestionar detalle">
+                                <Edit3 size={16} />
                               </button>
-                              <button onClick={() => handleDelete(rep.id)} className="action-btn-circle danger" title="Eliminar definitivamente">
-                                <Trash2 size={16} />
-                              </button>
-                            </>
-                          )}
-                          {rep.phone && (
-                            <>
-                              <a href={getWhatsAppLink(rep)} target="_blank" rel="noopener noreferrer" className="btn btn-table-action" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '0.35rem 0.5rem', display: 'inline-flex', alignItems: 'center' }} title="Enviar WhatsApp Manual">
-                                <Phone size={14} />
-                              </a>
-                              <button onClick={() => handleCopyMessage(rep)} className="btn btn-secondary btn-table-action" style={{ padding: '0.35rem 0.5rem' }} title="Copiar estado para enviar">
-                                <Copy size={14} />
-                              </button>
-                            </>
-                          )}
-                          <button onClick={() => handleOpenDetail(rep)} className="btn btn-secondary btn-table-action" style={{ padding: '0.35rem 0.5rem' }} title="Gestionar detalle">
-                            <Edit3 size={14} />
-                          </button>
-                        </td>
-                      </tr>
+                              {userRole === 'admin' && (
+                                <button onClick={() => handleDelete(rep.id)} className="btn btn-sm" style={{ padding: '0.4rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', border: 'none' }} title="Eliminar">
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     );
                   })}
-                </tbody>
-              </table>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -1179,7 +1417,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                               <div key={idx} style={{ position: 'relative' }}>
                                 <div style={{ position: 'absolute', left: '-1.65rem', top: '0.2rem', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--primary)', border: '2px solid var(--bg-card)' }}></div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
-                                  {new Date(historyItem.date).toLocaleString()}
+                                  {formatDate(historyItem.date)}
                                 </div>
                                 <div style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: '600' }}>
                                   {historyItem.status === 'recibido' && 'Recibido por secretaría'}
@@ -1237,40 +1475,69 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
               <div className="news-form-card glass-panel fade-in">
                 <h4>{currentNewsId ? 'Editar Noticia' : 'Crear Nueva Noticia'}</h4>
                 <form onSubmit={handleSaveNewsSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>
-                  <div className="form-group">
-                    <label>Título de la Noticia</label>
-                    <input type="text" value={newsTitle} onChange={(e) => setNewsTitle(e.target.value)} className="form-input" required placeholder="Ej: Nueva sesión del concejo..." />
-                  </div>
-                  <div className="form-group">
-                    <label>Fecha de Publicación</label>
-                    <input type="date" value={newsDate} onChange={(e) => setNewsDate(e.target.value)} className="form-input" required />
-                  </div>
-                  <div className="form-group">
-                    <label>Contenido (Soporta Markdown)</label>
-                    <textarea value={newsContent} onChange={(e) => setNewsContent(e.target.value)} className="form-textarea" rows="10" required></textarea>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>Usa **negrita**, - listas, y doble salto de línea para párrafos.</p>
-                  </div>
-                  <div className="form-group">
-                    <label>Imagen de Portada</label>
-                    <div style={{ border: '2px dashed var(--overlay-medium)', padding: '2rem', textAlign: 'center', borderRadius: '12px', background: 'var(--overlay-light)' }}>
-                      {newsImage ? (
-                        <div style={{ position: 'relative', display: 'inline-block' }}>
-                          <img src={newsImage} alt="Preview" style={{ maxHeight: '200px', borderRadius: '8px' }} />
-                          <button type="button" onClick={() => setNewsImage(null)} className="action-btn-circle danger" style={{ position: 'absolute', top: '-10px', right: '-10px' }}>
-                            <Trash2 size={14} />
-                          </button>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                    {/* Columna Izquierda: Metadatos e Imagen */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      <div className="form-group">
+                        <label>Título de la Noticia</label>
+                        <input type="text" value={newsTitle} onChange={(e) => setNewsTitle(e.target.value)} className="form-input" required placeholder="Ej: Nueva sesión del concejo..." />
+                      </div>
+                      <div className="form-group">
+                        <label>Fecha de Publicación</label>
+                        <input type="date" value={newsDate} onChange={(e) => setNewsDate(e.target.value)} className="form-input" required />
+                      </div>
+                      <div className="form-group">
+                        <label>Imagen de Portada</label>
+                        <div style={{ border: '2px dashed var(--overlay-medium)', padding: '2rem', textAlign: 'center', borderRadius: '12px', background: 'var(--overlay-light)' }}>
+                          {newsImage ? (
+                            <div style={{ position: 'relative', display: 'inline-block' }}>
+                              <img src={newsImage} alt="Preview" style={{ maxHeight: '180px', borderRadius: '8px' }} />
+                              <button type="button" onClick={() => setNewsImage(null)} className="action-btn-circle danger" style={{ position: 'absolute', top: '-10px', right: '-10px' }}>
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <Image size={32} style={{ color: 'var(--text-muted)', margin: '0 auto 1rem auto' }} />
+                              <p style={{ marginBottom: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Arrastrá una imagen o hacé clic para seleccionar</p>
+                              <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} id="news-img-upload" />
+                              <label htmlFor="news-img-upload" className="btn btn-secondary btn-sm" style={{ display: 'inline-block', cursor: 'pointer' }}>Seleccionar Archivo</label>
+                            </>
+                          )}
                         </div>
-                      ) : (
+                      </div>
+                    </div>
+
+                    {/* Columna Derecha: Editor */}
+                    <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <label style={{ margin: 0 }}>Contenido de la Noticia</label>
+                        <div style={{ display: 'flex', background: 'var(--bg-base)', borderRadius: '6px', padding: '2px' }}>
+                          <button type="button" onClick={() => setNewsTab('write')} className={`btn-sm ${newsTab === 'write' ? 'bg-white shadow-sm' : 'text-gray-500'}`} style={{ padding: '4px 12px', borderRadius: '4px', border: 'none', background: newsTab === 'write' ? 'var(--primary)' : 'transparent', color: newsTab === 'write' ? 'white' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.8rem' }}>Escribir</button>
+                          <button type="button" onClick={() => setNewsTab('preview')} className={`btn-sm ${newsTab === 'preview' ? 'bg-white shadow-sm' : 'text-gray-500'}`} style={{ padding: '4px 12px', borderRadius: '4px', border: 'none', background: newsTab === 'preview' ? 'var(--primary)' : 'transparent', color: newsTab === 'preview' ? 'white' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.8rem' }}>Vista Previa</button>
+                        </div>
+                      </div>
+
+                      {newsTab === 'write' ? (
                         <>
-                          <Image size={40} style={{ color: 'var(--text-muted)', margin: '0 auto 1rem auto' }} />
-                          <p style={{ marginBottom: '1rem', color: 'var(--text-secondary)' }}>Arrastrá una imagen o hacé clic para seleccionar</p>
-                          <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} id="news-img-upload" />
-                          <label htmlFor="news-img-upload" className="btn btn-secondary" style={{ display: 'inline-block', cursor: 'pointer' }}>Seleccionar Archivo</label>
+                          <div style={{ display: 'flex', gap: '0.25rem', padding: '0.5rem', background: 'var(--overlay-light)', border: '1px solid var(--overlay-medium)', borderBottom: 'none', borderRadius: '8px 8px 0 0' }}>
+                            <button type="button" onClick={() => insertMarkdown('bold')} className="btn-icon-sm" title="Negrita (Ctrl+B)" style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid transparent', background: 'transparent', cursor: 'pointer', fontWeight: 'bold' }}>B</button>
+                            <button type="button" onClick={() => insertMarkdown('italic')} className="btn-icon-sm" title="Cursiva (Ctrl+I)" style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid transparent', background: 'transparent', cursor: 'pointer', fontStyle: 'italic' }}>I</button>
+                            <div style={{ width: '1px', background: 'var(--overlay-medium)', margin: '0 0.25rem' }}></div>
+                            <button type="button" onClick={() => insertMarkdown('list')} className="btn-icon-sm" title="Lista" style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid transparent', background: 'transparent', cursor: 'pointer' }}>• Lista</button>
+                            <button type="button" onClick={() => insertMarkdown('quote')} className="btn-icon-sm" title="Cita" style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid transparent', background: 'transparent', cursor: 'pointer' }}>" Cita</button>
+                          </div>
+                          <textarea id="news-content-textarea" value={newsContent} onChange={(e) => setNewsContent(e.target.value)} className="form-textarea" rows="12" required style={{ borderRadius: '0 0 8px 8px', flex: 1, resize: 'vertical' }} placeholder="Escribe el contenido aquí usando Markdown..."></textarea>
                         </>
+                      ) : (
+                        <div className="preview-container" style={{ flex: 1, padding: '1rem', border: '1px solid var(--overlay-medium)', borderRadius: '8px', background: 'var(--bg-card)', minHeight: '300px', overflowY: 'auto' }}>
+                          {renderContentPreview(newsContent)}
+                        </div>
                       )}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+
+                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem', borderTop: '1px solid var(--overlay-light)', paddingTop: '1.5rem' }}>
                     <button type="button" onClick={() => setIsEditingNews(false)} className="btn btn-secondary">Cancelar</button>
                     <button type="submit" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={18} /> Guardar Publicación</button>
                   </div>
@@ -1331,6 +1598,8 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
           </div>
         )}
 
+
+
         {/* LIGHTBOX FOR PHOTOS */}
         {selectedPhoto && (
           <div className="modal-overlay" style={{ zIndex: 11000 }} onClick={() => setSelectedPhoto(null)}>
@@ -1346,6 +1615,25 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
         )}
 
       <style dangerouslySetInnerHTML={{__html: `
+        .news-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 1.5rem;
+          margin-top: 1rem;
+        }
+        
+        .news-admin-card {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .news-admin-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .modal-overlay {
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(15, 12, 19, 0.7);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
           display: flex;

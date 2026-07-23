@@ -5,6 +5,11 @@ import semImage from '../assets/sem.jpg';
 
 export default function PressKit({ newsList }) {
   const [copiedId, setCopiedId] = useState(null);
+  const [expandedNews, setExpandedNews] = useState({});
+
+  const toggleExpand = (id) => {
+    setExpandedNews(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const fallbackText = "No hay noticias recientes cargadas en este momento.";
 
@@ -164,12 +169,22 @@ export default function PressKit({ newsList }) {
                   </div>
                   
                   <h4 className="news-headline">{headline}</h4>
-                  <p className="news-date" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem', marginTop: '-0.5rem', fontWeight: '500' }}>
+                  <p className="news-date" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem', marginTop: '-0.5rem', fontWeight: '500', padding: '0 1.5rem' }}>
                     Publicado el: {formattedDate}
                   </p>
                   
-                  <div className="news-body">
+                  <div className={`news-body ${expandedNews[news.id || idx] ? 'expanded' : 'collapsed'}`}>
                     {renderContent(news.content)}
+                    {!expandedNews[news.id || idx] && <div className="fade-out-bottom"></div>}
+                  </div>
+                  
+                  <div className="read-more-container">
+                    <button 
+                      className="btn-read-more" 
+                      onClick={() => toggleExpand(news.id || idx)}
+                    >
+                      {expandedNews[news.id || idx] ? 'Ocultar texto' : 'Ver más'}
+                    </button>
                   </div>
                 </div>
 
@@ -271,8 +286,6 @@ export default function PressKit({ newsList }) {
           background: var(--bg-card);
           border-radius: 12px;
           border: 1px solid var(--overlay-light);
-          overflow-y: auto;
-          max-height: 500px;
           position: relative;
         }
 
@@ -353,7 +366,54 @@ export default function PressKit({ newsList }) {
         }
 
         .news-body {
-          padding: 0 1.5rem 1.5rem 1.5rem;
+          padding: 0 1.5rem 0 1.5rem;
+          position: relative;
+          transition: max-height 0.3s ease;
+        }
+
+        .news-body.collapsed {
+          max-height: 180px;
+          overflow: hidden;
+        }
+
+        .news-body.expanded {
+          max-height: 3000px; /* Suficiente para animar sin romper */
+          overflow: hidden;
+        }
+
+        .fade-out-bottom {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 60px;
+          background: linear-gradient(transparent, var(--bg-card));
+          pointer-events: none;
+        }
+
+        .read-more-container {
+          padding: 1rem 1.5rem 1.5rem 1.5rem;
+          display: flex;
+          justify-content: center;
+        }
+
+        .btn-read-more {
+          background: transparent;
+          border: 2px solid var(--primary);
+          color: var(--primary);
+          padding: 0.6rem 1.5rem;
+          border-radius: 20px;
+          font-weight: 700;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .btn-read-more:hover {
+          background: var(--primary);
+          color: var(--bg-base);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 10px rgba(217, 160, 36, 0.2);
         }
 
         .news-body p {

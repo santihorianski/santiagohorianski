@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, AlertCircle, Trash2, Shield, Search, FileText, Mail } from 'lucide-react';
+import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, AlertCircle, Trash2, Shield, Search, FileText, Mail, X } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { uploadFileToR2, isR2Configured } from '../r2Client';
 
@@ -13,6 +13,8 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
   const [gpsLoading, setGpsLoading] = useState(false);
   const [isLocationLocked, setIsLocationLocked] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   // PDF Receipt Generation States & Methods
   const [isGeneratingReceipt, setIsGeneratingReceipt] = useState(false);
@@ -139,6 +141,11 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
   };
 
   const handleCloseWizard = () => {
+    if (!isSuccess) {
+      const confirmClose = window.confirm("¿Estás seguro de que deseas salir? Los datos del reclamo no se guardarán.");
+      if (!confirmClose) return;
+    }
+
     setFormData({
       name: '',
       phone: '',
@@ -482,8 +489,8 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
         return;
       }
     } else if (step === 2) {
-      if (!formData.barrio.trim() || !formData.callePrincipal.trim()) {
-        setErrorMessage('Por favor, ingresá el barrio y la calle principal.');
+      if (!formData.callePrincipal.trim()) {
+        setErrorMessage('Por favor, ingresá la dirección o referencia del reclamo.');
         return;
       }
     }
@@ -501,7 +508,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
     setErrorMessage('');
 
     // Validar obligatorios
-    if (!formData.category || !formData.barrio || !formData.callePrincipal) {
+    if (!formData.category || !formData.callePrincipal) {
       setErrorMessage('Faltan completar campos obligatorios del reclamo.');
       return;
     }
@@ -512,7 +519,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
     }
 
     // Formatear ubicación e información para el feed del portal municipal
-    const locationFormatted = `${formData.barrio} - ${formData.callePrincipal} ${formData.entreCalle1 && formData.entreCalle2 ? `(entre ${formData.entreCalle1} y ${formData.entreCalle2})` : ''}`;
+    const locationFormatted = `${formData.callePrincipal} ${formData.entreCalle1 && formData.entreCalle2 ? `(entre ${formData.entreCalle1} y ${formData.entreCalle2})` : ''}`;
     
     // Generar número de seguimiento cortito de 4 dígitos
     const code = Math.floor(1000 + Math.random() * 9000);
@@ -520,7 +527,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
     // El objeto para enviar al feed general
     const reportData = {
-      title: `${formData.category.split(' ').slice(1).join(' ')}: Reclamo en ${formData.barrio}`,
+      title: `${formData.category.split(' ').slice(1).join(' ')}: Reclamo en ${formData.callePrincipal}`,
       description: formData.description.trim() ? formData.description : `Pedido de inspección y resolución inmediata para el problema de ${formData.category.toLowerCase()}.`,
       category: formData.category.split(': ')[0].substring(2), // Extrae el nombre limpio (ej: "Iluminación")
       urgency: 'medio',
@@ -570,8 +577,11 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           <p className="step-subtitle" style={{ marginBottom: '2rem' }}>
             Tu código de seguimiento es: <strong style={{ color: 'var(--primary)', fontSize: '2rem', display: 'block', marginTop: '1rem', background: 'rgba(217, 160, 36, 0.12)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(217, 160, 36, 0.2)' }}>#{createdTrackingCode}</strong>
           </p>
-          <p className="step-subtitle" style={{ fontSize: '1rem' }}>
+          <p className="step-subtitle" style={{ fontSize: '1rem', marginBottom: '1rem' }}>
             Se ha enviado al equipo de trabajo de Santiago Horianski. Conserva este número para auditar su estado.
+          </p>
+          <p className="step-subtitle" style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+            ¡Muchas gracias por involucrarte y confiar en este equipo para mejorar tu barrio! 💪
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem', flexWrap: 'wrap' }}>
             <button className="btn btn-primary wizard-btn-next" style={{ margin: 0, padding: '0.65rem 1.5rem' }} onClick={handleCloseWizard}>
@@ -607,45 +617,20 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                       key={cat.id}
                       className={`category-item-card ${isSelected ? 'selected' : ''}`}
                       onClick={() => handleSelectCategory(cat.title)}
-                      style={{
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '1rem',
-                        padding: '1rem',
-                        borderRadius: '16px',
-                        border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border-color)',
-                        background: isSelected ? 'rgba(217, 160, 36, 0.08)' : 'var(--bg-card)',
-                        boxShadow: isSelected ? '0 4px 15px rgba(217, 160, 36, 0.15)' : '0 2px 8px rgba(0,0,0,0.1)',
-                        transition: 'all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)',
-                        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
-                        cursor: 'pointer'
-                      }}
                     >
-                      <div className="cat-icon-container" style={{
-                        fontSize: '1.8rem',
-                        width: '50px',
-                        height: '50px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: isSelected ? 'var(--primary)' : 'rgba(150, 150, 150, 0.1)',
-                        borderRadius: '12px',
-                        flexShrink: 0,
-                        transition: 'all 0.3s ease',
-                        filter: isSelected ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' : 'none'
-                      }}>
+                      <div className="cat-icon-container">
                         {emoji}
                       </div>
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                        <span className="cat-card-title" style={{ fontSize: '1.05rem', fontWeight: 'bold', color: isSelected ? 'var(--primary)' : 'var(--text-primary)' }}>
+                      <div className="cat-content-container">
+                        <span className="cat-card-title">
                           {titleText}
                         </span>
-                        <span className="cat-card-desc" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.3' }}>
+                        <span className="cat-card-desc">
                           {cat.desc}
                         </span>
                       </div>
-                      <div style={{ width: '24px', display: 'flex', justifyContent: 'flex-end', color: isSelected ? 'var(--primary)' : 'transparent' }}>
-                        <Check size={20} strokeWidth={3} />
+                      <div className="cat-check-container">
+                        <Check size={24} strokeWidth={3} />
                       </div>
                     </div>
                   );
@@ -658,7 +643,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           {step === 2 && (
             <div className="wizard-step animate-fade-in">
               <h4 className="step-title">Paso 2: Ubicación Exacta del Reclamo</h4>
-              <p className="step-subtitle">Usá el GPS para darnos el punto exacto, o escribí manualmente el barrio y la calle principal abajo.</p>
+              <p className="step-subtitle">Usá el GPS para darnos el punto exacto, o escribí manualmente la dirección o referencia abajo.</p>
 
               <button 
                 type="button" 
@@ -692,31 +677,9 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                 </>
               )}
 
-              <div className="form-group" style={{ marginTop: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
-                  <label className="form-label" style={{ marginBottom: 0, display: 'flex', alignItems: 'center' }}>
-                    Barrio *
-                    {locationSource && formData.barrio && (
-                      <span className="auto-badge" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem', borderRadius: '4px', background: 'rgba(217, 160, 36, 0.15)', color: 'var(--primary)', marginLeft: '0.5rem', fontWeight: 'bold' }}>
-                        Autodetectado
-                      </span>
-                    )}
-                  </label>
-                </div>
-                <input 
-                  type="text" 
-                  name="barrio"
-                  value={formData.barrio}
-                  onChange={handleInputChange}
-                  placeholder="Ej. Villa Cabello, Itaembé Miní"
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div className="form-group" style={{ position: 'relative' }}>
+              <div className="form-group" style={{ position: 'relative', marginTop: '1rem' }}>
                 <label className="form-label" style={{ display: 'flex', alignItems: 'center' }}>
-                  Calle principal o referencia *
+                  Dirección o referencia *
                   {locationSource && formData.callePrincipal && (
                     <span className="auto-badge" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem', borderRadius: '4px', background: 'rgba(217, 160, 36, 0.15)', color: 'var(--primary)', marginLeft: '0.5rem', fontWeight: 'bold' }}>
                       Autodetectado
@@ -732,7 +695,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     setLocationSource(null); // Clear status if they manually edit
                     handleInputChange(e);
                   }}
-                  placeholder="Ej. Avenida Tambor de Tacuarí o 'Frente a la plaza'"
+                  placeholder="Ej. Villa Cabello, o 'Frente a la plaza'"
                   className="form-input"
                   required
                   autoComplete="off"
@@ -876,17 +839,18 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
               <h4 className="step-title">Paso 4: Notificaciones y Seguimiento</h4>
               <p className="step-subtitle">Para que podamos informarte con certeza sobre el avance de tu solicitud, necesitamos tus datos de contacto.</p>
               
-              <div className="form-group" style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '8px', border: '1px solid var(--overlay-medium)' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', margin: 0 }}>
+              <div className={`anonymous-checkbox-card ${isAnonymous ? 'active' : ''}`}>
+                <label>
                   <input 
                     type="checkbox" 
                     checked={isAnonymous}
                     onChange={(e) => setIsAnonymous(e.target.checked)}
-                    style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }}
+                    className="custom-checkbox"
                   />
-                  <span style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--text-primary)' }}>
-                    Quiero enviar este reclamo de forma ANÓNIMA
-                  </span>
+                  <div className="checkbox-content">
+                    <span className="checkbox-title">Enviar de forma ANÓNIMA</span>
+                    <span className="checkbox-desc">No guardaremos tu nombre ni número de teléfono.</span>
+                  </div>
                 </label>
               </div>
 
@@ -964,13 +928,20 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
             <div className="progress-line-bg">
               <div className="progress-line-fill" style={{ width: `${((step - 1) / 3) * 100}%` }}></div>
             </div>
-            {[1, 2, 3, 4].map(num => (
-              <div 
-                key={num} 
-                className={`progress-step-node ${step === num ? 'active' : ''} ${step > num ? 'completed' : ''}`}
-                onClick={() => num < step && setStep(num)}
-              >
-                {step > num ? <Check size={12} /> : num}
+            {[
+              { num: 1, label: 'Problema', icon: <FileText size={18} /> },
+              { num: 2, label: 'Lugar', icon: <MapPin size={18} /> },
+              { num: 3, label: 'Pruebas', icon: <Image size={18} /> },
+              { num: 4, label: 'Contacto', icon: <User size={18} /> }
+            ].map(item => (
+              <div key={item.num} className="progress-step-wrapper">
+                <div 
+                  className={`progress-step-node ${step === item.num ? 'active' : ''} ${step > item.num ? 'completed' : ''}`}
+                  onClick={() => item.num < step && setStep(item.num)}
+                >
+                  {step > item.num ? <Check size={20} /> : item.icon}
+                </div>
+                <span className={`progress-step-label ${step === item.num ? 'active-label' : ''}`}>{item.label}</span>
               </div>
             ))}
           </div>
@@ -992,21 +963,58 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                 {isUploadingFile ? 'Cargando archivo...' : <>Siguiente <ChevronRight size={16} /></>}
               </button>
             ) : (
-              <button 
-                type="button" 
-                onClick={handleSubmit} 
-                className="btn btn-accent wizard-btn-next"
-                disabled={isUploadingFile}
-                style={{ opacity: isUploadingFile ? 0.7 : 1, cursor: isUploadingFile ? 'not-allowed' : 'pointer' }}
-              >
-                {isUploadingFile ? 'Cargando archivo...' : <>Enviar Reclamo <Check size={16} /></>}
-              </button>
+                <div style={{ width: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', background: 'var(--bg-card-elevated)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                    <input 
+                      type="checkbox" 
+                      id="terms-checkbox" 
+                      checked={acceptedTerms} 
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
+                    />
+                    <label htmlFor="terms-checkbox" style={{ fontSize: '0.9rem', color: 'var(--text-primary)', cursor: 'pointer', flex: 1, lineHeight: '1.5' }}>
+                      He leído y acepto los <button type="button" onClick={() => setShowTermsModal(true)} style={{ color: 'var(--primary)', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '800' }}>Términos y Condiciones</button> para el tratamiento de mis datos y gestión del reclamo.
+                    </label>
+                  </div>
+                  
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary btn-block"
+                    onClick={handleSubmit}
+                    disabled={isUploadingFile || !acceptedTerms}
+                    style={{ opacity: (!acceptedTerms || isUploadingFile) ? 0.6 : 1, cursor: (!acceptedTerms || isUploadingFile) ? 'not-allowed' : 'pointer' }}
+                  >
+                    {isUploadingFile ? 'Cargando archivo...' : <>Enviar Reclamo <Check size={16} /></>}
+                  </button>
+                </div>
             )}
           </div>
         </div>
       )}
 
       {/* Estilos locales del Wizard de Reclamos */}
+      {showTermsModal && (
+        <div className="modal-overlay" onClick={() => setShowTermsModal(false)} style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div className="modal-content glass-panel" onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '600px', maxHeight: '80vh', overflowY: 'auto', padding: '2rem', borderRadius: '16px', position: 'relative' }}>
+            <button onClick={() => setShowTermsModal(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={20} /></button>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem' }}>Términos y Condiciones</h3>
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <p>Al utilizar el Buzón Ciudadano y enviar este formulario, usted acepta los siguientes términos y condiciones básicos:</p>
+              <ul style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <li><strong>Carácter público de la información:</strong> Al generar un reclamo, usted comprende y acepta que la información provista (fotos, descripción, ubicación) adquirirá <strong>estado público</strong>. Dicha información será utilizada para crear un proyecto legislativo oficial dirigido a la Municipalidad de Posadas, el cual podrá ser impreso, tratado en sesiones públicas o difundido por medios de comunicación.</li>
+                <li><strong>Tratamiento de datos personales:</strong> Sus datos de contacto (si los provee) serán utilizados para notificarle sobre el avance de su reclamo. Si seleccionó "Denuncia Anónima", sus datos personales serán ofuscados en la plataforma, pero la descripción del problema y fotos seguirán siendo de dominio público.</li>
+                <li><strong>Veracidad de la información:</strong> Usted declara que la información proporcionada es veraz y corresponde a un hecho real en el municipio de Posadas.</li>
+                <li><strong>Uso de la plataforma:</strong> Esta plataforma es una herramienta de intermediación legislativa. El equipo del Concejal se compromete a gestionar los pedidos, pero la ejecución final de obras depende del Ejecutivo municipal.</li>
+              </ul>
+              <p>Al marcar la casilla, usted da su consentimiento expreso para el tratamiento de los datos conforme a la normativa vigente.</p>
+            </div>
+            <button onClick={() => { setAcceptedTerms(true); setShowTermsModal(false); }} className="btn btn-primary btn-block" style={{ marginTop: '1.5rem' }}>
+              Aceptar y Continuar
+            </button>
+          </div>
+        </div>
+      )}
+
       <style dangerouslySetInnerHTML={{__html: `
         .wizard-card {
           width: 100%;
@@ -1017,70 +1025,100 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
         .wizard-progress-bar {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-start;
           position: relative;
-          margin-bottom: 2.25rem;
+          margin-bottom: 2.5rem;
           padding: 0 0.5rem;
+        }
+
+        .progress-step-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;
+          z-index: 2;
+          width: 70px;
+        }
+
+        .progress-step-label {
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          transition: all 0.3s ease;
+          text-align: center;
+        }
+
+        .progress-step-label.active-label {
+          color: var(--primary);
+          text-shadow: 0 0 10px rgba(217, 160, 36, 0.4);
         }
 
         .progress-line-bg {
           position: absolute;
-          top: 50%;
-          left: 0;
-          right: 0;
-          height: 3px;
-          background: rgba(255, 255, 255, 0.25);
-          transform: translateY(-50%);
+          top: 22px;
+          left: 35px;
+          right: 35px;
+          height: 4px;
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 4px;
           z-index: 1;
         }
 
         .progress-line-fill {
           height: 100%;
-          background: var(--gradient-primary);
-          transition: width 0.3s ease;
+          background: linear-gradient(90deg, var(--primary), var(--secondary));
+          border-radius: 4px;
+          transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 0 10px rgba(217, 160, 36, 0.4);
         }
 
         .progress-step-node {
-          width: 32px;
-          height: 32px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
-          background: #2a2a2a; /* Solid background to hide line */
-          border: 2px solid rgba(255, 255, 255, 0.3);
+          background: var(--bg-card);
+          border: 2px solid rgba(255, 255, 255, 0.15);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-family: var(--font-display);
-          font-size: 0.9rem;
-          font-weight: 800;
-          color: #ffffff;
-          position: relative;
-          z-index: 2;
+          color: var(--text-muted);
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .progress-step-node:hover {
+          border-color: rgba(255, 255, 255, 0.4);
+          transform: translateY(-2px);
         }
 
         .progress-step-node.active {
           border-color: var(--primary);
-          color: var(--primary);
-          background: #1f1f1f; /* Solid dark background */
-          box-shadow: 0 0 15px rgba(217, 160, 36, 0.4);
+          color: var(--bg-card-elevated);
+          background: var(--gradient-primary);
+          box-shadow: 0 0 20px rgba(217, 160, 36, 0.4), inset 0 2px 4px rgba(255,255,255,0.4);
           transform: scale(1.15);
         }
 
         .wizard-btn-next.btn-secondary {
-          background: rgba(255, 255, 255, 0.1) !important;
-          color: #ffffff !important;
-          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          background: var(--bg-card-elevated) !important;
+          color: var(--text-primary) !important;
+          border: 1px solid var(--border-color) !important;
+          backdrop-filter: blur(10px);
         }
 
         .wizard-btn-next.btn-secondary:hover {
-          background: rgba(255, 255, 255, 0.15) !important;
+          background: var(--bg-card) !important;
+          border-color: var(--text-muted) !important;
         }
 
         .progress-step-node.completed {
-          background: var(--gradient-primary);
+          background: var(--success);
           border-color: transparent;
-          color: hsl(30 15% 4%);
+          color: white;
+          box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
         }
 
         .step-title {
@@ -1118,53 +1156,97 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
         .category-selection-grid {
           display: grid;
           grid-template-columns: 1fr;
-          gap: 0.6rem;
+          gap: 1rem;
         }
 
-        @media (min-width: 480px) {
+        @media (min-width: 768px) {
           .category-selection-grid {
             grid-template-columns: repeat(2, 1fr);
           }
         }
 
         .category-item-card {
-          padding: 1rem 1.25rem;
+          padding: 1.25rem 1rem;
           background: var(--bg-card);
-          border: 1px solid var(--border-color);
-          border-radius: 12px;
+          border: 2px solid var(--border-color);
+          border-radius: 20px;
           cursor: pointer;
           position: relative;
-          transition: all 0.2s ease;
+          transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
           display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 0.3rem;
-          box-shadow: 0 2px 8px var(--overlay-inverted);
+          flex-direction: row;
+          align-items: center;
+          gap: 1.25rem;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .category-item-card:hover {
           border-color: var(--primary);
-          background: var(--overlay-light);
-          transform: translateY(-2px);
-          box-shadow: 0 8px 16px var(--overlay-inverted);
+          background: rgba(217, 160, 36, 0.04);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 24px rgba(217, 160, 36, 0.15);
         }
 
         .category-item-card.selected {
-          border-color: var(--secondary);
-          background: rgba(217, 160, 36, 0.08);
-          box-shadow: 0 0 0 1.5px var(--secondary), 0 8px 16px rgba(217, 160, 36, 0.15);
+          border-color: var(--primary);
+          background: rgba(217, 160, 36, 0.1);
+          box-shadow: 0 8px 24px rgba(217, 160, 36, 0.2);
+          transform: scale(1.02);
+        }
+
+        .cat-icon-container {
+          font-size: 2.2rem;
+          width: 60px;
+          height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(150, 150, 150, 0.1);
+          border-radius: 16px;
+          flex-shrink: 0;
+          transition: all 0.3s ease;
+        }
+
+        .category-item-card.selected .cat-icon-container {
+          background: var(--primary);
+          filter: drop-shadow(0 4px 8px rgba(217, 160, 36, 0.4));
+        }
+
+        .cat-content-container {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
         }
 
         .cat-card-title {
-          font-size: 0.95rem;
-          font-weight: 700;
+          font-size: 1.15rem;
+          font-weight: 800;
           color: var(--text-primary);
+          transition: color 0.3s ease;
+        }
+
+        .category-item-card.selected .cat-card-title {
+          color: var(--primary);
         }
 
         .cat-card-desc {
-          font-size: 0.8rem;
-          color: var(--text-muted);
+          font-size: 0.85rem;
+          color: var(--text-secondary);
           line-height: 1.4;
+        }
+
+        .cat-check-container {
+          width: 32px;
+          display: flex;
+          justify-content: flex-end;
+          color: transparent;
+          transition: all 0.3s ease;
+        }
+
+        .category-item-card.selected .cat-check-container {
+          color: var(--primary);
+          transform: scale(1.1);
         }
 
         .selected-badge-check {
@@ -1221,19 +1303,22 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
         /* Paso 4: Drag and Drop */
         .drag-drop-zone {
-          border: 1.5px dashed var(--border-color);
-          border-radius: 12px;
-          padding: 1.5rem;
+          border: 2px dashed var(--primary);
+          border-radius: 20px;
+          padding: 2.5rem 1.5rem;
           text-align: center;
-          background: rgba(0, 0, 0, 0.008);
-          transition: all 0.2s ease;
+          background: rgba(217, 160, 36, 0.05);
+          transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
           position: relative;
           cursor: pointer;
+          box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
         }
 
-        .drag-drop-zone:hover {
-          border-color: var(--primary);
-          background: rgba(217, 160, 36, 0.02);
+        .drag-drop-zone:hover, .drag-drop-zone:focus-within {
+          border-color: var(--secondary);
+          background: rgba(217, 160, 36, 0.1);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(217, 160, 36, 0.15);
         }
 
         .hidden-file-input {
@@ -1251,20 +1336,77 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 0.5rem;
-          color: var(--text-secondary);
-          font-size: 0.82rem;
+          gap: 0.8rem;
+          color: var(--text-primary);
+          font-size: 1.05rem;
           pointer-events: none;
         }
 
         .drag-icon {
           color: var(--primary);
-          margin-bottom: 0.25rem;
+          margin-bottom: 0.5rem;
+          transform: scale(1.5);
         }
 
         .file-limit-subtitle {
-          font-size: 0.7rem;
-          color: var(--text-muted);
+          font-size: 0.85rem;
+          color: var(--text-secondary);
+          max-width: 80%;
+          line-height: 1.4;
+        }
+
+        .anonymous-checkbox-card {
+          margin-bottom: 1.5rem;
+          padding: 1.25rem;
+          background: var(--bg-card);
+          border: 2px solid var(--border-color);
+          border-radius: 16px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .anonymous-checkbox-card.active {
+          border-color: var(--primary);
+          background: rgba(217, 160, 36, 0.1);
+          box-shadow: 0 8px 24px rgba(217, 160, 36, 0.15);
+        }
+
+        .anonymous-checkbox-card label {
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
+          cursor: pointer;
+          margin: 0;
+        }
+
+        .custom-checkbox {
+          width: 24px;
+          height: 24px;
+          accent-color: var(--primary);
+          flex-shrink: 0;
+          cursor: pointer;
+        }
+
+        .checkbox-content {
+          display: flex;
+          flex-direction: column;
+          gap: 0.2rem;
+        }
+
+        .checkbox-title {
+          font-size: 1.05rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          transition: color 0.3s ease;
+        }
+
+        .anonymous-checkbox-card.active .checkbox-title {
+          color: var(--primary);
+        }
+
+        .checkbox-desc {
+          font-size: 0.85rem;
+          color: var(--text-secondary);
         }
 
         .photos-preview-container {

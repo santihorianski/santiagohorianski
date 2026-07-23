@@ -12,9 +12,12 @@ import { supabase, isSupabaseConfigured } from './supabaseClient';
 // Carga perezosa (Lazy Loading) para optimización de rendimiento
 const Hero = lazy(() => import('./components/Hero'));
 const ProjectsCatalog = lazy(() => import('./components/ProjectsCatalog'));
+const SocialBento = lazy(() => import('./components/SocialBento'));
+const ContactPage = lazy(() => import('./components/ContactPage'));
 const ReportsPortal = lazy(() => import('./components/ReportsPortal'));
 const PressKit = lazy(() => import('./components/PressKit'));
 const AdminPanel = lazy(() => import('./components/AdminPanel'));
+const ReclamoPage = lazy(() => import('./components/ReclamoPage'));
 
 // Seed inicial de reportes
 const INITIAL_REPORTS = [
@@ -532,6 +535,7 @@ export default function App() {
             <Route path="/inicio" element={
               <>
                 <Hero reportsCount={reports.length} />
+                <SocialBento />
                 <ProjectsCatalog />
               </>
             } />
@@ -540,10 +544,11 @@ export default function App() {
               <ReportsPortal 
                 reports={reports} 
                 onUpvote={handleUpvoteReport} 
-                onSubmitReport={handleAddReport} 
               />
             } />
+            <Route path="/reclamo" element={<ReclamoPage onSubmitReport={handleAddReport} />} />
             <Route path="/noticias" element={<PressKit newsList={newsList} />} />
+            <Route path="/contacto" element={<ContactPage />} />
             <Route path="/login" element={<Navigate to="/admin" replace />} />
             <Route path="/admin" element={
               <AdminPanel 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Menu, X, MessageSquare, Home, BarChart3, FileText, Lock, Sun, Moon } from 'lucide-react';
+import { Menu, X, MessageSquare, Home, BarChart3, FileText, Lock, Sun, Moon, Phone } from 'lucide-react';
 
 export default function Header({ theme, toggleTheme }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,7 +10,8 @@ export default function Header({ theme, toggleTheme }) {
     { id: '/inicio', label: 'Inicio', icon: Home },
     { id: '/proyectos', label: 'Proyectos', icon: FileText },
     { id: '/gestion', label: 'Gestión Territorial', icon: MessageSquare },
-    { id: '/noticias', label: 'Noticias y Prensa', icon: FileText }
+    { id: '/noticias', label: 'Noticias y Prensa', icon: FileText },
+    { id: '/contacto', label: 'Contacto', icon: Phone }
   ];
 
   const handleNavClick = () => {
@@ -49,7 +50,7 @@ export default function Header({ theme, toggleTheme }) {
         {/* CTA Button Desktop */}
         <div className="desktop-cta">
           <Link 
-            to="/gestion" 
+            to="/reclamo" 
             onClick={handleNavClick}
             className="btn btn-primary btn-sm-nav"
             style={{ textDecoration: 'none' }}
@@ -107,7 +108,7 @@ export default function Header({ theme, toggleTheme }) {
         </nav>
         <div className="mobile-drawer-footer">
           <Link 
-            to="/gestion" 
+            to="/reclamo" 
             onClick={handleNavClick}
             className="btn btn-primary btn-block"
             style={{ textDecoration: 'none', display: 'flex', justifyContent: 'center' }}

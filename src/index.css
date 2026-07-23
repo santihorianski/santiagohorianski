@@ -274,6 +274,7 @@ input, textarea, select {
   border: 1px solid transparent;
   outline: none;
   min-height: 44px; /* Zonas Táctiles (Touch Targets) Mínimas */
+  touch-action: manipulation; /* Elimina retraso de 300ms en tap en móviles */
 }
 
 .btn-primary {

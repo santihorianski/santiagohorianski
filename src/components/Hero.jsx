@@ -71,12 +71,12 @@ export default function Hero({ reportsCount }) {
             Tu voz <span className="gradient-text">construye</span> el municipio que mereces.
           </h1>
           <p className="hero-subtitle">
-            Hola, soy <strong>Santiago Javier Horianski</strong>. Nací y crecí recorriendo estas mismas calles, y por eso sé lo frustrante que es cuando los problemas del barrio quedan cajoneados. Estoy convencido de que la política tiene que <span className="highlight-marker" style={{ '--delay': '0.8s' }}>salir de las oficinas</span> y estar al servicio de los vecinos. Pensando en eso, diseñé este portal. Quiero que tengas un canal rápido, simple y directo para reclamar por baches, luminarias rotas o cualquier inconveniente que afecte tu día a día. Llegó el momento de dejar de lado la vieja política de escritorio. Escribime, <span className="highlight-marker" style={{ '--delay': '1.8s' }}>hagamos que tu voz cuente</span>.
+            Hola, soy <strong>Santiago Javier Horianski</strong>. Sé lo frustrante que es cuando los problemas del barrio quedan cajoneados. Diseñé este portal para que tengas un canal directo y simple para solucionar los problemas de tu barrio. <span className="highlight-marker" style={{ '--delay': '0.8s' }}>Dejemos la política de escritorio.</span> <span className="highlight-marker" style={{ '--delay': '1.8s' }}>Hagamos que tu voz cuente</span>.
           </p>
           
           <div className="hero-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <Link 
-              to="/gestion" 
+              to="/reclamo" 
               className="btn btn-primary"
               style={{ textDecoration: 'none' }}
             >

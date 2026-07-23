@@ -318,10 +318,10 @@ const FEATURED_PROJECTS = [
   },
   {
     id: 'feat-2',
-    title: 'Hubs de Barrio',
-    summary: 'Espacios de innovación usando Urbanismo Táctico.',
-    details: 'Propuesta de readecuación de centros vecinales y comités abandonados mediante urbanismo táctico (bajo costo y rápida ejecución). Se proyectan como hubs con conectividad libre, computadoras y capacitaciones para el estudio y coworking juvenil en barrios.',
-    badge: 'Urbanismo Táctico',
+    title: 'Eliminar el SEM',
+    summary: 'Pedido de informes para la eliminación del estacionamiento medido.',
+    details: 'Presentamos un exhaustivo pedido de informes sobre la recaudación y gestión del Sistema de Estacionamiento Medido (SEM) en Posadas, con la propuesta y el objetivo final de eliminarlo para aliviar la carga económica sobre los vecinos y comerciantes del centro.',
+    badge: 'Tránsito y Gestión',
     color: 'var(--secondary)'
   },
   {

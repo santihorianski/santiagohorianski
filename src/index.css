@@ -611,6 +611,7 @@ input, textarea, select {
   }
   .wizard-content-container {
     padding: 1.5rem;
+    padding-bottom: 220px;
   }
   .wizard-bottom-bar {
     padding: 1rem;

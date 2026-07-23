@@ -914,6 +914,19 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                 <Shield size={12} />
                 <span>Tu información de contacto se procesará de forma segura y confidencial.</span>
               </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem', background: 'var(--bg-card-elevated)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                <input 
+                  type="checkbox" 
+                  id="terms-checkbox" 
+                  checked={acceptedTerms} 
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer', accentColor: 'var(--primary)', flexShrink: 0 }}
+                />
+                <label htmlFor="terms-checkbox" style={{ fontSize: '0.9rem', color: 'var(--text-primary)', cursor: 'pointer', flex: 1, lineHeight: '1.5' }}>
+                  He leído y acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: 'var(--primary)', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '800' }}>Términos y Condiciones</button> para el tratamiento de mis datos y gestión del reclamo.
+                </label>
+              </div>
             </div>
           )}
 
@@ -946,9 +959,9 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', width: '100%', flexDirection: 'row' }}>
             {step > 1 && (
-              <button type="button" onClick={prevStep} className="btn btn-secondary wizard-btn-next">
+              <button type="button" onClick={prevStep} className="btn btn-secondary wizard-btn-next" style={{ flex: '0 0 auto' }}>
                 <ChevronLeft size={16} /> Volver
               </button>
             )}
@@ -958,35 +971,20 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                 onClick={nextStep} 
                 className="btn btn-primary wizard-btn-next"
                 disabled={isUploadingFile}
-                style={{ opacity: isUploadingFile ? 0.7 : 1, cursor: isUploadingFile ? 'not-allowed' : 'pointer' }}
+                style={{ opacity: isUploadingFile ? 0.7 : 1, cursor: isUploadingFile ? 'not-allowed' : 'pointer', flex: 1 }}
               >
                 {isUploadingFile ? 'Cargando archivo...' : <>Siguiente <ChevronRight size={16} /></>}
               </button>
             ) : (
-                <div style={{ width: '100%' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', background: 'var(--bg-card-elevated)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                    <input 
-                      type="checkbox" 
-                      id="terms-checkbox" 
-                      checked={acceptedTerms} 
-                      onChange={(e) => setAcceptedTerms(e.target.checked)}
-                      style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
-                    />
-                    <label htmlFor="terms-checkbox" style={{ fontSize: '0.9rem', color: 'var(--text-primary)', cursor: 'pointer', flex: 1, lineHeight: '1.5' }}>
-                      He leído y acepto los <button type="button" onClick={() => setShowTermsModal(true)} style={{ color: 'var(--primary)', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '800' }}>Términos y Condiciones</button> para el tratamiento de mis datos y gestión del reclamo.
-                    </label>
-                  </div>
-                  
-                  <button 
-                    type="submit" 
-                    className="btn btn-primary btn-block"
-                    onClick={handleSubmit}
-                    disabled={isUploadingFile || !acceptedTerms}
-                    style={{ opacity: (!acceptedTerms || isUploadingFile) ? 0.6 : 1, cursor: (!acceptedTerms || isUploadingFile) ? 'not-allowed' : 'pointer' }}
-                  >
-                    {isUploadingFile ? 'Cargando archivo...' : <>Enviar Reclamo <Check size={16} /></>}
-                  </button>
-                </div>
+              <button 
+                type="submit" 
+                className="btn btn-primary wizard-btn-next"
+                onClick={handleSubmit}
+                disabled={isUploadingFile || !acceptedTerms}
+                style={{ opacity: (!acceptedTerms || isUploadingFile) ? 0.6 : 1, cursor: (!acceptedTerms || isUploadingFile) ? 'not-allowed' : 'pointer', flex: 1 }}
+              >
+                {isUploadingFile ? 'Cargando...' : <>Enviar Reclamo <Check size={16} /></>}
+              </button>
             )}
           </div>
         </div>

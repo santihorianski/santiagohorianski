@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, AlertCircle, Trash2, Shield, Search, FileText, Mail, X } from 'lucide-react';
+import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, ChevronDown, AlertCircle, Trash2, Shield, Search, FileText, Mail, X } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { uploadFileToR2, isR2Configured } from '../r2Client';
 

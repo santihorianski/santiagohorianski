@@ -535,7 +535,6 @@ export default function App() {
             <Route path="/inicio" element={
               <>
                 <Hero reportsCount={reports.length} />
-                <SocialBento />
                 <ProjectsCatalog />
               </>
             } />

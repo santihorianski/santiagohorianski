@@ -154,58 +154,56 @@ var worker_default = {
           <head>
             <meta charset="UTF-8">
             <style>
-              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f7f9fc; color: #333333; margin: 0; padding: 0; }
-              .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; border: 1px solid #e1e8ed; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-              .header { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 40px 20px; text-align: center; color: #ffffff; }
-              .header h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+              body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0a0e; color: #e2dfeb; margin: 0; padding: 0; }
+              .container { max-width: 600px; margin: 40px auto; background-color: #121016; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+              .header { background: linear-gradient(135deg, #743bbc 0%, #3a1d5e 100%); padding: 40px 20px; text-align: center; color: #ffffff; border-bottom: 2px solid #e8b923; }
+              .header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
               .content { padding: 40px 30px; line-height: 1.6; }
-              .content p { margin: 0 0 20px 0; font-size: 16px; color: #4b5563; }
-              .code-box { background: rgba(217, 160, 36, 0.08); border: 1px solid rgba(217, 160, 36, 0.2); border-radius: 12px; padding: 20px; text-align: center; margin: 30px 0; }
-              .code-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #b45309; font-weight: 600; margin-bottom: 8px; }
-              .code-value { font-size: 32px; font-weight: 800; color: #d9a024; font-family: monospace; margin: 0; }
-              .btn { display: inline-block; background-color: #d9a024; color: #ffffff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; margin: 20px 0; text-align: center; }
-              .btn:hover { background-color: #c28e1d; }
-              .footer { background-color: #f9fafb; padding: 30px 20px; text-align: center; border-top: 1px solid #e5e7eb; font-size: 12px; color: #9ca3af; }
+              .content p { margin: 0 0 20px 0; font-size: 16px; color: #e2dfeb; }
+              .code-box { background: rgba(232, 185, 35, 0.1); border: 1px solid rgba(232, 185, 35, 0.2); border-radius: 12px; padding: 20px; text-align: center; margin: 30px 0; }
+              .code-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #e8b923; font-weight: 600; margin-bottom: 8px; }
+              .code-value { font-size: 36px; font-weight: 800; color: #ffffff; font-family: monospace; margin: 0; letter-spacing: 2px; }
+              .btn { display: inline-block; background-color: #e8b923; color: #000000; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; margin: 20px 0; text-align: center; box-shadow: 0 4px 15px rgba(232, 185, 35, 0.3); transition: all 0.2s; }
+              .btn:hover { background-color: #fbd34d; }
+              .footer { background-color: #0b0a0e; padding: 30px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: #888398; }
             </style>
           </head>
           <body>
             <div class="container">
               <div class="header">
-                <h1>Buz\xF3n Ciudadano</h1>
+                <h1>Reclamos con Santiago Horianski</h1>
+                <p style="margin: 10px 0 0 0; font-size: 15px; color: #f3d78c; font-weight: 500;">Tu voz en el Concejo</p>
               </div>
               <div class="content">
                 <p>Hola <strong>${recipientName}</strong>,</p>
-                <p>Hemos registrado con \xE9xito tu reclamo sobre la categor\xEDa <strong>"${category}"</strong> en nuestra plataforma de gesti\xF3n municipal.</p>
+                <p>Gracias por comprometerte y ayudarnos a mejorar nuestra ciudad. Te confirmamos que hemos recibido tu reporte sobre <strong>"${category}"</strong> y nuestro equipo ya lo tiene registrado.</p>
                 
                 <div class="code-box">
-                  <div class="code-label">C\xF3digo de Seguimiento \xDAnico</div>
+                  <div class="code-label">Tu C\xF3digo de Seguimiento</div>
                   <div class="code-value">#${trackingCode}</div>
                 </div>
                 
-                <p>Conserva este c\xF3digo para realizar consultas. Podr\xE1s auditar el estado del tr\xE1mite en tiempo real haciendo clic en el siguiente bot\xF3n:</p>
+                <p>Pod\xE9s usar este c\xF3digo para auditar el estado de tu tr\xE1mite en tiempo real desde nuestra plataforma:</p>
                 
                 <div style="text-align: center;">
-                  <a href="https://santiagohorianski.com/gestion?codigo=${trackingCode}" class="btn" target="_blank" style="color: #ffffff;">Seguir mi Reclamo</a>
+                  <a href="https://santiagohorianski.com/gestion?codigo=${trackingCode}" class="btn">Seguir mi Reclamo</a>
                 </div>
                 
-                <p style="margin-top: 30px;">\xA1Muchas gracias por involucrarte para mejorar nuestra comunidad! \u{1F4AA}</p>
-              
-                <div style="margin-top: 40px; padding-top: 30px; border-top: 2px dashed #e1e8ed; text-align: center;">
-                  <h3 style="color: #1e1b4b; font-size: 18px; margin-bottom: 20px;">Mirá cómo digo la verdad y las cosas que muchos no se animan a decir de frente:</h3>
+                <div style="margin-top: 40px; padding-top: 30px; border-top: 1px dashed rgba(255,255,255,0.1); text-align: center;">
+                  <p style="color: #e8b923; font-weight: 600; font-size: 15px; margin-bottom: 20px;">La pol\xEDtica real se hace escuchando. Seguime para ver el trabajo del d\xEDa a d\xEDa o escribime para tomar un caf\xE9:</p>
                   <div style="margin-bottom: 15px;">
-                    <a href="https://instagram.com/santi.horianski" target="_blank" style="display: inline-block; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 12px 25px; border-radius: 8px; color: white; text-decoration: none; font-weight: bold; font-size: 15px; margin: 5px;">
-                      📸 Seguime en Instagram
+                    <a href="https://instagram.com/santi.horianski" target="_blank" style="display: inline-block; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 12px 25px; border-radius: 8px; color: white; text-decoration: none; font-weight: bold; font-size: 14px; margin: 5px;">
+                      📸 Instagram
                     </a>
-                    <a href="https://www.tiktok.com/@santiagohorianski" target="_blank" style="display: inline-block; background: #000000; padding: 12px 25px; border-radius: 8px; color: white; text-decoration: none; font-weight: bold; font-size: 15px; margin: 5px;">
-                      🎵 Seguime en TikTok
+                    <a href="https://www.tiktok.com/@santiagohorianski" target="_blank" style="display: inline-block; background: #222222; border: 1px solid #444; padding: 12px 25px; border-radius: 8px; color: white; text-decoration: none; font-weight: bold; font-size: 14px; margin: 5px;">
+                      🎵 TikTok
                     </a>
                   </div>
                 </div>
               </div>
               <div class="footer">
-
                 Este es un correo autom\xE1tico enviado por el equipo de Santiago Horianski.<br>
-                \xA9 ${year} Buz\xF3n Ciudadano Posadas. Todos los derechos reservados.
+                \xA9 ${year} Buz\xF3n Ciudadano. Todos los derechos reservados.
               </div>
             </div>
           </body>
@@ -219,9 +217,9 @@ var worker_default = {
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              from: "Buz\xF3n Ciudadano <reclamos@santiagohorianski.com>",
+              from: "Santiago Horianski <reclamos@santiagohorianski.com>",
               to: [email],
-              subject: `Confirmaci\xF3n de Reclamo #${trackingCode}`,
+              subject: `Reclamos con Santiago Horianski - Seguimiento #${trackingCode}`,
               html: htmlContent
             })
           });
@@ -255,7 +253,7 @@ var worker_default = {
                     parameters: [
                       { type: "text", text: recipientName },
                       { type: "text", text: category },
-                      { type: "text", text: `#${trackingCode}` }
+                      { type: "text", text: String(trackingCode) }
                     ]
                   }
                 ]

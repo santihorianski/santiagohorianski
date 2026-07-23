@@ -13,8 +13,9 @@ export default function Footer() {
         
         {/* Left Column: Brand */}
         <div className="footer-brand">
-          <div className="brand-logo-footer">
-            <h3>Santiago Javier Horianski</h3>
+          <div className="brand-logo-footer" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+            <img src="/character_logo.png" alt="Logo" style={{ width: '45px', height: '45px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} />
+            <h3 style={{ margin: 0 }}>Santiago Javier Horianski</h3>
           </div>
           <p className="footer-brand-desc">
             Un espacio simple y directo para que tu voz se escuche y juntos mejoremos nuestra ciudad, sin vueltas ni burocracia.

@@ -22,7 +22,8 @@ export default function Header({ theme, toggleTheme }) {
     <header className="header-nav glass-panel">
       <div className="container header-container">
         {/* Brand / Logo */}
-        <Link to="/inicio" className="brand-container" onClick={handleNavClick} style={{ textDecoration: 'none' }}>
+        <Link to="/inicio" className="brand-container" onClick={handleNavClick} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <img src="/character_logo.png" alt="Logo" style={{ width: '45px', height: '45px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} />
           <div className="brand-text">
             <span className="brand-name">Santiago Javier Horianski</span>
             <span className="brand-tagline">

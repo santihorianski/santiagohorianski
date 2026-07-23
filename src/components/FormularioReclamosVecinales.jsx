@@ -915,11 +915,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                 <span>Tu información de contacto se procesará de forma segura y confidencial.</span>
               </div>
 
-              <div style={{ marginTop: '1.5rem', background: 'rgba(217, 160, 36, 0.05)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(217, 160, 36, 0.2)', textAlign: 'center' }}>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
-                  Al hacer clic en "Enviar Reclamo", declarás haber leído y aceptado de forma automática los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: 'var(--primary)', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '800' }}>Términos y Condiciones</button> para la gestión de este reporte.
-                </p>
-              </div>
+
             </div>
           )}
 
@@ -931,7 +927,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       {!isSuccess && (
         <div className="wizard-bottom-bar">
           {step === 1 && (
-            <div className="scroll-indicator" style={{ opacity: 1, fontWeight: 'bold' }}>
+            <div className="scroll-indicator" style={{ opacity: 1, fontWeight: 'bold', color: 'var(--success)', textShadow: '0 2px 4px rgba(16, 185, 129, 0.2)' }}>
               <span style={{ fontSize: '0.9rem', marginBottom: '0.2rem' }}>Deslizá para ver más opciones</span>
               <ChevronDown size={24} />
             </div>
@@ -959,33 +955,49 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', width: '100%', flexDirection: 'row' }}>
-            {step > 1 && (
-              <button type="button" onClick={prevStep} className="btn btn-secondary wizard-btn-next" style={{ flex: '0 0 auto' }}>
-                <ChevronLeft size={16} /> Volver
-              </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
+            {step === 4 && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'rgba(217,160,36,0.1)', padding: '0.5rem', borderRadius: '8px', border: '1px solid rgba(217,160,36,0.3)' }}>
+                <input 
+                  type="checkbox" 
+                  id="bottom-terms-checkbox" 
+                  checked={acceptedTerms} 
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
+                />
+                <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '0.8rem', color: 'var(--text-primary)', cursor: 'pointer', margin: 0, fontWeight: '500' }}>
+                  Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: 'var(--primary)', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '800' }}>Términos y Condiciones</button>
+                </label>
+              </div>
             )}
-            {step < 4 ? (
-              <button 
-                type="button" 
-                onClick={nextStep} 
-                className="btn btn-primary wizard-btn-next"
-                disabled={isUploadingFile}
-                style={{ opacity: isUploadingFile ? 0.7 : 1, cursor: isUploadingFile ? 'not-allowed' : 'pointer', flex: 1 }}
-              >
-                {isUploadingFile ? 'Cargando archivo...' : <>Siguiente <ChevronRight size={16} /></>}
-              </button>
-            ) : (
-              <button 
-                type="submit" 
-                className="btn btn-primary wizard-btn-next"
-                onClick={handleSubmit}
-                disabled={isUploadingFile}
-                style={{ opacity: isUploadingFile ? 0.6 : 1, cursor: isUploadingFile ? 'not-allowed' : 'pointer', flex: 1 }}
-              >
-                {isUploadingFile ? 'Cargando...' : <>Enviar Reclamo <Check size={16} /></>}
-              </button>
-            )}
+            <div style={{ display: 'flex', gap: '1rem', width: '100%', flexDirection: 'row' }}>
+              {step > 1 && (
+                <button type="button" onClick={prevStep} className="btn btn-secondary wizard-btn-next" style={{ flex: '0 0 auto' }}>
+                  <ChevronLeft size={16} /> Volver
+                </button>
+              )}
+              {step < 4 ? (
+                <button 
+                  type="button" 
+                  onClick={nextStep} 
+                  className="btn btn-primary wizard-btn-next"
+                  disabled={isUploadingFile}
+                  style={{ opacity: isUploadingFile ? 0.7 : 1, cursor: isUploadingFile ? 'not-allowed' : 'pointer', flex: 1 }}
+                >
+                  {isUploadingFile ? 'Cargando archivo...' : <>Siguiente <ChevronRight size={16} /></>}
+                </button>
+              ) : (
+                <button 
+                  type="submit" 
+                  className="btn btn-primary wizard-btn-next"
+                  onClick={handleSubmit}
+                  disabled={isUploadingFile || !acceptedTerms}
+                  style={{ opacity: (!acceptedTerms || isUploadingFile) ? 0.6 : 1, cursor: (!acceptedTerms || isUploadingFile) ? 'not-allowed' : 'pointer', flex: 1 }}
+                >
+                  {isUploadingFile ? 'Cargando...' : <>Enviar Reclamo <Check size={16} /></>}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

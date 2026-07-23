@@ -963,10 +963,10 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                   id="bottom-terms-checkbox" 
                   checked={acceptedTerms} 
                   onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
+                  style={{ width: '1.5rem', height: '1.5rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
                 />
-                <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '0.8rem', color: 'var(--text-primary)', cursor: 'pointer', margin: 0, fontWeight: '500' }}>
-                  Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: 'var(--primary)', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '800' }}>Términos y Condiciones</button>
+                <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '1.1rem', color: 'var(--text-primary)', cursor: 'pointer', margin: 0, fontWeight: '700' }}>
+                  Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: 'var(--primary)', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900' }}>Términos y Condiciones</button>
                 </label>
               </div>
             )}

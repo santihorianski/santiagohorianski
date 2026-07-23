@@ -154,57 +154,64 @@ var worker_default = {
           <head>
             <meta charset="UTF-8">
             <meta name="color-scheme" content="dark">
-            <meta name="supported-color-schemes" content="dark">
             <style>
-              :root { color-scheme: dark; }
-              body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0a0e; color: #e2dfeb; margin: 0; padding: 0; }
-              .container { max-width: 600px; margin: 40px auto; background-color: #121016; border-radius: 16px; border: 1px solid #222222; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-              .header { background-color: #3a1d5e; background-image: linear-gradient(135deg, #743bbc 0%, #3a1d5e 100%); padding: 40px 20px; text-align: center; color: #ffffff; border-bottom: 2px solid #e8b923; }
-              .header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; }
-              .content { padding: 40px 30px; line-height: 1.6; }
-              .content p { margin: 0 0 20px 0; font-size: 16px; color: #e2dfeb; }
-              .code-box { background-color: #1f1b13; border: 1px solid #332a13; border-radius: 12px; padding: 20px; text-align: center; margin: 30px 0; }
-              .code-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #e8b923; font-weight: 600; margin-bottom: 8px; }
-              .code-value { font-size: 36px; font-weight: 800; color: #ffffff; font-family: monospace; margin: 0; letter-spacing: 2px; }
-              .btn { display: inline-block; background-color: #e8b923; color: #000000 !important; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; margin: 20px 0; text-align: center; box-shadow: 0 4px 15px rgba(232, 185, 35, 0.3); transition: all 0.2s; }
-              .btn:hover { background-color: #fbd34d; }
-              .footer { background-color: #0b0a0e; padding: 30px 20px; text-align: center; border-top: 1px solid #222222; font-size: 12px; color: #888398; }
+              body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #0b141a; margin: 0; padding: 20px; color: #e9edef; }
+              .chat-container { max-width: 500px; margin: 0 auto; background-color: #0b141a; border-radius: 12px; overflow: hidden; padding: 10px; }
+              
+              /* Header de chat (similar a WA) */
+              .chat-header { background-color: #202c33; padding: 15px; display: flex; align-items: center; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+              .chat-header img { width: 45px; height: 45px; border-radius: 50%; margin-right: 15px; background: #3a1d5e; padding: 2px; }
+              .chat-header h1 { margin: 0; font-size: 18px; color: #e9edef; font-weight: 500; }
+              .chat-header p { margin: 2px 0 0 0; font-size: 13px; color: #8696a0; }
+              
+              /* Burbuja de mensaje */
+              .chat-bubble { background-color: #202c33; border-radius: 12px; border-top-left-radius: 0; padding: 12px 16px; position: relative; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.3); color: #e9edef; font-size: 15px; line-height: 1.5; }
+              .chat-bubble::before { content: ""; position: absolute; top: 0; left: -10px; width: 0; height: 0; border-top: 15px solid #202c33; border-left: 15px solid transparent; }
+              
+              .chat-bubble p { margin: 0 0 10px 0; }
+              
+              .code-box { background-color: #111b21; border: 1px dashed #00a884; border-radius: 8px; padding: 15px; text-align: center; margin: 15px 0; }
+              .code-label { font-size: 12px; color: #00a884; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
+              .code-value { font-size: 28px; font-weight: bold; color: #ffffff; margin: 0; letter-spacing: 1px; }
+              
+              .btn-wa { display: inline-block; background-color: #00a884; color: #111b21 !important; padding: 12px 24px; border-radius: 24px; text-decoration: none; font-weight: 600; font-size: 15px; text-align: center; margin-top: 10px; }
+              .btn-wa:hover { background-color: #02c098; }
+              
+              .time-stamp { text-align: right; font-size: 11px; color: #8696a0; margin-top: 5px; display: block; }
+              
+              .footer { text-align: center; font-size: 12px; color: #8696a0; margin-top: 30px; }
             </style>
           </head>
           <body>
-            <div class="container">
-              <div class="header">
-                <img src="https://santiagohorianski.com/favicon.png" alt="Logo Santiago Horianski" style="width: 80px; height: 80px; margin-bottom: 15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));" />
-                <h1>Reclamos con Santiago Horianski</h1>
-                <p style="margin: 10px 0 0 0; font-size: 15px; color: #f3d78c; font-weight: 500;">Tu voz en el Concejo</p>
+            <div class="chat-container">
+              <div class="chat-header">
+                <img src="https://santiagohorianski.com/favicon.png" alt="Santi" />
+                <div>
+                  <h1>Buzón Ciudadano</h1>
+                  <p>Santiago Horianski • Cuenta oficial</p>
+                </div>
               </div>
-              <div class="content">
-                <p>Hola <strong>${recipientName}</strong>,</p>
-                <p>Gracias por comprometerte y ayudarnos a mejorar nuestra ciudad. Te confirmamos que hemos recibido tu reporte sobre <strong>"${category}"</strong> y nuestro equipo ya lo tiene registrado.</p>
+              
+              <div class="chat-bubble">
+                <p>¡Hola <strong>${recipientName}</strong>! 👋</p>
+                <p>Gracias por comprometerte y ayudarnos a mejorar nuestra ciudad. Ya registramos tu reporte sobre <strong>"${category}"</strong> y lo tenemos agendado.</p>
                 
                 <div class="code-box">
-                  <div class="code-label">Tu C\xF3digo de Seguimiento</div>
+                  <div class="code-label">Tu Código de Seguimiento</div>
                   <div class="code-value">#${trackingCode}</div>
                 </div>
                 
-                <p>Pod\xE9s usar este c\xF3digo para auditar el estado de tu tr\xE1mite en tiempo real desde nuestra plataforma:</p>
+                <p>Podés usar este código para seguir el estado de tu trámite en tiempo real desde acá:</p>
                 
-                <div style="text-align: center;">
-                  <a href="https://santiagohorianski.com/gestion?codigo=${trackingCode}" class="btn">Seguir mi Reclamo</a>
+                <div style="text-align: center; margin-bottom: 15px;">
+                  <a href="https://santiagohorianski.com/gestion?codigo=${trackingCode}" class="btn-wa">Seguir mi Reclamo</a>
                 </div>
                 
-                <div style="margin-top: 40px; padding-top: 30px; border-top: 1px dashed rgba(255,255,255,0.1); text-align: center;">
-                  <p style="color: #e8b923; font-weight: 600; font-size: 15px; margin-bottom: 20px;">La pol\xEDtica real se hace escuchando. Seguime para ver el trabajo del d\xEDa a d\xEDa o escribime para tomar un caf\xE9:</p>
-                  <div style="margin-bottom: 15px;">
-                    <a href="https://instagram.com/santi.horianski" target="_blank" style="display: inline-block; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 12px 25px; border-radius: 8px; color: white; text-decoration: none; font-weight: bold; font-size: 14px; margin: 5px;">
-                      📸 Instagram
-                    </a>
-                    <a href="https://www.tiktok.com/@santiagohorianski" target="_blank" style="display: inline-block; background: #222222; border: 1px solid #444; padding: 12px 25px; border-radius: 8px; color: white; text-decoration: none; font-weight: bold; font-size: 14px; margin: 5px;">
-                      🎵 TikTok
-                    </a>
-                  </div>
-                </div>
+                <p>La política real se hace escuchando. ¡Un abrazo grande!</p>
+                
+                <span class="time-stamp">Leído ✓✓</span>
               </div>
+              
               <div class="footer">
                 Este es un correo autom\xE1tico enviado por el equipo de Santiago Horianski.<br>
                 \xA9 ${year} Buz\xF3n Ciudadano. Todos los derechos reservados.

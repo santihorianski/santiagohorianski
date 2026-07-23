@@ -15,6 +15,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsError, setTermsError] = useState(false);
 
   // PDF Receipt Generation States & Methods
   const [isGeneratingReceipt, setIsGeneratingReceipt] = useState(false);
@@ -507,6 +508,12 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
     e.preventDefault();
     setErrorMessage('');
 
+    if (!acceptedTerms) {
+      setTermsError(true);
+      setTimeout(() => setTermsError(false), 1000);
+      return;
+    }
+
     // Validar obligatorios
     if (!formData.category || !formData.callePrincipal) {
       setErrorMessage('Faltan completar campos obligatorios del reclamo.');
@@ -957,16 +964,16 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
             {step === 4 && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.5rem 0' }}>
+              <div className={termsError ? 'shake-error' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.5rem 0', transition: 'all 0.3s ease', transform: termsError ? 'scale(1.05)' : 'scale(1)', background: termsError ? 'rgba(239, 68, 68, 0.2)' : 'transparent', borderRadius: '8px' }}>
                 <input 
                   type="checkbox" 
                   id="bottom-terms-checkbox" 
                   checked={acceptedTerms} 
-                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  onChange={(e) => { setAcceptedTerms(e.target.checked); if (e.target.checked) setTermsError(false); }}
                   style={{ width: '1.5rem', height: '1.5rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
                 />
-                <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '1.1rem', color: '#ffffff', cursor: 'pointer', margin: 0, fontWeight: '700' }}>
-                  Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: '#ffffff', textDecoration: 'underline', textUnderlineOffset: '4px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900' }}>Términos y Condiciones</button>
+                <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '1.1rem', color: termsError ? '#ff6b6b' : '#ffffff', cursor: 'pointer', margin: 0, fontWeight: '700', transition: 'color 0.3s ease' }}>
+                  Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: termsError ? '#ff6b6b' : '#ffffff', textDecoration: 'underline', textUnderlineOffset: '4px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900', transition: 'color 0.3s ease' }}>Términos y Condiciones</button>
                 </label>
               </div>
             )}
@@ -991,8 +998,8 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                   type="submit" 
                   className="btn btn-primary wizard-btn-next"
                   onClick={handleSubmit}
-                  disabled={isUploadingFile || !acceptedTerms}
-                  style={{ opacity: (!acceptedTerms || isUploadingFile) ? 0.6 : 1, cursor: (!acceptedTerms || isUploadingFile) ? 'not-allowed' : 'pointer', flex: 1 }}
+                  disabled={isUploadingFile}
+                  style={{ opacity: isUploadingFile ? 0.6 : 1, cursor: isUploadingFile ? 'not-allowed' : 'pointer', flex: 1 }}
                 >
                   {isUploadingFile ? 'Cargando...' : <>Enviar Reclamo <Check size={16} /></>}
                 </button>

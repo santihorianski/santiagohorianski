@@ -625,6 +625,6 @@ input, textarea, select {
     width: 100%;
   }
   .wizard-bottom-bar .wizard-btn-next {
-    width: 100%;
+    width: auto;
   }
 }

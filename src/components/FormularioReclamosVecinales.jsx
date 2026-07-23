@@ -636,6 +636,12 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                   );
                 })}
               </div>
+
+              {/* Scroll Indicator */}
+              <div className="scroll-indicator">
+                <span style={{ fontSize: '0.85rem', marginBottom: '0.2rem' }}>Más opciones abajo</span>
+                <ChevronDown size={20} />
+              </div>
             </div>
           )}
 
@@ -666,7 +672,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     <img 
                       src={`https://maps.googleapis.com/maps/api/staticmap?center=${gpsCoordinates.lat},${gpsCoordinates.lng}&zoom=16&size=600x300&scale=2&maptype=roadmap&markers=color:0xd9a024%7C${gpsCoordinates.lat},${gpsCoordinates.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyCpqNAb7azBFU32oxAgSDCxnIFZFI_tAfA"}`}
                       alt="Vista previa de Google Maps"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      className="static-map-img"
                       onError={(e) => { e.target.style.display = 'none'; }}
                     />
                     <div style={{ position: 'absolute', bottom: '8px', left: '8px', background: 'rgba(22, 16, 34, 0.85)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>

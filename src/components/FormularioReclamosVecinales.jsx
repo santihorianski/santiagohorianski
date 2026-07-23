@@ -957,7 +957,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
             {step === 4 && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'rgba(217,160,36,0.1)', padding: '0.5rem', borderRadius: '8px', border: '1px solid rgba(217,160,36,0.3)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.5rem 0' }}>
                 <input 
                   type="checkbox" 
                   id="bottom-terms-checkbox" 
@@ -966,7 +966,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                   style={{ width: '1.5rem', height: '1.5rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
                 />
                 <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '1.1rem', color: 'var(--text-primary)', cursor: 'pointer', margin: 0, fontWeight: '700' }}>
-                  Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: 'var(--primary)', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900' }}>Términos y Condiciones</button>
+                  Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: '4px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900' }}>Términos y Condiciones</button>
                 </label>
               </div>
             )}

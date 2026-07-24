@@ -336,8 +336,8 @@ export default function App() {
       statusHistory: [{ status: 'recibido', timestamp: new Date().toISOString() }],
       photos: newReportData.photos || [],
       phone: newReportData.phone || null,
-      gpsLat: newReportData.gpsLat || null,
-      gpsLng: newReportData.gpsLng || null,
+      gpsLat: newReportData.coordinates?.lat || newReportData.gpsLat || null,
+      gpsLng: newReportData.coordinates?.lng || newReportData.gpsLng || null,
       isVisible: false
     };
 

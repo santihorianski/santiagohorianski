@@ -533,7 +533,12 @@ export default function App() {
           }>
             <Routes>
             <Route path="/" element={<Navigate to="/inicio" replace />} />
-            <Route path="/inicio" element={<Hero reportsCount={reports.length} />} />
+            <Route path="/inicio" element={
+              <>
+                <Hero reportsCount={reports.length} />
+                <ProjectsCatalog hideBandera={true} />
+              </>
+            } />
             <Route path="/proyectos" element={<ProjectsCatalog />} />
             <Route path="/gestion" element={
               <ReportsPortal 

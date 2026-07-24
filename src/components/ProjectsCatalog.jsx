@@ -412,7 +412,7 @@ const FEATURED_PROJECTS = [
   }
 ];
 
-export default function ProjectsCatalog() {
+export default function ProjectsCatalog({ hideBandera = false }) {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' o 'list'
@@ -517,6 +517,7 @@ export default function ProjectsCatalog() {
         </div>
 
         {/* Sección Proyectos Bandera (Top 3 destacados) */}
+        {!hideBandera && (
         <div className="featured-section" data-aos="fade-up">
           <h3 className="section-subtitle-small">
             <span className="bullet-glow"></span>
@@ -549,6 +550,7 @@ export default function ProjectsCatalog() {
             ))}
           </div>
         </div>
+        )}
 
         {/* Separator / Subtitle */}
         <div className="catalog-controls-title" data-aos="fade-right">

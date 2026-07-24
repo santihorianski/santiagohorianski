@@ -35,33 +35,40 @@ const ReportFichaPDF = React.forwardRef(({ report, getStatusDetails }, ref) => {
         position: 'relative',
         zIndex: 1,
         lineHeight: 1.5,
+        overflow: 'hidden'
       }}
     >
-      {/* Marca de Agua */}
+      {/* Marca de Agua Textual en Diagonal */}
       <div style={{
         position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        opacity: 0.03,
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
         zIndex: -1,
         pointerEvents: 'none',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        opacity: 0.04,
+        transform: 'rotate(-45deg) scale(1.5)',
+        gap: '40px'
       }}>
-        <ShieldCheck size={400} color="#000000" />
+        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>SANTIAGO JAVIER HORIANSKI</div>
+        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>SANTIAGO JAVIER HORIANSKI</div>
+        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>SANTIAGO JAVIER HORIANSKI</div>
+        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>SANTIAGO JAVIER HORIANSKI</div>
       </div>
 
       {/* Encabezado */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e2e8f0', paddingBottom: '15px', marginBottom: '30px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <div style={{ backgroundColor: '#f1f5f9', padding: '15px', borderRadius: '12px' }}>
-            <ShieldCheck size={40} color="#475569" />
+          <div style={{ padding: '0', borderRadius: '12px' }}>
+            <img src="/logo-santi.png" alt="Santi Logo" style={{ width: '70px', height: '70px', objectFit: 'contain' }} />
           </div>
           <div>
-            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.5px' }}>BUZÓN CIUDADANO</h1>
+            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.5px' }}>Reclamando con Santiago Horianski</h1>
             <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600' }}>Honorable Concejo Deliberante</p>
             <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>Ciudad de Posadas, Misiones</p>
           </div>
@@ -70,7 +77,7 @@ const ReportFichaPDF = React.forwardRef(({ report, getStatusDetails }, ref) => {
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center', textAlign: 'right' }}>
           <div>
             <p style={{ margin: 0, fontSize: '12px', color: '#64748b', textTransform: 'uppercase', fontWeight: '600' }}>Cód. Seguimiento</p>
-            <p style={{ margin: '4px 0 0 0', fontSize: '28px', fontWeight: '900', color: '#0f172a', fontFamily: 'monospace' }}>#{report.trackingCode || '----'}</p>
+            <p style={{ margin: '4px 0 0 0', fontSize: '28px', fontWeight: '900', color: '#d9a024', fontFamily: 'monospace' }}>#{report.trackingCode || '----'}</p>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#64748b' }}>Generado el {formatDate(new Date().toISOString())}</p>
           </div>
           <div style={{ padding: '8px', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: '#fff' }}>
@@ -109,7 +116,7 @@ const ReportFichaPDF = React.forwardRef(({ report, getStatusDetails }, ref) => {
             <Calendar size={18} color="#64748b" />
             <span style={{ fontSize: '12px', color: '#64748b', textTransform: 'uppercase', fontWeight: '700' }}>Fecha de Ingreso</span>
           </div>
-          <p style={{ margin: 0, fontSize: '15px', fontWeight: '600' }}>{formatDate(report.date)}</p>
+          <p style={{ margin: 0, fontSize: '15px', fontWeight: '600' }}>{formatDate(report.createdAt || report.date)}</p>
         </div>
         
         <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '15px' }}>
@@ -126,9 +133,9 @@ const ReportFichaPDF = React.forwardRef(({ report, getStatusDetails }, ref) => {
             <span style={{ fontSize: '12px', color: '#64748b', textTransform: 'uppercase', fontWeight: '700' }}>Ubicación Declarada</span>
           </div>
           <p style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#0f172a' }}>{report.location}</p>
-          {report.coordinates && report.coordinates.lat && (
+          {report.gpsLat && (
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8', fontFamily: 'monospace' }}>
-              GPS: {report.coordinates.lat}, {report.coordinates.lng}
+              GPS: {report.gpsLat}, {report.gpsLng}
             </p>
           )}
         </div>
@@ -169,24 +176,22 @@ const ReportFichaPDF = React.forwardRef(({ report, getStatusDetails }, ref) => {
       )}
 
       {/* Área de Firmas (Empujada hacia abajo) */}
-      <div style={{ position: 'absolute', bottom: '20mm', left: '20mm', right: '20mm', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e2e8f0', paddingTop: '40px' }}>
+      <div style={{ position: 'absolute', bottom: '25mm', left: '20mm', right: '20mm', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e2e8f0', paddingTop: '30px' }}>
         <div style={{ textAlign: 'center', width: '250px' }}>
           <div style={{ borderBottom: '1px solid #94a3b8', height: '40px', marginBottom: '10px' }}></div>
           <p style={{ margin: 0, fontSize: '12px', fontWeight: '600', color: '#334155' }}>Firma de Recepción</p>
-          <p style={{ margin: '4px 0 0 0', fontSize: '10px', color: '#94a3b8' }}>Aclaración y DNI</p>
         </div>
         
         <div style={{ textAlign: 'center', width: '250px' }}>
-          <div style={{ borderBottom: '1px dotted #94a3b8', height: '40px', marginBottom: '10px' }}></div>
-          <p style={{ margin: 0, fontSize: '12px', fontWeight: '600', color: '#334155' }}>Sello Institucional</p>
-          <p style={{ margin: '4px 0 0 0', fontSize: '10px', color: '#94a3b8' }}>Honorable Concejo Deliberante</p>
+          <div style={{ borderBottom: '1px solid #94a3b8', height: '40px', marginBottom: '10px' }}></div>
+          <p style={{ margin: 0, fontSize: '12px', fontWeight: '600', color: '#334155' }}>Concejal Santiago Javier Horianski</p>
         </div>
       </div>
       
-      {/* Pie de página con folio */}
-      <div style={{ position: 'absolute', bottom: '10mm', left: '0', right: '0', textAlign: 'center' }}>
-        <p style={{ margin: 0, fontSize: '9px', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '1px' }}>
-          Documento Generado Electrónicamente - Buzón Ciudadano Posadas - ID Interno: {report.id}
+      {/* Disclaimer Institucional */}
+      <div style={{ position: 'absolute', bottom: '10mm', left: '20mm', right: '20mm', borderTop: '1px solid #e2e8f0', paddingTop: '10px' }}>
+        <p style={{ margin: 0, fontSize: '9px', color: '#94a3b8', fontStyle: 'italic' }}>
+          Aclaración: Este comprobante tiene validez para control exclusivo del vecino y registro interno del Concejal. Institucional y oficialmente, este documento no tiene ninguna validez. Trabajando juntos por un Posadas mejor y más transparente.
         </p>
       </div>
 

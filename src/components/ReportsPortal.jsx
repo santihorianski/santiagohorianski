@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Search, MapPin, ThumbsUp, Check, MessageSquare, AlertCircle, Calendar, PlusCircle, Filter } from 'lucide-react';
+import { Search, MapPin, ThumbsUp, Check, MessageSquare, AlertCircle, Calendar, PlusCircle, Filter, Clipboard } from 'lucide-react';
 import santiagoImg from '../assets/santiago.jpg';
 
 const formatAnonymousName = (fullName) => {
@@ -68,7 +68,7 @@ const getStatusDetails = (report) => {
   }
 };
 
-export default function ReportsPortal({ reports, onUpvote }) {
+export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = false }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [trackingInput, setTrackingInput] = useState('');
@@ -163,81 +163,116 @@ export default function ReportsPortal({ reports, onUpvote }) {
         <div className="container">
           {/* Section Header */}
           <div className="section-header" style={{ marginBottom: '2rem' }}>
-            <span className="section-pre">Gestión del Concejo</span>
+            <span className="section-pre">{isSeguimientoMode ? 'Seguimiento' : 'Gestión del Concejo'}</span>
             <h2 className="section-title">
-              Buzón de <span className="gradient-text">Gestión Territorial</span>
+              {isSeguimientoMode ? <span className="gradient-text">Estado de tu Reclamo</span> : <>Buzón de <span className="gradient-text">Gestión Territorial</span></>}
             </h2>
             <p className="section-desc" style={{ marginBottom: '2rem' }}>
-              Tu reclamo será auditado directamente por el equipo del Concejo del concejal Santiago Horianski.
+              {isSeguimientoMode ? 'Ingresá tu código único de seguimiento para verificar el avance de tu expediente en tiempo real.' : 'Tu reclamo será auditado directamente por el equipo del Concejo del concejal Santiago Horianski.'}
             </p>
 
             <div className="portal-action-banner glass-panel animate-fade-in" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 2rem', borderRadius: '16px', background: 'rgba(217, 160, 36, 0.08)', border: '1px solid rgba(217, 160, 36, 0.2)', marginBottom: '3rem' }}>
-              <div style={{ flex: '1 1 300px', textAlign: 'left' }}>
-                <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '0.5rem', fontFamily: 'var(--font-display)', fontWeight: '800' }}>¿Problemas en tu barrio?</h3>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Hacé tu reclamo ahora mismo de forma simple y nosotros lo gestionamos ante la municipalidad.</p>
-              </div>
-              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                <form 
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (trackingInput.trim()) {
-                      setSearchTerm(trackingInput);
-                      setTimeout(() => {
-                        scrollToReports();
-                      }, 100);
-                    }
-                  }} 
-                  className="tracking-mini-form" 
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-dark)', padding: '0.5rem', borderRadius: '10px', border: '1px solid var(--border-color)' }}
-                >
-                  <Search size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
-                  <input 
-                    type="text" 
-                    placeholder="N° de seguimiento..." 
-                    value={trackingInput}
-                    onChange={(e) => setTrackingInput(e.target.value.replace(/#/g, ''))}
-                    style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', outline: 'none', width: '130px', fontSize: '0.85rem' }}
-                  />
-                  <button 
-                    type="submit"
-                    className="btn btn-secondary" 
-                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+              {isSeguimientoMode ? (
+                <div style={{ width: '100%', textAlign: 'center' }}>
+                  <h3 style={{ fontSize: '1.5rem', color: 'var(--text-primary)', marginBottom: '1.5rem', fontFamily: 'var(--font-display)', fontWeight: '800' }}>INGRESE SU CÓDIGO DE SEGUIMIENTO</h3>
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (trackingInput.trim()) {
+                        setSearchTerm(trackingInput);
+                        setTimeout(() => scrollToReports(), 100);
+                      }
+                    }} 
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-dark)', padding: '0.8rem 1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)', maxWidth: '500px', margin: '0 auto' }}
                   >
-                    Rastrear
-                  </button>
-                </form>
-                <button 
-                  onClick={() => navigate('/reclamo')}
-                  className="btn btn-primary" 
-                  style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', boxShadow: '0 4px 15px rgba(217, 160, 36, 0.3)' }}
-                >
-                  <span style={{ fontSize: '1.2rem', marginRight: '0.5rem' }}>+</span> Nuevo Reclamo
-                </button>
-              </div>
+                    <Search size={20} style={{ color: 'var(--text-muted)' }} />
+                    <input 
+                      type="text" 
+                      placeholder="Ej. 1234" 
+                      value={trackingInput}
+                      onChange={(e) => setTrackingInput(e.target.value.replace(/#/g, ''))}
+                      style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', outline: 'none', width: '100%', fontSize: '1.1rem', fontWeight: 'bold', textAlign: 'center' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          const text = await navigator.clipboard.readText();
+                          setTrackingInput(text.replace(/#/g, ''));
+                        } catch (err) {
+                          console.error('Failed to read clipboard', err);
+                        }
+                      }}
+                      style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.4rem', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                      title="Pegar código"
+                    >
+                      <Clipboard size={18} />
+                    </button>
+                    <button type="submit" className="btn btn-secondary" style={{ padding: '0.6rem 1.2rem' }}>
+                      Buscar
+                    </button>
+                  </form>
+                </div>
+              ) : (
+                <>
+                  <div style={{ flex: '1 1 300px', textAlign: 'left' }}>
+                    <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '0.5rem', fontFamily: 'var(--font-display)', fontWeight: '800' }}>¿Problemas en tu barrio?</h3>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Hacé tu reclamo ahora mismo de forma simple y nosotros lo gestionamos ante la municipalidad.</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <form 
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (trackingInput.trim()) {
+                          setSearchTerm(trackingInput);
+                          setTimeout(() => scrollToReports(), 100);
+                        }
+                      }} 
+                      className="tracking-mini-form" 
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-dark)', padding: '0.5rem', borderRadius: '10px', border: '1px solid var(--border-color)' }}
+                    >
+                      <Search size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
+                      <input 
+                        type="text" 
+                        placeholder="N° de seguimiento..." 
+                        value={trackingInput}
+                        onChange={(e) => setTrackingInput(e.target.value.replace(/#/g, ''))}
+                        style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', outline: 'none', width: '130px', fontSize: '0.85rem' }}
+                      />
+                      <button type="submit" className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>Rastrear</button>
+                    </form>
+                    <button onClick={() => navigate('/reclamo')} className="btn btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', boxShadow: '0 4px 15px rgba(217, 160, 36, 0.3)' }}>
+                      <span style={{ fontSize: '1.2rem', marginRight: '0.5rem' }}>+</span> Nuevo Reclamo
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Live Progress Metrics Bar */}
-          <div className="portal-metrics-bar glass-panel" data-aos="zoom-in">
-            <div className="metric-item">
-              <span className="metric-value">{reports.length + 82}</span>
-              <span className="metric-title">Reclamos Recibidos</span>
+          {/* Live Progress Metrics Bar (Hidden in Seguimiento mode) */}
+          {!isSeguimientoMode && (
+            <div className="portal-metrics-bar glass-panel" data-aos="zoom-in">
+              <div className="metric-item">
+                <span className="metric-value">{reports.length + 82}</span>
+                <span className="metric-title">Reclamos Recibidos</span>
+              </div>
+              <div className="metric-divider"></div>
+              <div className="metric-item">
+                <span className="metric-value" style={{ color: 'var(--warning)' }}>
+                  {reports.filter(r => r.status === 'en_comision' || r.status === 'en_votacion' || r.status === 'presentado').length + 12}
+                </span>
+                <span className="metric-title">En Trámite Legislativo</span>
+              </div>
+              <div className="metric-divider"></div>
+              <div className="metric-item">
+                <span className="metric-value" style={{ color: 'var(--success)' }}>
+                  {reports.filter(r => r.status === 'aprobado').length + 70}
+                </span>
+                <span className="metric-title">Solucionados / Respuestas</span>
+              </div>
             </div>
-            <div className="metric-divider"></div>
-            <div className="metric-item">
-              <span className="metric-value" style={{ color: 'var(--warning)' }}>
-                {reports.filter(r => r.status === 'en_comision' || r.status === 'en_votacion' || r.status === 'presentado').length + 12}
-              </span>
-              <span className="metric-title">En Trámite Legislativo</span>
-            </div>
-            <div className="metric-divider"></div>
-            <div className="metric-item">
-              <span className="metric-value" style={{ color: 'var(--success)' }}>
-                {reports.filter(r => r.status === 'aprobado').length + 70}
-              </span>
-              <span className="metric-title">Solucionados / Respuestas</span>
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="portal-grid" style={{ display: 'flex', justifyContent: 'center' }}>
@@ -245,53 +280,53 @@ export default function ReportsPortal({ reports, onUpvote }) {
           {/* Feed list & Filters */}
           <div className="portal-feed-container" style={{ width: '100%', maxWidth: '1000px' }}>
             
-            {/* Filter and search bar */}
-            <div className="feed-controls glass-panel" data-aos="fade-up">
-              <div className="search-box">
-                <Search size={18} className="search-icon" />
-                <input 
-                  type="text" 
-                  value={searchTerm} 
-                  onChange={(e) => setSearchTerm(e.target.value)} 
-                  placeholder="Buscar reportes por título, calle o descripción..." 
-                  className="search-input"
-                />
-              </div>
-
-              <div className="filter-group-container">
-                <div className="filter-label-icon">
-                  <Filter size={14} />
-                  <span>Filtrar:</span>
+            {/* Filter and search bar (Hidden in Seguimiento mode) */}
+            {!isSeguimientoMode && (
+              <div className="feed-controls glass-panel" data-aos="fade-up">
+                <div className="search-box">
+                  <Search size={18} className="search-icon" />
+                  <input 
+                    type="text" 
+                    value={searchTerm} 
+                    onChange={(e) => setSearchTerm(e.target.value)} 
+                    placeholder="Buscar reportes por título, calle o descripción..." 
+                    className="search-input"
+                  />
                 </div>
-                <div className="filter-scrollable">
-                  {categories.map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`filter-btn ${selectedCategory === cat ? 'active' : ''}`}
+
+                <div className="filter-group-container">
+                  <div className="filter-label-icon">
+                    <Filter size={14} />
+                    <span>Filtrar:</span>
+                  </div>
+                  <div className="filter-scrollable">
+                    {categories.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`filter-btn ${selectedCategory === cat ? 'active' : ''}`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="feed-footer-controls">
+                  <div className="sort-controls">
+                    <span className="sort-label">Ordenar por:</span>
+                    <select 
+                      value={sortBy} 
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="sort-select"
                     >
-                      {cat}
-                    </button>
-                  ))}
+                      <option value="recent">Más Recientes</option>
+                      <option value="upvotes">Más Apoyados</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-
-              <div className="feed-footer-controls">
-                {/* Status filters removidos porque la vista pública sólo muestra reclamos aprobados */}
-
-                <div className="sort-box">
-                  <label>Ordenar:</label>
-                  <select 
-                    value={sortBy} 
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="sort-select"
-                  >
-                    <option value="recent">Más recientes</option>
-                    <option value="upvotes">Más apoyados</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+            )}
 
             {/* Reports List */}
             <div ref={reportsListRef} className="reports-list">

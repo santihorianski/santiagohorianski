@@ -124,9 +124,12 @@ export default function Header({ theme, toggleTheme }) {
           border-left: none;
           border-right: none;
           border-top: none;
+          border-bottom: 1px solid var(--overlay-medium);
           display: flex;
           align-items: center;
           background: var(--glass-bg) !important;
+          backdrop-filter: blur(12px);
+          box-shadow: 0 4px 25px rgba(0, 0, 0, 0.35);
         }
         
         .header-container {
@@ -312,7 +315,7 @@ export default function Header({ theme, toggleTheme }) {
           .mobile-only-flex {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 1.5rem;
           }
           .mobile-drawer {
             display: block;

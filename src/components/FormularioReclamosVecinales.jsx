@@ -2,7 +2,53 @@ import React, { useState, useEffect, useRef } from 'react';
 import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, ChevronDown, AlertCircle, Trash2, Shield, Search, FileText, Mail, X } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { uploadFileToR2, isR2Configured } from '../r2Client';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
+// Fix for default Leaflet icons in React
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+const customMarkerIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+function DraggableMarker({ position, setPosition, setLocationSource }) {
+  const markerRef = useRef(null);
+  const eventHandlers = React.useMemo(
+    () => ({
+      dragend() {
+        const marker = markerRef.current;
+        if (marker != null) {
+          const newPos = marker.getLatLng();
+          setPosition({ lat: newPos.lat, lng: newPos.lng });
+          setLocationSource('manual_map');
+        }
+      },
+    }),
+    [setPosition, setLocationSource],
+  );
+
+  return (
+    <Marker
+      draggable={true}
+      eventHandlers={eventHandlers}
+      position={[position.lat, position.lng]}
+      ref={markerRef}
+      icon={customMarkerIcon}
+    />
+  );
+}
 export default function FormularioReclamosVecinales({ onSubmitReport, onClose }) {
   const [step, setStep] = useState(1);
   const [errorMessage, setErrorMessage] = useState('');
@@ -33,25 +79,56 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       const primaryColor = [217, 160, 36]; 
       const darkColor = [15, 23, 42]; 
       const greyColor = [100, 116, 139]; 
+      
+      // Función auxiliar para cargar imagen de forma asíncrona
+      const loadImage = (src) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.src = src;
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+        });
+      };
 
+      // 1. Watermark en el fondo
+      pdf.setTextColor(245, 245, 245);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(60);
+      // Rotar el texto del watermark. jsPDF: text(text, x, y, { angle })
+      for (let i = 0; i < 3; i++) {
+        pdf.text("SANTIAGO JAVIER HORIANSKI", 30, 80 + (i * 80), { angle: 45 });
+      }
+
+      // 2. Encabezado con color oscuro
       pdf.setFillColor(...darkColor);
       pdf.rect(0, 0, 210, 45, 'F');
 
+      // Intentar cargar logo (santiagoImg)
+      try {
+        const logo = await loadImage(santiagoImg);
+        // Dibujar logo redondo o cuadrado (jsPDF addImage no soporta crop redondo nativo, así que lo ponemos cuadrado/ajustado)
+        pdf.addImage(logo, 'JPEG', 15, 5, 35, 35);
+      } catch (e) {
+        console.error("No se pudo cargar el logo:", e);
+      }
+
       pdf.setTextColor(255, 255, 255);
       pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(20);
-      pdf.text("BUZON CIUDADANO", 20, 18);
+      pdf.setFontSize(18);
+      pdf.text("Reclamando con Santiago Horianski", 55, 18);
       
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(10);
-      pdf.text("HONORABLE CONCEJO DELIBERANTE", 20, 25);
-      pdf.text("Ciudad de Posadas, Misiones", 20, 30);
+      pdf.text("HONORABLE CONCEJO DELIBERANTE", 55, 25);
+      pdf.text("Ciudad de Posadas, Misiones", 55, 30);
 
       pdf.setFontSize(9);
-      pdf.text("COD. DE SEGUIMIENTO", 150, 18);
+      pdf.text("COD. DE SEGUIMIENTO", 155, 18);
       pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(24);
-      pdf.text(`#${createdTrackingCode}`, 150, 28);
+      pdf.setFontSize(22);
+      pdf.setTextColor(...primaryColor); // Número en color dorado para destacar
+      pdf.text(`#${createdTrackingCode}`, 155, 28);
 
       pdf.setTextColor(...darkColor);
       pdf.setFontSize(16);
@@ -95,42 +172,50 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       pdf.text(splitDesc, 20, yPos);
       yPos += (splitDesc.length * 5) + 10;
 
-      const trackingUrl = `https://santiagohorianski.com/gestion?codigo=${createdTrackingCode}`;
+      const trackingUrl = `https://santiagohorianski.com/seguimiento?codigo=${createdTrackingCode}`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(trackingUrl)}`;
 
-      const addQrCode = () => {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.src = qrUrl;
-          img.onload = () => {
-            pdf.addImage(img, 'PNG', 20, yPos, 35, 35);
-            pdf.setFont('helvetica', 'bold');
-            pdf.setFontSize(10);
-            pdf.text("Escanear para Seguir Trámite:", 62, yPos + 10);
-            pdf.setFont('helvetica', 'normal');
-            pdf.setFontSize(8.5);
-            pdf.setTextColor(...greyColor);
-            pdf.text("Podés escanear este código QR con la cámara de tu celular", 62, yPos + 16);
-            pdf.text("para abrir directamente la página de rastreo de tu reclamo.", 62, yPos + 21);
-            pdf.text("Enlace directo: santiagohorianski.com/gestion", 62, yPos + 26);
-            resolve();
-          };
-          img.onerror = () => {
-            resolve();
-          };
-        });
-      };
+      try {
+        const qrImg = await loadImage(qrUrl);
+        pdf.addImage(qrImg, 'PNG', 20, yPos, 35, 35);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(10);
+        pdf.text("Escanear para Seguir Trámite:", 62, yPos + 10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8.5);
+        pdf.setTextColor(...greyColor);
+        pdf.text("Podés escanear este código QR con la cámara de tu celular", 62, yPos + 16);
+        pdf.text("para abrir directamente la página de rastreo de tu reclamo.", 62, yPos + 21);
+        pdf.text("Enlace directo: santiagohorianski.com/seguimiento", 62, yPos + 26);
+      } catch (e) {
+        console.error("Error al cargar QR:", e);
+      }
+      
+      yPos += 55;
 
-      await addQrCode();
-
-      pdf.setDrawColor(226, 232, 240);
-      pdf.line(20, 275, 190, 275);
+      // 3. Firmas
+      pdf.setDrawColor(...greyColor);
+      pdf.setLineWidth(0.3);
+      
+      // Firma Recepción (izquierda)
+      pdf.line(30, yPos, 80, yPos);
       pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(9);
+      pdf.text("Firma de recepción", 40, yPos + 5);
+
+      // Firma Concejal (derecha)
+      pdf.line(130, yPos, 180, yPos);
+      pdf.text("Concejal Santiago Javier Horianski", 128, yPos + 5);
+
+      // 4. Disclaimer institucional
+      pdf.setDrawColor(226, 232, 240);
+      pdf.line(20, 270, 190, 270);
+      pdf.setFont('helvetica', 'italic');
       pdf.setFontSize(8);
       pdf.setTextColor(...greyColor);
-      pdf.text("Este es un comprobante digital emitido por el Buzón Ciudadano de Posadas.", 20, 281);
-      pdf.text("Trabajando juntos por un Posadas mejor y más transparente.", 20, 285);
+      pdf.text("Aclaración: Este comprobante tiene validez para control exclusivo del vecino y registro interno del Concejal.", 20, 275);
+      pdf.text("Institucional y oficialmente, este documento no tiene ninguna validez.", 20, 279);
+      pdf.text("Trabajando juntos por un Posadas mejor y más transparente.", 20, 284);
 
       pdf.save(`Comprobante_Reclamo_${createdTrackingCode}.pdf`);
     } catch (error) {
@@ -200,6 +285,60 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
     }
   }, [step]);
 
+  // Buscar Barrio Automáticamente en IDE Posadas y Reverse Geocoding cuando cambia el GPS
+  useEffect(() => {
+    if (!gpsCoordinates || step !== 2) return;
+
+    const fetchBarrio = async () => {
+      try {
+        const url = `https://www.ide.posadas.gob.ar/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:Barrios_SMU0&outputFormat=application/json&cql_filter=CONTAINS(geometry,SRID=4326;POINT(${gpsCoordinates.lng}%20${gpsCoordinates.lat}))`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.features && data.features.length > 0) {
+          const props = data.features[0].properties;
+          const barrioName = props._Barrio ? `Barrio ${props._Barrio}` : '';
+          const delegacionName = props.Delegacion ? ` (Deleg. ${props.Delegacion})` : '';
+          const fullNeighborhood = `${barrioName}${delegacionName}`;
+          
+          if (fullNeighborhood) {
+            setFormData(prev => ({
+              ...prev,
+              barrio: fullNeighborhood
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Error al buscar barrio en IDE:", error);
+      }
+    };
+
+    const reverseGeocode = () => {
+      // Solo hacer reverse geocode si la ubicación viene del GPS o de arrastrar el mapa.
+      // Si viene de 'google' (autocompletado), ya tenemos la dirección limpia.
+      if (locationSource === 'google') return;
+
+      if (window.google?.maps?.Geocoder) {
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ location: { lat: gpsCoordinates.lat, lng: gpsCoordinates.lng } }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const formattedAddress = results[0].formatted_address.split(',')[0];
+            setFormData(prev => ({
+              ...prev,
+              callePrincipal: formattedAddress
+            }));
+          }
+        });
+      }
+    };
+
+    const timer = setTimeout(() => {
+      fetchBarrio();
+      reverseGeocode();
+    }, 500); // debounce para evitar spamear la API mientras se arrastra el mapa
+    return () => clearTimeout(timer);
+  }, [gpsCoordinates, step, locationSource]);
+
   // Obtener predicciones de Google Places programáticamente con Debounce
   useEffect(() => {
     if (step !== 2 || !formData.callePrincipal || formData.callePrincipal.trim().length < 3) {
@@ -214,9 +353,20 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
     const timer = setTimeout(() => {
       if (window.google?.maps?.places) {
         const service = new window.google.maps.places.AutocompleteService();
+        
+        // Rectángulo aproximado que cubre Posadas, Misiones
+        const posadasBounds = {
+          north: -27.350,
+          south: -27.483,
+          east: -55.850,
+          west: -56.020
+        };
+
         service.getPlacePredictions({
-          input: formData.callePrincipal,
+          input: formData.callePrincipal + " Posadas Misiones", // Truco extra para priorizar la ciudad
           componentRestrictions: { country: 'ar' },
+          locationBias: posadasBounds,
+          locationRestriction: posadasBounds,
           types: ['address']
         }, (predictions, status) => {
           if (status === 'OK' && predictions) {
@@ -491,7 +641,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       }
     } else if (step === 2) {
       if (!formData.callePrincipal.trim()) {
-        setErrorMessage('Por favor, ingresá la dirección o referencia del reclamo.');
+        setErrorMessage('Por favor, ingresá la dirección del reclamo.');
         return;
       }
     }
@@ -580,14 +730,15 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           <div className="success-icon-ring" style={{ width: '80px', height: '80px', margin: '0 auto 2rem' }}>
             <Check size={48} style={{ color: 'var(--success)' }} />
           </div>
-          <h2 className="step-title" style={{ marginBottom: '1.5rem' }}>¡Reclamo Registrado en el Concejo!</h2>
-          <p className="step-subtitle" style={{ marginBottom: '2rem' }}>
-            Tu código de seguimiento es: <strong style={{ color: 'var(--primary)', fontSize: '2rem', display: 'block', marginTop: '1rem', background: 'rgba(217, 160, 36, 0.12)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(217, 160, 36, 0.2)' }}>#{createdTrackingCode}</strong>
+          <h2 className="step-title" style={{ marginBottom: '1rem' }}>¡Reclamo Registrado en el Concejo!</h2>
+          <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+            Tu código de seguimiento es:<br/>
+            <strong style={{ color: 'var(--primary)', fontSize: '2.5rem', display: 'inline-block', marginTop: '0.5rem', background: 'rgba(217, 160, 36, 0.12)', padding: '0.5rem 1.5rem', borderRadius: '12px', border: '1px solid rgba(217, 160, 36, 0.2)' }}>#{createdTrackingCode}</strong>
           </p>
-          <p className="step-subtitle" style={{ fontSize: '1rem', marginBottom: '1rem' }}>
-            Se ha enviado al equipo de trabajo de Santiago Horianski. Conserva este número para auditar su estado.
+          <p style={{ fontSize: '1rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+            Se ha enviado al equipo de trabajo de Santiago Horianski.<br/>Conserva este número para auditar su estado.
           </p>
-          <p className="step-subtitle" style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+          <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
             ¡Muchas gracias por involucrarte y confiar en este equipo para mejorar tu barrio! 💪
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem', flexWrap: 'wrap' }}>
@@ -650,7 +801,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           {step === 2 && (
             <div className="wizard-step animate-fade-in">
               <h4 className="step-title">Paso 2: Ubicación Exacta del Reclamo</h4>
-              <p className="step-subtitle">Usá el GPS para darnos el punto exacto, o escribí manualmente la dirección o referencia abajo.</p>
+              <p className="step-subtitle">Usá el GPS para darnos el punto exacto, o escribí manualmente la dirección abajo.</p>
 
               <button 
                 type="button" 
@@ -669,16 +820,23 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     <span>GPS: Lat {gpsCoordinates.lat}, Lng {gpsCoordinates.lng} (Precisión guardada)</span>
                   </div>
                   
-                  <div className="map-preview-container animate-fade-in" style={{ margin: '1rem 0', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--overlay-medium)', position: 'relative', height: '160px', background: '#1e1b4b' }}>
-                    <img 
-                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${gpsCoordinates.lat},${gpsCoordinates.lng}&zoom=16&size=600x300&scale=2&maptype=roadmap&markers=color:0xd9a024%7C${gpsCoordinates.lat},${gpsCoordinates.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyCpqNAb7azBFU32oxAgSDCxnIFZFI_tAfA"}`}
-                      alt="Vista previa de Google Maps"
-                      className="static-map-img"
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-                    <div style={{ position: 'absolute', bottom: '8px', left: '8px', background: 'rgba(22, 16, 34, 0.85)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <div className="map-preview-container animate-fade-in" style={{ margin: '1rem 0', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--overlay-medium)', position: 'relative', height: '220px', background: '#1e1b4b' }}>
+                    <MapContainer 
+                      center={[gpsCoordinates.lat, gpsCoordinates.lng]} 
+                      zoom={16} 
+                      scrollWheelZoom={false}
+                      style={{ height: '100%', width: '100%', zIndex: 1 }}
+                    >
+                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                      <DraggableMarker 
+                        position={gpsCoordinates} 
+                        setPosition={setGpsCoordinates}
+                        setLocationSource={setLocationSource}
+                      />
+                    </MapContainer>
+                    <div style={{ position: 'absolute', bottom: '8px', left: '8px', zIndex: 10, background: 'rgba(22, 16, 34, 0.85)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                       <MapPin size={12} style={{ color: 'var(--primary)' }} />
-                      <span>Ubicación detectada</span>
+                      <span>Mantené presionado el pin dorado para moverlo</span>
                     </div>
                   </div>
                 </>
@@ -686,7 +844,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
               <div className="form-group" style={{ position: 'relative', marginTop: '1rem' }}>
                 <label className="form-label" style={{ display: 'flex', alignItems: 'center' }}>
-                  Dirección o referencia *
+                  Dirección *
                   {locationSource && formData.callePrincipal && (
                     <span className="auto-badge" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem', borderRadius: '4px', background: 'rgba(217, 160, 36, 0.15)', color: 'var(--primary)', marginLeft: '0.5rem', fontWeight: 'bold' }}>
                       Autodetectado
@@ -702,11 +860,18 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     setLocationSource(null); // Clear status if they manually edit
                     handleInputChange(e);
                   }}
-                  placeholder="Ej. Villa Cabello, o 'Frente a la plaza'"
+                  placeholder="Ej. Av. Uruguay 1234"
                   className="form-input"
                   required
                   autoComplete="off"
                 />
+                
+                {formData.barrio && (
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <MapPin size={12} style={{ color: 'var(--primary)' }} />
+                    Zona identificada: <strong>{formData.barrio}</strong>
+                  </div>
+                )}
                 
                 {suggestions.length > 0 && (
                   <div className="custom-autocomplete-dropdown glass-panel">
@@ -919,7 +1084,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
               <div className="disclaimer-text" style={{ marginTop: '1.5rem' }}>
                 <Shield size={12} />
-                <span>Tu información de contacto se procesará de forma segura y confidencial.</span>
+                <span>Tu información de contacto se procesará de forma segura y confidencial (ya que los datos del reclamo son públicos).</span>
               </div>
 
 

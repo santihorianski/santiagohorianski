@@ -2,8 +2,86 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Search, Grid, List, Wrench, Laptop, CheckSquare, BarChart3, AlertCircle, FileText, Send, X } from 'lucide-react';
 
-// Catálogo completo de los 50 Proyectos del HCD Misiones (Concejo Deliberante de Posadas)
+// Catálogo completo de los proyectos del HCD Misiones (Concejo Deliberante de Posadas)
 const PROJECTS_DATA = [
+  {
+    id: 101,
+    title: 'Normas de Transparencia y Datos Abiertos en el HCD',
+    summary: 'Proyecto de Resolución para establecer normas de transparencia, publicidad, datos abiertos y control en absolutamente todos los procesos de contratación, adquisición, locación y provisión que realice el Honorable Concejo Deliberante.',
+    category: 'Transparencia'
+  },
+  {
+    id: 102,
+    title: 'Programa "Posadas Libre para Emprender"',
+    summary: 'Proyecto de Ordenanza para crear el programa "Posadas Libre para Emprender", facilitando y promoviendo el desarrollo de nuevos emprendimientos en la ciudad.',
+    category: 'Desarrollo Económico'
+  },
+  {
+    id: 103,
+    title: 'Balance Digital de Sumas y Saldos 2025',
+    summary: 'Proyecto de Resolución para requerir al DEM que remita en formato digital el Balance de Sumas y Saldos al 31/12/2025 con toda la documentación respaldatoria.',
+    category: 'Economía'
+  },
+  {
+    id: 104,
+    title: 'Informe sobre Multa Infundada a Comercio Local',
+    summary: 'Proyecto de Resolución pidiendo informes al DEM sobre el cobro infundado de una multa de $190.000.000 al local comercial LE UTTHE.',
+    category: 'Control'
+  },
+  {
+    id: 105,
+    title: 'Rendición de Fondos en Eventos Masivos (2025-2026)',
+    summary: 'Proyecto de Comunicación solicitando al DEM informe detallado sobre planificación, contratación, ejecución y rendición de fondos destinados a eventos masivos.',
+    category: 'Transparencia'
+  },
+  {
+    id: 106,
+    title: 'Ejecución de Gastos de Cortesía y Homenajes 2025',
+    summary: 'Proyecto de Comunicación para solicitar al DEM un informe detallado sobre la ejecución de la partida "Gastos de Cortesía y Homenajes" del ejercicio 2025.',
+    category: 'Economía'
+  },
+  {
+    id: 107,
+    title: 'Prohibición de Fotomultas Automáticas sin Constatación Humana',
+    summary: 'Proyecto de Ordenanza para prohibir la utilización de radares o fotomultas cuya configuración sea estrictamente algorítmica, careciendo de constatación humana en tiempo real.',
+    category: 'Tránsito'
+  },
+  {
+    id: 108,
+    title: 'Informes y Expedientes del Sistema de Estacionamiento Medido (SEM)',
+    summary: 'Proyecto de Comunicación exigiendo al DEM toda la información, antecedentes y expedientes vinculados al Sistema de Estacionamiento Medido (SEM).',
+    category: 'Tránsito'
+  },
+  {
+    id: 109,
+    title: 'Puesta en Funcionamiento de la Junta Electoral Municipal',
+    summary: 'Proyecto de Comunicación para que el DEM arbitre las medidas necesarias para la constitución e integración de la Junta Electoral Municipal.',
+    category: 'Institucional'
+  },
+  {
+    id: 110,
+    title: 'Informe sobre el evento "UNA + FAN FEST — Edición Mundial"',
+    summary: 'Proyecto de Comunicación para solicitar al DEM un informe completo sobre la finalización y realización del evento "UNA + FAN FEST".',
+    category: 'Transparencia'
+  },
+  {
+    id: 111,
+    title: 'Autorización y Fondos de la "Casa del Streaming de Posadas"',
+    summary: 'Proyecto de Comunicación solicitando información documentada sobre la autorización municipal de los eventos realizados en calle Colón bajo la denominación "Casa del Streaming".',
+    category: 'Transparencia'
+  },
+  {
+    id: 112,
+    title: 'Contrataciones de Volquetes y Camiones Volcadores',
+    summary: 'Proyecto de Comunicación solicitando informes vinculados a las contrataciones, alquileres y locaciones de volquetes y servicios de camiones volcadores.',
+    category: 'Control'
+  },
+  {
+    id: 113,
+    title: 'Eliminación de Tasas Específicas para Volquetes',
+    summary: 'Proyecto de Ordenanza para modificar la Ord. XVI-N° 119 y eliminar la posibilidad de establecer tasas específicas vinculadas a la autorización e instalación de volquetes.',
+    category: 'Desarrollo Económico'
+  },
   {
     id: 1,
     title: 'Pedido de Informes sobre Alquileres de Edificios Municipales',
@@ -312,7 +390,7 @@ const FEATURED_PROJECTS = [
     id: 'feat-1',
     title: 'Transparencia Legislativa',
     summary: 'Auditoría y optimización de recursos.',
-    details: 'Llevamos a cabo una auditoría exhaustiva en el Concejo Deliberante de Posadas, consolidando 50 proyectos de pedido de informes para transparentar contrataciones directas, compras públicas, viáticos y el uso de vales de combustible de la flota municipal.',
+    details: 'Llevamos a cabo una auditoría exhaustiva en el Concejo Deliberante de Posadas, consolidando más de 100 proyectos de pedido de informes y ordenanzas para transparentar contrataciones directas, compras públicas, viáticos y el uso de vales de combustible de la flota municipal.',
     badge: 'Auditoría y Control',
     color: 'var(--primary)'
   },
@@ -379,12 +457,27 @@ export default function ProjectsCatalog() {
     return () => clearTimeout(timeout);
   }, [placeholderWord, isDeleting, exampleIndex]);
 
-  // Filtrar los proyectos de la grilla
+  // Helper para asignar prioridad de orden
+  const getProjectTypeWeight = (proj) => {
+    const text = (proj.title + " " + proj.summary).toLowerCase();
+    if (text.includes("ordenanza")) return 1;
+    if (text.includes("resolución") || text.includes("resolucion")) return 2;
+    if (text.includes("comunicación") || text.includes("comunicacion")) return 3;
+    if (text.includes("interés") || text.includes("interes")) return 4;
+    return 5; // Default para otros
+  };
+
+  // Filtrar los proyectos de la grilla y ordenarlos
   const filteredProjects = PROJECTS_DATA.filter((proj) => {
     const matchesCategory = selectedCategory === 'Todos' || proj.category === selectedCategory;
     const matchesSearch = proj.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           proj.summary.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
+  }).sort((a, b) => {
+    const weightDiff = getProjectTypeWeight(a) - getProjectTypeWeight(b);
+    if (weightDiff !== 0) return weightDiff;
+    // Si son del mismo tipo, ordenarlos por ID descendente (más nuevos primero)
+    return b.id - a.id;
   });
 
   const visibleProjects = filteredProjects.slice(0, visibleCount);
@@ -419,7 +512,7 @@ export default function ProjectsCatalog() {
             Mis <span className="gradient-text">Proyectos en el Concejo</span>
           </h2>
           <p className="section-desc">
-            Como Concejal de Posadas, mi compromiso es fiscalizar los recursos públicos y proponer soluciones reales. Aquí podés auditar y descargar cada uno de los 50 proyectos de pedido de informes y ordenanzas presentados desde mi banca.
+            Como Concejal de Posadas, mi compromiso es fiscalizar los recursos públicos y proponer soluciones reales. Aquí podés auditar y descargar los más de 100 proyectos presentados en nuestro primer año legislativo.
           </p>
         </div>
 
@@ -476,7 +569,7 @@ export default function ProjectsCatalog() {
                 type="text" 
                 value={searchTerm} 
                 onChange={(e) => setSearchTerm(e.target.value)} 
-                placeholder={`Buscar "${placeholderWord}" entre los 50 proyectos...`}
+                placeholder={`Buscar "${placeholderWord}" entre más de 100 proyectos...`}
                 className="search-input"
               />
             </div>
@@ -529,11 +622,16 @@ export default function ProjectsCatalog() {
           ) : viewMode === 'grid' ? (
             /* VISTA GRILLA */
             <div className="projects-grid-layout">
-              {visibleProjects.map((proj) => (
-                <div key={proj.id} className="project-grid-card card glass-panel">
+              {visibleProjects.map((proj) => {
+                const isOrdenanza = proj.summary.toLowerCase().includes('ordenanza') || proj.title.toLowerCase().includes('ordenanza');
+                return (
+                <div key={proj.id} className={`project-grid-card card glass-panel ${isOrdenanza ? 'ordenanza-highlight' : ''}`}>
                   <div className="proj-card-header">
                     <span className="proj-id-badge">#{proj.id}</span>
-                    <span className="badge badge-accent proj-cat-badge">{proj.category}</span>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      {isOrdenanza && <span className="badge" style={{ backgroundColor: 'var(--primary)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>⭐ ORDENANZA</span>}
+                      <span className="badge badge-accent proj-cat-badge">{proj.category}</span>
+                    </div>
                   </div>
                   <h4 className="proj-card-title">{proj.title}</h4>
                   <p className="proj-card-summary">{proj.summary}</p>
@@ -552,7 +650,7 @@ export default function ProjectsCatalog() {
                     </button>
                   </div>
                 </div>
-              ))}
+                )})}
             </div>
           ) : (
             /* VISTA LISTA (Modelo Híbrido tipo Dashboard) */
@@ -564,14 +662,20 @@ export default function ProjectsCatalog() {
                 <span className="th-actions">Acciones</span>
               </div>
               <div className="list-table-body">
-                {visibleProjects.map((proj) => (
-                  <div key={proj.id} className="list-row">
+                {visibleProjects.map((proj) => {
+                  const isOrdenanza = proj.summary.toLowerCase().includes('ordenanza') || proj.title.toLowerCase().includes('ordenanza');
+                  return (
+                  <div key={proj.id} className={`list-row ${isOrdenanza ? 'ordenanza-row-highlight' : ''}`}>
                     <span className="td-id">#{proj.id}</span>
                     <div className="td-title-wrapper">
-                      <span className="td-title">{proj.title}</span>
+                      <span className="td-title">
+                        {isOrdenanza && <span style={{ color: 'var(--primary)', marginRight: '0.4rem' }}>⭐</span>}
+                        {proj.title}
+                      </span>
                       <span className="td-summary-inline">{proj.summary}</span>
                     </div>
                     <span className="td-category">
+                      {isOrdenanza && <span className="badge" style={{ backgroundColor: 'var(--primary)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px', marginBottom: '0.2rem', display: 'inline-block' }}>ORDENANZA</span>}
                       <span className="badge badge-accent proj-cat-badge-small">{proj.category}</span>
                     </span>
                     <div className="td-actions">
@@ -587,9 +691,9 @@ export default function ProjectsCatalog() {
                       >
                         Sumar idea
                       </button>
-                    </div>
                   </div>
-                ))}
+                  </div>
+                )})}
               </div>
             </div>
           )}
@@ -931,6 +1035,16 @@ export default function ProjectsCatalog() {
           display: flex;
           flex-direction: column;
           min-height: 180px;
+        }
+
+        .ordenanza-highlight {
+          border: 1px solid var(--primary);
+          box-shadow: 0 4px 12px rgba(217, 160, 36, 0.15);
+        }
+
+        .ordenanza-row-highlight {
+          background-color: rgba(217, 160, 36, 0.05) !important;
+          border-left: 3px solid var(--primary) !important;
         }
 
         .proj-card-header {

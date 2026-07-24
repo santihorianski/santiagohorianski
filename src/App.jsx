@@ -533,17 +533,19 @@ export default function App() {
           }>
             <Routes>
             <Route path="/" element={<Navigate to="/inicio" replace />} />
-            <Route path="/inicio" element={
-              <>
-                <Hero reportsCount={reports.length} />
-                <ProjectsCatalog />
-              </>
-            } />
+            <Route path="/inicio" element={<Hero reportsCount={reports.length} />} />
             <Route path="/proyectos" element={<ProjectsCatalog />} />
             <Route path="/gestion" element={
               <ReportsPortal 
                 reports={reports} 
                 onUpvote={handleUpvoteReport} 
+              />
+            } />
+            <Route path="/seguimiento" element={
+              <ReportsPortal 
+                reports={reports} 
+                onUpvote={handleUpvoteReport} 
+                isSeguimientoMode={true}
               />
             } />
             <Route path="/reclamo" element={<ReclamoPage onSubmitReport={handleAddReport} />} />

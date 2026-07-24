@@ -124,6 +124,66 @@ var worker_default = {
         return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { "Access-Control-Allow-Origin": "*" } });
       }
     }
+
+    if (request.method === "POST" && url.pathname === "/api/status-change") {
+      try {
+        const { phone, trackingCode, newStatus, userName } = await request.json();
+        if (!phone || !trackingCode || !newStatus) {
+          return new Response(JSON.stringify({ error: "Faltan parámetros" }), { status: 400, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+        }
+        
+        let waResult = null;
+        if (env.WA_PHONE_NUMBER_ID && env.WA_TOKEN) {
+          const cleanPhone = phone.replace(/\D/g, "");
+          const recipientName = userName ? userName.split(' ')[0] : 'Vecino';
+          
+          const waResponse = await fetch(`https://graph.facebook.com/v25.0/${env.WA_PHONE_NUMBER_ID}/messages`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${env.WA_TOKEN}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              messaging_product: "whatsapp",
+              to: cleanPhone,
+              type: "template",
+              template: {
+                name: "estado_reclamo_actualizado",
+                language: { code: "es_AR" },
+                components: [
+                  {
+                    type: "body",
+                    parameters: [
+                      { type: "text", text: String(recipientName) },
+                      { type: "text", text: String(trackingCode) },
+                      { type: "text", text: String(newStatus) }
+                    ]
+                  },
+                  {
+                    type: "button",
+                    sub_type: "url",
+                    index: "0",
+                    parameters: [
+                      { type: "text", text: String(trackingCode) }
+                    ]
+                  }
+                ]
+              }
+            })
+          });
+          const waData = await waResponse.json();
+          waResult = { success: waResponse.ok, data: waData };
+        }
+        
+        return new Response(JSON.stringify({ success: true, whatsapp: waResult }), { 
+          status: 200, 
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } 
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+      }
+    }
+
     if (request.method !== "POST" || url.pathname !== "/") {
       return new Response("Method Not Allowed", {
         status: 405,
@@ -206,7 +266,7 @@ var worker_default = {
                 <p>Podés usar este código para seguir el estado de tu trámite en tiempo real desde acá:</p>
                 
                 <div style="text-align: center; margin-bottom: 15px;">
-                  <a href="https://santiagohorianski.com/gestion?codigo=${trackingCode}" class="btn-wa">Seguir mi Reclamo</a>
+                  <a href="https://santiagohorianski.com/seguimiento?codigo=${trackingCode}" class="btn-wa">Seguir mi Reclamo</a>
                 </div>
                 
                 <p style="font-weight: bold;">La política real se hace escuchando. ¡Un abrazo grande!</p>

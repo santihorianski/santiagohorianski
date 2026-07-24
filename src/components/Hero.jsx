@@ -57,6 +57,19 @@ const CountUp = ({ end, duration = 2000, suffix = '', prefix = '', decimals = 0 
 };
 
 export default function Hero({ reportsCount }) {
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Calculate scale: starts large (1.15) at top, shrinks to 1 as we scroll down 400px
+  const imageScale = Math.max(1, 1.15 - (scrollY / 400) * 0.15);
+
   return (
     <>
       <Helmet>
@@ -119,6 +132,11 @@ export default function Hero({ reportsCount }) {
                 className="profile-image" 
                 fetchPriority="high"
                 loading="eager"
+                style={{ 
+                  transform: `scale(${imageScale})`,
+                  transition: 'transform 0.1s ease-out',
+                  transformOrigin: 'center center'
+                }}
               />
               <div className="profile-info">
                 <h3>Santiago Javier Horianski</h3>
@@ -131,7 +149,7 @@ export default function Hero({ reportsCount }) {
                 </div>
                 <div className="quote-box">
                   <p>
-                    <TypewriterText text="“Con el voto que me confiaste, hoy me planto acá para ser la voz de todos los que están hartos pero no se animan a decirlo. Ya estamos dando pelea por el municipio que exigimos, pero esto recién empieza: no nos podemos relajar. Tenemos que seguir metiendo presión para que, en las próximas elecciones, vayamos a patear el tablero y logremos de una vez por todas los cambios que este Concejo necesita”" />
+                    <TypewriterText text="“Con el voto que me confiaste, hoy me planto acá para ser la voz de todos los que están hartos pero no se animan a decirlo. Ya estamos dando pelea por el municipio que exigimos, pero esto recién empieza no nos podemos relajar. Tenemos que seguir metiendo presión para que, en las próximas elecciones, vayamos a patear el tablero y logremos de una vez por todas los cambios que POSADAS necesita”" />
                   </p>
                 </div>
               </div>

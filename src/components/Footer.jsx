@@ -48,16 +48,6 @@ export default function Footer() {
           </div>
 
           <div className="footer-col">
-            <h4>Ejes de Campaña</h4>
-            <ul className="footer-ul text-muted-ul">
-              <li>Transparencia Total</li>
-              <li>Reglas Claras</li>
-              <li>Basta de CURROS</li>
-              <li>Basta de Privilegios</li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
             <h4>Contacto</h4>
             <p className="footer-contact-info">
               ¿Querés sumarte a la juventud?<br />

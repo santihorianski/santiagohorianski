@@ -689,6 +689,10 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       category: formData.category.split(': ')[0].substring(2), // Extrae el nombre limpio (ej: "Iluminación")
       urgency: 'medio',
       location: locationFormatted,
+      barrio: formData.barrio,
+      callePrincipal: formData.callePrincipal,
+      entreCalle1: formData.entreCalle1,
+      entreCalle2: formData.entreCalle2,
       coordinates: gpsCoordinates, // Se guarda lat/lng si el usuario usó GPS
       anonymousName: isAnonymous ? 'Vecino Anónimo' : formData.name,
       phone: isAnonymous ? null : formData.phone,

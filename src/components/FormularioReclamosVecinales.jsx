@@ -935,8 +935,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
         <div className="wizard-bottom-bar">
           {step === 1 && (
             <div className="scroll-indicator" style={{ opacity: 1, fontWeight: 'bold', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.9rem', marginBottom: '0.2rem', backgroundColor: '#000000', color: '#ff4444', padding: '4px 12px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>Deslizá para ver más opciones</span>
-              <ChevronDown size={24} style={{ color: '#ff4444', marginTop: '2px' }} />
+              <span style={{ fontSize: '0.9rem', backgroundColor: '#000000', color: '#ff4444', padding: '4px 12px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>Deslizá para ver más opciones</span>
             </div>
           )}
           

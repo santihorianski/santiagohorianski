@@ -30,7 +30,7 @@
     "react-router-dom": "^7.17.0"
   },
   "overrides": {
-    "@react-leaflet/core": "$@react-leaflet/core"
+    "@react-leaflet/core": "^2.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

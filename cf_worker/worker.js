@@ -247,7 +247,7 @@ var worker_default = {
           <body>
             <div class="chat-container">
               <div class="chat-header">
-                <img src="https://santiagohorianski.com/favicon.png" alt="Santi" />
+                <img src="https://santiagohorianski.com/logo-santi.png" alt="Santi" />
                 <div>
                   <h1 style="font-weight: 800;">Buzón Ciudadano</h1>
                   <p>Santiago Horianski • Cuenta oficial</p>

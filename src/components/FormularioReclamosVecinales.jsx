@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, ChevronDown, AlertCircle, Trash2, Shield, Search, FileText, Mail, X } from 'lucide-react';
+import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, ChevronDown, AlertCircle, Trash2, Shield, ShieldCheck, Search, FileText, Mail, X } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { uploadFileToR2, isR2Configured } from '../r2Client';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
@@ -250,8 +250,8 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
     onClose();
   };
 
-  // Form State
   const [formData, setFormData] = useState({
+    dni: '',
     name: '',
     phone: '',
     email: '',
@@ -265,6 +265,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
   });
 
   const [suggestions, setSuggestions] = useState([]);
+  const [showValidationAlerts, setShowValidationAlerts] = useState(false);
   const isSuggestionSelectedRef = useRef(false);
 
   // Cargar script de Google Maps Places
@@ -641,10 +642,12 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       }
     } else if (step === 2) {
       if (!formData.callePrincipal.trim()) {
+        setShowValidationAlerts(true);
         setErrorMessage('Por favor, ingresá la dirección del reclamo.');
         return;
       }
     }
+    setShowValidationAlerts(false);
     setErrorMessage('');
     setStep(prev => prev + 1);
   };
@@ -670,10 +673,25 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       return;
     }
 
-    if (!isAnonymous && (!formData.name.trim() || !formData.phone.trim())) {
-      setErrorMessage('Para poder informarte sobre el seguimiento, necesitamos tu nombre y teléfono. O podés seleccionar la opción de enviar de forma anónima.');
-      return;
+    if (!isAnonymous) {
+      if (!formData.name.trim() || !formData.phone.trim() || !formData.dni.trim() || !formData.email.trim()) {
+        setShowValidationAlerts(true);
+        setErrorMessage('Para poder informarte sobre el seguimiento, necesitamos tu nombre, DNI, teléfono y correo electrónico. O podés seleccionar la opción de enviar de forma anónima.');
+        return;
+      }
+      if (formData.phone.replace(/\D/g, '').length < 9) {
+        setShowValidationAlerts(true);
+        setErrorMessage('El número de celular debe tener al menos 9 dígitos (incluyendo código de área).');
+        return;
+      }
+      if (!formData.email.includes('@')) {
+        setShowValidationAlerts(true);
+        setErrorMessage('El correo electrónico debe ser válido (contener un @).');
+        return;
+      }
     }
+
+    setShowValidationAlerts(false);
 
     // Formatear ubicación e información para el feed del portal municipal
     const locationFormatted = `${formData.callePrincipal} ${formData.entreCalle1 && formData.entreCalle2 ? `(entre ${formData.entreCalle1} y ${formData.entreCalle2})` : ''}`;
@@ -681,6 +699,20 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
     // Generar número de seguimiento cortito de 4 dígitos
     const code = Math.floor(1000 + Math.random() * 9000);
     setCreatedTrackingCode(code);
+
+    // Obtener información del dispositivo
+    const ua = navigator.userAgent;
+    let deviceString = "Computadora";
+    if (/android/i.test(ua)) deviceString = "Móvil (Android)";
+    else if (/iPad|iPhone|iPod/.test(ua)) deviceString = "Móvil (iOS)";
+    
+    let browser = "Navegador Desconocido";
+    if (/Edg/i.test(ua)) browser = "Edge";
+    else if (/Chrome|CriOS/i.test(ua)) browser = "Chrome";
+    else if (/Safari/i.test(ua)) browser = "Safari";
+    else if (/Firefox|FxiOS/i.test(ua)) browser = "Firefox";
+
+    const deviceInfo = `${deviceString} usando ${browser}`;
 
     // El objeto para enviar al feed general
     const reportData = {
@@ -695,10 +727,12 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       entreCalle2: formData.entreCalle2,
       coordinates: gpsCoordinates, // Se guarda lat/lng si el usuario usó GPS
       anonymousName: isAnonymous ? 'Vecino Anónimo' : formData.name,
+      dni: isAnonymous ? null : (formData.dni ? formData.dni.replace(/\D/g, '') : null),
       phone: isAnonymous ? null : formData.phone,
       email: isAnonymous ? null : (formData.email || null),
       photos: formData.photos,
-      trackingCode: code
+      trackingCode: code,
+      deviceInfo: deviceInfo
     };
 
     onSubmitReport(reportData);
@@ -866,9 +900,15 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                   }}
                   placeholder="Ej. Av. Uruguay 1234"
                   className="form-input"
+                  style={showValidationAlerts && !formData.callePrincipal.trim() ? { border: '2px solid var(--danger)' } : {}}
                   required
                   autoComplete="off"
                 />
+                {showValidationAlerts && !formData.callePrincipal.trim() && (
+                  <div style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '0.4rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <AlertCircle size={14} /> Ingresá la dirección exacta.
+                  </div>
+                )}
                 
                 {formData.barrio && (
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -1033,9 +1073,28 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
               {!isAnonymous ? (
                 <>
                   <div className="form-group animate-fade-in">
+                    <label className="form-label">Número de DNI *</label>
+                    <div className="input-with-icon" style={showValidationAlerts && !formData.dni.trim() ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
+                      <ShieldCheck size={18} className="input-icon" />
+                      <input 
+                        type="text" 
+                        name="dni"
+                        value={formData.dni || ''}
+                        onChange={handleInputChange}
+                        placeholder="Ej. 34567890"
+                        className="form-input padding-left-icon"
+                        required
+                      />
+                    </div>
+                    <small className="form-text text-muted" style={{ display: 'block', marginTop: '0.25rem', fontSize: '0.75rem' }}>
+                      Ayuda a validar tu identidad y agilizar el seguimiento.
+                    </small>
+                  </div>
+
+                  <div className="form-group animate-fade-in">
                     <label className="form-label">Nombre y Apellido *</label>
-                    <div className="input-with-icon">
-                      <User size={16} className="input-icon" />
+                    <div className="input-with-icon" style={showValidationAlerts && !formData.name.trim() ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
+                      <User size={18} className="input-icon" />
                       <input 
                         type="text" 
                         name="name"
@@ -1050,23 +1109,32 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
                   <div className="form-group animate-fade-in">
                     <label className="form-label">Teléfono WhatsApp *</label>
-                    <div className="input-with-icon">
-                      <Phone size={16} className="input-icon" />
+                    <div style={{ display: 'flex', width: '100%', ...(showValidationAlerts && !formData.phone.trim() ? { border: '2px solid var(--danger)', borderRadius: '14px' } : {}) }}>
+                      <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-secondary)', border: '2px solid var(--border-color)', borderRight: 'none', borderRadius: '14px 0 0 14px', padding: '0 1rem', height: '56px', flexShrink: 0, transition: 'all 0.3s ease' }}>
+                         <span style={{ fontSize: '1.2rem', marginRight: '6px' }}>🇦🇷</span>
+                         <span style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '1rem' }}>+54</span>
+                      </div>
                       <input 
                         type="tel" 
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        placeholder="Ej. 3764-123456"
-                        className="form-input padding-left-icon"
+                        placeholder="Ej. 9 3764 123456"
+                        className="form-input"
+                        style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0, flex: 1 }}
                         required
                       />
                     </div>
+                    {showValidationAlerts && formData.phone.replace(/\D/g, '').length < 9 && (
+                      <div style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '0.4rem', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '500' }}>
+                        <AlertCircle size={14} /> El celular debe tener al menos 9 números (incluyendo código de área).
+                      </div>
+                    )}
                   </div>
 
                   <div className="form-group animate-fade-in">
-                    <label className="form-label">Correo Electrónico (Opcional - Para recibir código de seguimiento)</label>
-                    <div className="input-with-icon">
+                    <label className="form-label">Correo Electrónico *</label>
+                    <div className="input-with-icon" style={showValidationAlerts && !formData.email.trim() ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
                       <Mail size={16} className="input-icon" />
                       <input 
                         type="email" 
@@ -1075,8 +1143,14 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                         onChange={handleInputChange}
                         placeholder="Ej. vecino@correo.com"
                         className="form-input padding-left-icon"
+                        required
                       />
                     </div>
+                    {showValidationAlerts && !formData.email.includes('@') && (
+                      <div style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '0.4rem', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '500' }}>
+                        <AlertCircle size={14} /> El correo es inválido, debe contener el símbolo '@'.
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (

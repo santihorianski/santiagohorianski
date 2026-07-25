@@ -588,7 +588,10 @@ Párrafo final o conclusión de la noticia.`);
     return d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
-  const handleOpenDetail = (report) => {
+  const [padronMatch, setPadronMatch] = useState(null);
+  const [isFetchingPadron, setIsFetchingPadron] = useState(false);
+
+  const handleOpenDetail = async (report) => {
     setSelectedReport(report);
     setEditStatus(report.status);
     setEditResponse(report.candidateResponse || '');
@@ -596,6 +599,30 @@ Párrafo final o conclusión de la noticia.`);
     setEditComisionConcejal(report.comisionConcejal || '');
     setEditSesionNumber(report.sesionNumber || '');
     setIsSaveSuccess(false);
+    setPadronMatch(null);
+
+    if (report.dni && isSupabaseConfigured) {
+      setIsFetchingPadron(true);
+      try {
+        const cleanDni = String(report.dni).replace(/\D/g, '');
+        console.log("Consultando padrón para DNI:", cleanDni);
+        
+        const { data, error } = await supabase
+          .from('padron_posadas')
+          .select('*')
+          .eq('NU_MATRICULA', cleanDni)
+          .neq('id_centro', 'cachebuster_999999');
+          
+        console.log("Resultado padrón:", data, "Error:", error);
+
+        setPadronMatch({ rawDebug: JSON.stringify({ data, error, cleanDni }, null, 2) });
+      } catch (err) {
+        console.error("Error capturado buscando en el padrón:", err);
+        setPadronMatch({ rawDebug: err.message });
+      } finally {
+        setIsFetchingPadron(false);
+      }
+    }
   };
 
   const handleDelete = (id) => {
@@ -789,12 +816,24 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
   };
   
   // Helper for Maps Link
-  const getMapsLink = (location) => {
-    const gpsMatch = location.match(/Lat:\s*([-\d.]+),\s*Lng:\s*([-\d.]+)/);
+  const getMapsLink = (report) => {
+    if (!report) return '#';
+    // 1. Prioridad: Coordenadas GPS exactas
+    if (report.gpsLat && report.gpsLng) {
+      return `https://www.google.com/maps/search/?api=1&query=${report.gpsLat},${report.gpsLng}`;
+    }
+    // 2. Fallback: Parsear lat/lng si quedaron en el string antiguo
+    const locationStr = report.location || '';
+    const gpsMatch = locationStr.match(/Lat:\s*([-\d.]+),\s*Lng:\s*([-\d.]+)/);
     if (gpsMatch) {
       return `https://www.google.com/maps/search/?api=1&query=${gpsMatch[1]},${gpsMatch[2]}`;
     }
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location + ', Posadas, Misiones')}`;
+    // 3. Fallback: Usar solo la calle principal limpia (evita el barrio/delegación)
+    if (report.callePrincipal) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(report.callePrincipal + ', Posadas, Misiones')}`;
+    }
+    // 4. Último recurso: El location entero (puede fallar en Google si tiene mucho texto)
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationStr + ', Posadas, Misiones')}`;
   };
 
   // Funciones auxiliares para el editor de Noticias
@@ -1290,6 +1329,8 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                           <strong>WhatsApp:</strong> 
                           <span className="phone-number-badge">{selectedReport.phone || 'No provisto'}</span>
                         </p>
+                        <p><strong>DNI Reportado:</strong> {selectedReport.dni || 'No provisto'}</p>
+                        <p><strong>Correo Electrónico:</strong> {selectedReport.email || 'No provisto'}</p>
                       </div>
 
                       <div className="info-block">
@@ -1297,14 +1338,58 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                         <div className="info-grid-two-cols">
                           <p><strong>Eje / Categoría:</strong> <span className="badge badge-accent">{selectedReport.category}</span></p>
                           <p><strong>Fecha de Creación:</strong> {formatDate(selectedReport.createdAt)}</p>
+                          <p><strong>Dispositivo:</strong> {selectedReport.deviceInfo || 'Desconocido'}</p>
                         </div>
+                        
+                        {/* Padrón Match Box */}
+                        {isFetchingPadron && (
+                          <div className="padron-match-card fetching" style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '1rem', border: '1px solid var(--overlay-light)', textAlign: 'center' }}>
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Consultando Padrón Oficial...</span>
+                          </div>
+                        )}
+                        {!isFetchingPadron && padronMatch?.rawDebug && (
+                          <div className="padron-match-card" style={{ padding: '1rem', background: '#222', borderRadius: '12px', marginBottom: '1rem', border: '2px solid yellow' }}>
+                            <strong style={{ color: 'yellow', display: 'block' }}>DEBUG INFO</strong>
+                            <pre style={{ fontSize: '0.75rem', color: '#eee', whiteSpace: 'pre-wrap', margin: 0 }}>
+                              {padronMatch.rawDebug}
+                            </pre>
+                          </div>
+                        )}
+                        {!isFetchingPadron && padronMatch?._error && (
+                          <div className="padron-match-card not-found" style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '12px', marginBottom: '1rem', border: '2px solid red' }}>
+                            <strong style={{ color: 'red', display: 'block' }}>Error Interno al buscar DNI</strong>
+                            <span style={{ fontSize: '0.85rem', color: '#ef4444' }}>{padronMatch._error}</span>
+                          </div>
+                        )}
+                        {!isFetchingPadron && padronMatch && !padronMatch._error && (
+                          <div className="padron-match-card success" style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '12px', marginBottom: '1rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                              <ShieldCheck size={18} style={{ color: '#10b981' }} />
+                              <strong style={{ color: '#10b981', fontSize: '0.95rem' }}>Coincidencia en Padrón (DNI: {padronMatch.NU_MATRICULA})</strong>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
+                              <div><strong>Nombre:</strong> {padronMatch.TX_NOMBRE} {padronMatch.TX_APELLIDO}</div>
+                              <div><strong>Profesión:</strong> {padronMatch.TX_PROFESION || '-'}</div>
+                              <div><strong>Domicilio Electoral:</strong> {padronMatch.TX_DOMICILIO || '-'}</div>
+                              <div><strong>Localidad:</strong> {padronMatch.localidad || '-'}</div>
+                              <div><strong>Centro Votación:</strong> {padronMatch.centro_votacion || '-'}</div>
+                              <div><strong>Circuito:</strong> {padronMatch.TX_CIRC_NUMERO || '-'} (Mesa {padronMatch.NU_NRO_MESA})</div>
+                            </div>
+                          </div>
+                        )}
+                        {!isFetchingPadron && selectedReport.dni && (!padronMatch || padronMatch._error) && (
+                          <div className="padron-match-card not-found" style={{ padding: '0.75rem 1rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '12px', marginBottom: '1rem', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                            <span style={{ fontSize: '0.85rem', color: '#ef4444' }}>El DNI provisto ({selectedReport.dni}) no figura en el padrón electoral cargado.</span>
+                          </div>
+                        )}
+
                         <div className="location-detail-card">
                           <div className="loc-card-header">
                             <MapPin size={16} className="loc-card-icon" />
                             <strong>Ubicación Reportada:</strong>
                           </div>
                           <p className="loc-card-address">{selectedReport.location}</p>
-                          <a href={getMapsLink(selectedReport.location)} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm maps-btn-link" style={{ marginTop: '0.5rem', width: '100%', gap: '0.4rem' }}>
+                          <a href={getMapsLink(selectedReport)} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm maps-btn-link" style={{ marginTop: '0.5rem', width: '100%', gap: '0.4rem' }}>
                             <ExternalLink size={14} />
                             <span>Ver en Google Maps</span>
                           </a>

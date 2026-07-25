@@ -13,8 +13,8 @@ export default function Footer() {
         
         {/* Left Column: Brand */}
         <div className="footer-brand">
-          <div className="brand-logo-footer" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <img src="/logo-santi.png" alt="Logo" style={{ width: '65px', height: '65px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} />
+          <div className="footer-brand" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+            <img src="/logo-santi.png" alt="Logo" style={{ width: '65px', height: '65px', objectFit: 'cover', borderRadius: '50%', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} />
             <h3 style={{ margin: 0 }}>Santiago Javier Horianski</h3>
           </div>
           <p className="footer-brand-desc">

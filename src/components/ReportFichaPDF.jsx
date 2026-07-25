@@ -55,17 +55,17 @@ const ReportFichaPDF = React.forwardRef(({ report, getStatusDetails }, ref) => {
         transform: 'rotate(-45deg) scale(1.5)',
         gap: '40px'
       }}>
-        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>SANTIAGO JAVIER HORIANSKI</div>
-        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>SANTIAGO JAVIER HORIANSKI</div>
-        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>SANTIAGO JAVIER HORIANSKI</div>
-        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>SANTIAGO JAVIER HORIANSKI</div>
+        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>HORIANSKI - HORIANSKI - HORIANSKI</div>
+        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>HORIANSKI - HORIANSKI - HORIANSKI</div>
+        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>HORIANSKI - HORIANSKI - HORIANSKI</div>
+        <div style={{ fontSize: '100px', fontWeight: '900', color: '#000', whiteSpace: 'nowrap' }}>HORIANSKI - HORIANSKI - HORIANSKI</div>
       </div>
 
       {/* Encabezado */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e2e8f0', paddingBottom: '15px', marginBottom: '30px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <div style={{ padding: '0', borderRadius: '12px' }}>
-            <img src="/logo-santi.png" alt="Santi Logo" style={{ width: '70px', height: '70px', objectFit: 'contain' }} />
+          <div style={{ padding: '0', borderRadius: '50%', overflow: 'hidden', width: '70px', height: '70px' }}>
+            <img src="/logo-santi.png" alt="Santi Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div>
             <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.5px' }}>Reclamando con Santiago Horianski</h1>

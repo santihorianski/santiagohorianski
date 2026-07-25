@@ -2098,8 +2098,8 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
         }
 
         .info-block p {
-          font-size: 0.88rem;
-          color: #b0b0b0 !important;
+          font-size: 0.95rem;
+          color: var(--text-primary) !important;
           margin-bottom: 0.5rem;
         }
 
@@ -2214,15 +2214,15 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
         .desc-box strong {
           display: block;
           font-size: 0.8rem;
-          color: var(--text-muted);
+          color: var(--text-secondary);
           margin-bottom: 0.25rem;
         }
 
         .desc-box p {
           margin: 0;
-          font-size: 0.88rem;
+          font-size: 0.95rem;
           line-height: 1.5;
-          color: var(--text-secondary);
+          color: var(--text-primary);
         }
 
         .drawer-photos-grid {

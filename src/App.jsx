@@ -265,12 +265,21 @@ export default function App() {
     fetchSupabaseData();
   }, []);
 
+  // Persist state
   useEffect(() => {
-    localStorage.setItem('municipal_reports', JSON.stringify(reports));
+    try {
+      localStorage.setItem('municipal_reports', JSON.stringify(reports));
+    } catch (e) {
+      console.warn("Storage quota exceeded for municipal_reports", e);
+    }
   }, [reports]);
 
   useEffect(() => {
-    localStorage.setItem('municipal_news', JSON.stringify(newsList));
+    try {
+      localStorage.setItem('municipal_news', JSON.stringify(newsList));
+    } catch (e) {
+      console.warn("Storage quota exceeded for municipal_news", e);
+    }
   }, [newsList]);
 
   useEffect(() => {

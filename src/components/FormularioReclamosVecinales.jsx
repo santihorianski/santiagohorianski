@@ -889,8 +889,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     </span>
                   )}
                 </label>
-                <input 
-                  type="text" 
+                <input maxLength="500" type="text" 
                   name="callePrincipal"
                   value={formData.callePrincipal}
                   onChange={(e) => {
@@ -936,8 +935,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
                   <label className="form-label">Entre calle (opcional)</label>
-                  <input 
-                    type="text" 
+                  <input maxLength="500" type="text" 
                     name="entreCalle1"
                     value={formData.entreCalle1}
                     onChange={handleInputChange}
@@ -947,8 +945,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label className="form-label">Y calle (opcional)</label>
-                  <input 
-                    type="text" 
+                  <input maxLength="500" type="text" 
                     name="entreCalle2"
                     value={formData.entreCalle2}
                     onChange={handleInputChange}
@@ -1038,8 +1035,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
               <div className="form-group" style={{ marginTop: '1.25rem' }}>
                 <label className="form-label">Breve descripción adicional (opcional)</label>
-                <textarea 
-                  name="description"
+                <textarea maxLength="2000" name="description"
                   value={formData.description}
                   onChange={handleInputChange}
                   placeholder="Ej. El pozo se formó por una pérdida de agua subterránea. El tránsito de colectivos lo hace más peligroso..."
@@ -1076,8 +1072,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     <label className="form-label">Número de DNI *</label>
                     <div className="input-with-icon" style={showValidationAlerts && !formData.dni.trim() ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
                       <ShieldCheck size={18} className="input-icon" />
-                      <input 
-                        type="text" 
+                      <input maxLength="500" type="text" 
                         name="dni"
                         value={formData.dni || ''}
                         onChange={handleInputChange}
@@ -1095,8 +1090,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     <label className="form-label">Nombre y Apellido *</label>
                     <div className="input-with-icon" style={showValidationAlerts && !formData.name.trim() ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
                       <User size={18} className="input-icon" />
-                      <input 
-                        type="text" 
+                      <input maxLength="500" type="text" 
                         name="name"
                         value={formData.name}
                         onChange={handleInputChange}
@@ -1136,8 +1130,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     <label className="form-label">Correo Electrónico *</label>
                     <div className="input-with-icon" style={showValidationAlerts && !formData.email.trim() ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
                       <Mail size={16} className="input-icon" />
-                      <input 
-                        type="email" 
+                      <input maxLength="200" type="email" 
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}

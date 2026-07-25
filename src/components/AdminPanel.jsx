@@ -601,12 +601,14 @@ Párrafo final o conclusión de la noticia.`);
     setIsSaveSuccess(false);
     setPadronMatch(null);
 
-    if (report.dni && isSupabaseConfigured) {
+    if (report.dni) {
       setIsFetchingPadron(true);
       try {
-        const cleanDni = String(report.dni).replace(/\D/g, '');
-        console.log("Consultando padrón para DNI:", cleanDni);
-             const { data, error } = await supabase
+        const { supabase, isSupabaseConfigured } = await import('../supabaseClient');
+        if (isSupabaseConfigured) {
+          const cleanDni = String(report.dni).replace(/\D/g, '');
+          console.log("Consultando padrón para DNI:", cleanDni);
+          const { data, error } = await supabase
             .from('padron_posadas')
             .select('*')
             .eq('NU_MATRICULA', cleanDni)
@@ -623,10 +625,11 @@ Párrafo final o conclusión de la noticia.`);
             setPadronMatch({ _error: "El DNI no se encuentra en el padrón" }); // Esto no se muestra como error, lo maneja el if de "no figura"
             setPadronMatch(null); // Lo seteamos a null para que muestre el cartel rojo original
           }
-        } catch (err) {
-          console.error("Error general buscando en el padrón:", err);
-          setPadronMatch({ _error: "Error interno al verificar padrón" });
-        } finally {
+        }
+      } catch (err) {
+        console.error("Error general buscando en el padrón:", err);
+        setPadronMatch({ _error: "Error interno al verificar padrón" });
+      } finally {
         setIsFetchingPadron(false);
       }
     }

@@ -606,20 +606,27 @@ Párrafo final o conclusión de la noticia.`);
       try {
         const cleanDni = String(report.dni).replace(/\D/g, '');
         console.log("Consultando padrón para DNI:", cleanDni);
-        
-        const { data, error } = await supabase
-          .from('padron_posadas')
-          .select('*')
-          .eq('NU_MATRICULA', cleanDni)
-          .neq('id_centro', 'cachebuster_999999');
-          
-        console.log("Resultado padrón:", data, "Error:", error);
+             const { data, error } = await supabase
+            .from('padron_posadas')
+            .select('*')
+            .eq('NU_MATRICULA', cleanDni)
+            .maybeSingle();
+            
+          console.log("Resultado padrón:", data, "Error:", error);
 
-        setPadronMatch({ rawDebug: JSON.stringify({ data, error, cleanDni }, null, 2) });
-      } catch (err) {
-        console.error("Error capturado buscando en el padrón:", err);
-        setPadronMatch({ rawDebug: err.message });
-      } finally {
+          if (error) {
+            console.error("Error en query Supabase:", error);
+            setPadronMatch({ _error: error.message || "Error al conectar con la base de datos" });
+          } else if (data) {
+            setPadronMatch(data);
+          } else {
+            setPadronMatch({ _error: "El DNI no se encuentra en el padrón" }); // Esto no se muestra como error, lo maneja el if de "no figura"
+            setPadronMatch(null); // Lo seteamos a null para que muestre el cartel rojo original
+          }
+        } catch (err) {
+          console.error("Error general buscando en el padrón:", err);
+          setPadronMatch({ _error: "Error interno al verificar padrón" });
+        } finally {
         setIsFetchingPadron(false);
       }
     }
@@ -1347,14 +1354,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Consultando Padrón Oficial...</span>
                           </div>
                         )}
-                        {!isFetchingPadron && padronMatch?.rawDebug && (
-                          <div className="padron-match-card" style={{ padding: '1rem', background: '#222', borderRadius: '12px', marginBottom: '1rem', border: '2px solid yellow' }}>
-                            <strong style={{ color: 'yellow', display: 'block' }}>DEBUG INFO</strong>
-                            <pre style={{ fontSize: '0.75rem', color: '#eee', whiteSpace: 'pre-wrap', margin: 0 }}>
-                              {padronMatch.rawDebug}
-                            </pre>
-                          </div>
-                        )}
+
                         {!isFetchingPadron && padronMatch?._error && (
                           <div className="padron-match-card not-found" style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '12px', marginBottom: '1rem', border: '2px solid red' }}>
                             <strong style={{ color: 'red', display: 'block' }}>Error Interno al buscar DNI</strong>

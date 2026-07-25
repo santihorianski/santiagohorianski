@@ -1365,15 +1365,15 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                           <div className="padron-match-card success" style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '12px', marginBottom: '1rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                               <ShieldCheck size={18} style={{ color: '#10b981' }} />
-                              <strong style={{ color: '#10b981', fontSize: '0.95rem' }}>Coincidencia en Padrón (DNI: {padronMatch.NU_MATRICULA})</strong>
+                              <strong style={{ color: '#10b981', fontSize: '0.95rem' }}>Coincidencia en Padrón (DNI: {String(padronMatch.NU_MATRICULA || '')})</strong>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
-                              <div><strong>Nombre:</strong> {padronMatch.TX_NOMBRE} {padronMatch.TX_APELLIDO}</div>
-                              <div><strong>Profesión:</strong> {padronMatch.TX_PROFESION || '-'}</div>
-                              <div><strong>Domicilio Electoral:</strong> {padronMatch.TX_DOMICILIO || '-'}</div>
-                              <div><strong>Localidad:</strong> {padronMatch.localidad || '-'}</div>
-                              <div><strong>Centro Votación:</strong> {padronMatch.centro_votacion || '-'}</div>
-                              <div><strong>Circuito:</strong> {padronMatch.TX_CIRC_NUMERO || '-'} (Mesa {padronMatch.NU_NRO_MESA})</div>
+                              <div><strong>Nombre:</strong> {String(padronMatch.TX_NOMBRE || '')} {String(padronMatch.TX_APELLIDO || '')}</div>
+                              <div><strong>Profesión:</strong> {String(padronMatch.TX_PROFESION || '-')}</div>
+                              <div><strong>Domicilio Electoral:</strong> {String(padronMatch.TX_DOMICILIO || '-')}</div>
+                              <div><strong>Localidad:</strong> {String(padronMatch.localidad || '-')}</div>
+                              <div><strong>Centro Votación:</strong> {String(padronMatch.centro_votacion || '-')}</div>
+                              <div><strong>Circuito:</strong> {String(padronMatch.TX_CIRC_NUMERO || '-')} (Mesa {String(padronMatch.NU_NRO_MESA || '')})</div>
                             </div>
                           </div>
                         )}

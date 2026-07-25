@@ -1246,10 +1246,10 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                             <Calendar size={14} /> <span>{formatDate(rep.createdAt)}</span>
                           </div>
                           
-                          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: 'var(--text-primary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{rep.description}</h4>
+                          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: 'var(--text-primary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{rep.description?.length > 500 ? rep.description.substring(0, 500) + '...' : rep.description}</h4>
                           
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0.5rem 0', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                            <MapPin size={14} style={{ color: 'var(--primary)' }} /> <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{rep.location}</span>
+                            <MapPin size={14} style={{ color: 'var(--primary)' }} /> <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{rep.location?.length > 300 ? rep.location.substring(0, 300) + '...' : rep.location}</span>
                           </div>
                           
                           <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--overlay-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1334,7 +1334,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                     <div className="drawer-left-col">
                       <div className="info-block">
                         <h4>Datos de Contacto Vecinal</h4>
-                        <p><strong>Nombre:</strong> {selectedReport.anonymousName || 'Vecino Anónimo'}</p>
+                        <p><strong>Nombre:</strong> {selectedReport.anonymousName ? (selectedReport.anonymousName.length > 500 ? selectedReport.anonymousName.substring(0, 500) + '... [TRUNCADO]' : selectedReport.anonymousName) : 'Vecino Anónimo'}</p>
                         <p className="whatsapp-row">
                           <strong>WhatsApp:</strong> 
                           <span className="phone-number-badge">{selectedReport.phone || 'No provisto'}</span>
@@ -1391,7 +1391,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                             <MapPin size={16} className="loc-card-icon" />
                             <strong>Ubicación Reportada:</strong>
                           </div>
-                          <p className="loc-card-address">{selectedReport.location}</p>
+                          <p className="loc-card-address">{selectedReport.location?.length > 1000 ? selectedReport.location.substring(0, 1000) + '... [TRUNCADO POR SEGURIDAD]' : selectedReport.location}</p>
                           <a href={getMapsLink(selectedReport)} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm maps-btn-link" style={{ marginTop: '0.5rem', width: '100%', gap: '0.4rem' }}>
                             <ExternalLink size={14} />
                             <span>Ver en Google Maps</span>
@@ -1399,7 +1399,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                         </div>
                         <div className="desc-box">
                           <strong>Detalle Vecinal:</strong>
-                          <p>{selectedReport.description}</p>
+                          <p>{selectedReport.description?.length > 2000 ? selectedReport.description.substring(0, 2000) + '... [TRUNCADO POR SEGURIDAD]' : selectedReport.description}</p>
                         </div>
                       </div>
 

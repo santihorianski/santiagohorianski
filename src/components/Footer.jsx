@@ -51,7 +51,7 @@ export default function Footer() {
             <h4>Contacto</h4>
             <p className="footer-contact-info">
               ¿Querés sumarte a la juventud?<br />
-              <a href="https://www.instagram.com/juventudmisioneslibertadavanza/?hl=en" target="_blank" rel="noopener noreferrer" className="gradient-text-accent" style={{ textDecoration: 'none' }}>@juventudmisioneslibertadavanza</a>
+              <a href="https://www.instagram.com/juventudmisioneslibertadavanza/?hl=en" target="_blank" rel="noopener noreferrer" className="gradient-text" style={{ textDecoration: 'none', fontWeight: 'bold' }}>@juventudmisioneslibertadavanza</a>
             </p>
           </div>
         </div>

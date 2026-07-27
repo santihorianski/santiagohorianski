@@ -732,62 +732,32 @@ export default function ProjectsCatalog({ hideBandera = false }) {
             <button className="modal-close-btn" onClick={() => setIsModalOpen(false)}>
               <X size={20} />
             </button>
-
-            {modalSent ? (
-              <div className="modal-success">
-                <div className="success-icon-ring">
-                  <Send size={32} style={{ color: 'var(--success)' }} />
-                </div>
-                <h3>¡Solicitud Recibida!</h3>
-                <p>Nos pondremos en contacto con vos a la brevedad para enviarte el expediente oficial del proyecto o coordinar tu propuesta legislativa.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleModalSubmit} className="modal-form">
-                <h3>Contacto Vecinal Directo</h3>
-                <p className="modal-subtitle-form">
-                  Estás solicitando el proyecto completo o sumando ideas para:<br />
-                  <strong>{modalProjectTitle}</strong>
+            <div className="modal-form" style={{ padding: '1rem 0', width: '100%' }}>
+              <h3>{modalProject?.title}</h3>
+              <div style={{ margin: '1rem 0', padding: '1rem', background: 'var(--overlay-light)', borderRadius: '8px' }}>
+                <p style={{ margin: '0 0 0.5rem 0' }}><strong>Categoría:</strong> {modalProject?.category}</p>
+                <p style={{ margin: '0 0 0.5rem 0' }}><strong>Tipo:</strong> {modalProject ? getProjectType(modalProject) : ''}</p>
+                <p style={{ margin: '0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <strong>Estado actual:</strong> 
+                  <span className="badge" style={{ backgroundColor: 'var(--success)', color: '#000', fontWeight: 'bold', fontSize: '0.8rem', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
+                    {modalProject?.status?.toUpperCase()}
+                  </span>
                 </p>
-
-                <div className="form-group">
-                  <label className="form-label">Nombre Completo *</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    placeholder="Ej. Juan Pérez" 
-                    required 
-                    value={modalForm.name}
-                    onChange={(e) => setModalForm(prev => ({ ...prev, name: e.target.value }))}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Número de WhatsApp *</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    placeholder="Ej. 3764-XXXXXX" 
-                    required 
-                    value={modalForm.contact}
-                    onChange={(e) => setModalForm(prev => ({ ...prev, contact: e.target.value }))}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Mensaje / Idea</label>
-                  <textarea 
-                    className="form-textarea" 
-                    rows={3} 
-                    value={modalForm.message}
-                    onChange={(e) => setModalForm(prev => ({ ...prev, message: e.target.value }))}
-                  ></textarea>
-                </div>
-
-                <button type="submit" className="btn btn-primary btn-full-width" style={{ marginTop: '1rem' }}>
-                  <span>Enviar mensaje a Santiago</span>
-                </button>
-              </form>
-            )}
+              </div>
+              <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>
+                Si querés acceder al texto completo del expediente o sumar tu idea sobre este proyecto, contactate por WhatsApp de manera directa.
+              </p>
+              <button 
+                type="button"
+                className="btn btn-primary" 
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', backgroundColor: '#25D366' }}
+                onClick={() => {
+                  window.open(`https://wa.me/5493764515738?text=Hola Santiago, quisiera pedirte más información o aportar sobre el proyecto: ${modalProject?.title}`, '_blank');
+                }}
+              >
+                <MessageSquare size={18} /> Solicitar por WhatsApp
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Search, Grid, List, Wrench, Laptop, CheckSquare, BarChart3, AlertCircle, FileText, Send, X, MessageSquare } from 'lucide-react';
 
 // Catálogo completo de los proyectos del HCD Misiones (Concejo Deliberante de Posadas)
-import { PROJECTS_DATA } from '../utils/projectsData';
+import { PROJECTS_DATA, FEATURED_PROJECTS } from '../utils/projectsData';
 
   const getProjectType = (proj) => {
   if (!proj) return '';

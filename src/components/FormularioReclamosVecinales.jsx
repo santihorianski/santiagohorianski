@@ -442,7 +442,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
   const categories = [
     { id: 'verdes', title: '🌿 Espacios Verdes', desc: 'Pedido de corte de césped / Malezas altas en terreno baldío.' },
     { id: 'limpieza', title: '🧹 Limpieza', desc: 'Pedido de limpieza en la calle / Limpieza de boca de tormenta.' },
-    { id: 'calles', title: '🕳️ Calles y Asfalto', desc: 'Pozo peligroso / Reparación de lomo de burro.' },
+    { id: 'calles', title: '🚧 Calles y Asfalto', desc: 'Pozo peligroso / Reparación de lomo de burro.' },
     { id: 'iluminacion', title: '💡 Iluminación', desc: 'Foco roto / Cuadra a oscuras.' },
     { id: 'residuos', title: '🗑️ Residuos', desc: 'Falta contenedor de basura / Basural a cielo abierto.' },
     { id: 'transito', title: '🚦 Tránsito', desc: 'Semáforo sin funcionar / Falta señalización.' },

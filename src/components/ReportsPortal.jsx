@@ -105,7 +105,7 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
   const [selectedStatus, setSelectedStatus] = useState('Todos');
   const [sortBy, setSortBy] = useState('recent'); // 'recent' or 'upvotes'
 
-  const categories = ['Todas', '🌿 Espacios Verdes', '🧹 Limpieza', '🕳️ Calles y Asfalto', '💡 Iluminación', '🗑️ Residuos', '🚦 Tránsito', '👮 Seguridad', '⚠️ Peligro en vía pública', '💬 Idea / Propuesta', '🔹 Otros'];
+  const categories = ['Todas', '🌿 Espacios Verdes', '🧹 Limpieza', '🚧 Calles y Asfalto', '💡 Iluminación', '🗑️ Residuos', '🚦 Tránsito', '👮 Seguridad', '⚠️ Peligro en vía pública', '💬 Idea / Propuesta', '🔹 Otros'];
   const statuses = ['Todos', 'recibido', 'presentado', 'en_comision', 'en_votacion', 'aprobado'];
 
   // Filtrar y ordenar reportes

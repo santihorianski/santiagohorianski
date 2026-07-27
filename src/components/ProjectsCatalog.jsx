@@ -236,7 +236,7 @@ export default function ProjectsCatalog({ hideBandera = false }) {
                         
                     </div>
                   </div>
-                  <h4 className="proj-card-title">{proj.title}</h4>
+                  <h4 className="proj-card-title" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }} title={proj.original_title || proj.title}>{proj.title}</h4>
                   <p className="proj-card-summary">{proj.summary}</p>
                   <div className="proj-card-actions">
                     <button 
@@ -271,7 +271,7 @@ export default function ProjectsCatalog({ hideBandera = false }) {
                   <div key={proj.id} className={`list-row ${projectType === 'Ordenanza' ? 'ordenanza-row-highlight' : ''}`}>
                     <span className="td-id">#{proj.id}</span>
                     <div className="td-title-wrapper">
-                      <span className="td-title">
+                      <span className="td-title" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }} title={proj.original_title || proj.title}>
                         <span style={{ color: 'var(--primary)', marginRight: '0.4rem' }}>⭐</span>
                         {proj.title}
                       </span>
@@ -321,21 +321,36 @@ export default function ProjectsCatalog({ hideBandera = false }) {
       {/* Modal Glassmorphism de Solicitud */}
       {isModalOpen && (
         <div className="modal-overlay">
-          <div className="modal-content glass-panel animate-fade-in">
-            <button className="modal-close-btn" onClick={() => setIsModalOpen(false)}>
-              <X size={20} />
+          <div className="modal-content glass-panel animate-fade-in" style={{ maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+            <button className="modal-close-btn" onClick={() => setIsModalOpen(false)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(0,0,0,0.3)', borderRadius: '50%', padding: '5px', zIndex: 10 }}>
+              <X size={20} color="#fff" />
             </button>
             <div className="modal-form" style={{ padding: '1rem 0', width: '100%' }}>
-              <h3>{modalProject?.title}</h3>
+              <h3 style={{ paddingRight: '2rem' }}>{modalProject?.title}</h3>
               <div style={{ margin: '1rem 0', padding: '1rem', background: 'var(--overlay-light)', borderRadius: '8px' }}>
                 <p style={{ margin: '0 0 0.5rem 0' }}><strong>Categoría:</strong> {modalProject?.category}</p>
                 <p style={{ margin: '0 0 0.5rem 0' }}><strong>Tipo:</strong> {modalProject ? getProjectType(modalProject) : ''}</p>
-                <p style={{ margin: '0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <strong>Estado actual:</strong> 
-                  <span className="badge" style={{ backgroundColor: 'var(--success)', color: '#000', fontWeight: 'bold', fontSize: '0.8rem', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
-                    {modalProject?.status?.toUpperCase()}
-                  </span>
-                </p>
+                
+                {modalProject?.history && modalProject.history.length > 0 ? (
+                  <div style={{ marginTop: '1rem' }}>
+                    <strong>Historial de Estados:</strong>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0 0', fontSize: '0.85rem' }}>
+                      {modalProject.history.map((h, i) => (
+                        <li key={i} style={{ marginBottom: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                          <span style={{ color: 'var(--primary)', marginRight: '0.5rem' }}>→</span>
+                          {h}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p style={{ margin: '0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <strong>Estado actual:</strong> 
+                    <span className="badge" style={{ backgroundColor: 'var(--success)', color: '#000', fontWeight: 'bold', fontSize: '0.8rem', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
+                      {modalProject?.status?.toUpperCase()}
+                    </span>
+                  </p>
+                )}
               </div>
               <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>
                 Si querés acceder al texto completo del expediente o sumar tu idea sobre este proyecto, contactate por WhatsApp de manera directa.

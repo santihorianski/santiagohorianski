@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Search, Grid, List, Wrench, Laptop, CheckSquare, BarChart3, AlertCircle, FileText, Send, X } from 'lucide-react';
+import { Search, Grid, List, Wrench, Laptop, CheckSquare, BarChart3, AlertCircle, FileText, Send, X, MessageSquare } from 'lucide-react';
 
 // Catálogo completo de los proyectos del HCD Misiones (Concejo Deliberante de Posadas)
 const PROJECTS_DATA = [
@@ -419,7 +419,7 @@ export default function ProjectsCatalog({ hideBandera = false }) {
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalProjectTitle, setModalProjectTitle] = useState('');
+  const [modalProject, setModalProject] = useState(null);
   const [modalSent, setModalSent] = useState(false);
   const [modalForm, setModalForm] = useState({ name: '', contact: '', message: '' });
 
@@ -625,28 +625,28 @@ export default function ProjectsCatalog({ hideBandera = false }) {
             /* VISTA GRILLA */
             <div className="projects-grid-layout">
               {visibleProjects.map((proj) => {
-                const isOrdenanza = proj.summary.toLowerCase().includes('ordenanza') || proj.title.toLowerCase().includes('ordenanza');
+                const projectType = getProjectType(proj);
                 return (
-                <div key={proj.id} className={`project-grid-card card glass-panel ${isOrdenanza ? 'ordenanza-highlight' : ''}`}>
+                <div key={proj.id} className={`project-grid-card card glass-panel ${projectType === 'Ordenanza' ? 'ordenanza-highlight' : ''}`}>
                   <div className="proj-card-header">
                     <span className="proj-id-badge">#{proj.id}</span>
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                      {isOrdenanza && <span className="badge" style={{ backgroundColor: 'var(--primary)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>⭐ ORDENANZA</span>}
+                      <span className="badge" style={{ backgroundColor: 'var(--primary)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>⭐ {projectType.toUpperCase()}</span>
                       <span className="badge badge-accent proj-cat-badge">{proj.category}</span>
-                        {proj.status && <span className="badge" style={{ backgroundColor: 'var(--success)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>{proj.status.toUpperCase()}</span>}
+                        
                     </div>
                   </div>
                   <h4 className="proj-card-title">{proj.title}</h4>
                   <p className="proj-card-summary">{proj.summary}</p>
                   <div className="proj-card-actions">
                     <button 
-                      onClick={() => handleOpenModal(proj.title)}
+                      onClick={() => handleOpenModal(proj)}
                       className="btn btn-secondary btn-sm proj-card-cta"
                     >
                       <span>Solicitar completo</span>
                     </button>
                     <button 
-                      onClick={() => handleOpenModal(`Aporte para: ${proj.title}`)}
+                      onClick={() => handleOpenModal(proj)}
                       className="btn-link-action"
                     >
                       <span>Sumar mi idea</span>
@@ -666,31 +666,31 @@ export default function ProjectsCatalog({ hideBandera = false }) {
               </div>
               <div className="list-table-body">
                 {visibleProjects.map((proj) => {
-                  const isOrdenanza = proj.summary.toLowerCase().includes('ordenanza') || proj.title.toLowerCase().includes('ordenanza');
+                  const projectType = getProjectType(proj);
                   return (
-                  <div key={proj.id} className={`list-row ${isOrdenanza ? 'ordenanza-row-highlight' : ''}`}>
+                  <div key={proj.id} className={`list-row ${projectType === 'Ordenanza' ? 'ordenanza-row-highlight' : ''}`}>
                     <span className="td-id">#{proj.id}</span>
                     <div className="td-title-wrapper">
                       <span className="td-title">
-                        {isOrdenanza && <span style={{ color: 'var(--primary)', marginRight: '0.4rem' }}>⭐</span>}
+                        <span style={{ color: 'var(--primary)', marginRight: '0.4rem' }}>⭐</span>
                         {proj.title}
                       </span>
                       <span className="td-summary-inline">{proj.summary}</span>
                     </div>
                     <span className="td-category">
-                      {isOrdenanza && <span className="badge" style={{ backgroundColor: 'var(--primary)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px', marginBottom: '0.2rem', display: 'inline-block' }}>ORDENANZA</span>}
+                      <span className="badge" style={{ backgroundColor: 'var(--primary)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px', marginBottom: '0.2rem', display: 'inline-block' }}>{projectType.toUpperCase()}</span>
                       <span className="badge badge-accent proj-cat-badge-small">{proj.category}</span>
-                        {proj.status && <span className="badge" style={{ backgroundColor: 'var(--success)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px', display: 'inline-block', marginLeft: '0.5rem' }}>{proj.status.toUpperCase()}</span>}
+                        
                     </span>
                     <div className="td-actions">
                       <button 
-                        onClick={() => handleOpenModal(proj.title)}
+                        onClick={() => handleOpenModal(proj)}
                         className="btn btn-secondary btn-xs-table"
                       >
                         Solicitar
                       </button>
                       <button 
-                        onClick={() => handleOpenModal(`Idea sobre: ${proj.title}`)}
+                        onClick={() => handleOpenModal(proj)}
                         className="btn-xs-link"
                       >
                         Sumar idea

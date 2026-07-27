@@ -2075,8 +2075,8 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
         }
 
         .info-block, .management-block {
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.06);
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 12px;
           padding: 1.25rem;
         }

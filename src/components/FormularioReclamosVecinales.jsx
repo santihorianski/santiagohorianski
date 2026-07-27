@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, ChevronDown, AlertCircle, Trash2, Shield, ShieldCheck, Search, FileText, Mail, X } from 'lucide-react';
+import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, ChevronDown, AlertCircle, Trash2, Shield, ShieldCheck, Search, FileText, Mail, X, MessageSquare } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { uploadFileToR2, isR2Configured } from '../r2Client';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';

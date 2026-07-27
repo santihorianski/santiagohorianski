@@ -134,6 +134,7 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
       const matchesSearch = rep.title.toLowerCase().includes(searchTermLower) || 
                             rep.description.toLowerCase().includes(searchTermLower) ||
                             rep.location.toLowerCase().includes(searchTermLower) ||
+                            (rep.anonymousName && rep.anonymousName.toLowerCase().includes(searchTermLower)) ||
                             (rep.trackingCode && rep.trackingCode.toString().includes(cleanSearch) && cleanSearch !== '');
       
       const matchesCategory = selectedCategory === 'Todas' || rep.category === selectedCategory || isExactTrackingSearch;

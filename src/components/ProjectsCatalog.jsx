@@ -412,6 +412,17 @@ const FEATURED_PROJECTS = [
   }
 ];
 
+const getProjectType = (proj) => {
+  if (!proj) return '';
+  const text = (proj.title + ' ' + proj.summary).toLowerCase();
+  if (text.includes('ordenanza')) return 'Ordenanza';
+  if (text.includes('resolución') || text.includes('resolucion')) return 'Resolución';
+  if (text.includes('comunicación') || text.includes('comunicacion')) return 'Comunicación';
+  if (text.includes('pedido de informe')) return 'Pedido de Informe';
+  if (text.includes('declaración') || text.includes('declaracion')) return 'Declaración';
+  return 'Proyecto';
+};
+
 export default function ProjectsCatalog({ hideBandera = false }) {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');

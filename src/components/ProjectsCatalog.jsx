@@ -8,379 +8,379 @@ const PROJECTS_DATA = [
     id: 101,
     title: 'Normas de Transparencia y Datos Abiertos en el HCD',
     summary: 'Proyecto de Resolución para establecer normas de transparencia, publicidad, datos abiertos y control en absolutamente todos los procesos de contratación, adquisición, locación y provisión que realice el Honorable Concejo Deliberante.',
-    category: 'Transparencia'
+    , status: 'Aprobado'
   },
   {
     id: 102,
     title: 'Programa "Posadas Libre para Emprender"',
     summary: 'Proyecto de Ordenanza para crear el programa "Posadas Libre para Emprender", facilitando y promoviendo el desarrollo de nuevos emprendimientos en la ciudad.',
-    category: 'Desarrollo Económico'
+    , status: 'Aprobado'
   },
   {
     id: 103,
     title: 'Balance Digital de Sumas y Saldos 2025',
     summary: 'Proyecto de Resolución para requerir al DEM que remita en formato digital el Balance de Sumas y Saldos al 31/12/2025 con toda la documentación respaldatoria.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 104,
     title: 'Informe sobre Multa Infundada a Comercio Local',
     summary: 'Proyecto de Resolución pidiendo informes al DEM sobre el cobro infundado de una multa de $190.000.000 al local comercial LE UTTHE.',
-    category: 'Control'
+    , status: 'Aprobado'
   },
   {
     id: 105,
     title: 'Rendición de Fondos en Eventos Masivos (2025-2026)',
     summary: 'Proyecto de Comunicación solicitando al DEM informe detallado sobre planificación, contratación, ejecución y rendición de fondos destinados a eventos masivos.',
-    category: 'Transparencia'
+    , status: 'Aprobado'
   },
   {
     id: 106,
     title: 'Ejecución de Gastos de Cortesía y Homenajes 2025',
     summary: 'Proyecto de Comunicación para solicitar al DEM un informe detallado sobre la ejecución de la partida "Gastos de Cortesía y Homenajes" del ejercicio 2025.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 107,
     title: 'Prohibición de Fotomultas Automáticas sin Constatación Humana',
     summary: 'Proyecto de Ordenanza para prohibir la utilización de radares o fotomultas cuya configuración sea estrictamente algorítmica, careciendo de constatación humana en tiempo real.',
-    category: 'Tránsito'
+    , status: 'Aprobado'
   },
   {
     id: 108,
     title: 'Informes y Expedientes del Sistema de Estacionamiento Medido (SEM)',
     summary: 'Proyecto de Comunicación exigiendo al DEM toda la información, antecedentes y expedientes vinculados al Sistema de Estacionamiento Medido (SEM).',
-    category: 'Tránsito'
+    , status: 'Aprobado'
   },
   {
     id: 109,
     title: 'Puesta en Funcionamiento de la Junta Electoral Municipal',
     summary: 'Proyecto de Comunicación para que el DEM arbitre las medidas necesarias para la constitución e integración de la Junta Electoral Municipal.',
-    category: 'Institucional'
+    , status: 'Aprobado'
   },
   {
     id: 110,
     title: 'Informe sobre el evento "UNA + FAN FEST — Edición Mundial"',
     summary: 'Proyecto de Comunicación para solicitar al DEM un informe completo sobre la finalización y realización del evento "UNA + FAN FEST".',
-    category: 'Transparencia'
+    , status: 'Aprobado'
   },
   {
     id: 111,
     title: 'Autorización y Fondos de la "Casa del Streaming de Posadas"',
     summary: 'Proyecto de Comunicación solicitando información documentada sobre la autorización municipal de los eventos realizados en calle Colón bajo la denominación "Casa del Streaming".',
-    category: 'Transparencia'
+    , status: 'Aprobado'
   },
   {
     id: 112,
     title: 'Contrataciones de Volquetes y Camiones Volcadores',
     summary: 'Proyecto de Comunicación solicitando informes vinculados a las contrataciones, alquileres y locaciones de volquetes y servicios de camiones volcadores.',
-    category: 'Control'
+    , status: 'Aprobado'
   },
   {
     id: 113,
     title: 'Eliminación de Tasas Específicas para Volquetes',
     summary: 'Proyecto de Ordenanza para modificar la Ord. XVI-N° 119 y eliminar la posibilidad de establecer tasas específicas vinculadas a la autorización e instalación de volquetes.',
-    category: 'Desarrollo Económico'
+    , status: 'Aprobado'
   },
   {
     id: 1,
     title: 'Pedido de Informes sobre Alquileres de Edificios Municipales',
     summary: 'Auditoría y control de los contratos de alquiler vigentes de dependencias municipales para optimizar recursos públicos.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 2,
     title: 'Auditoría y Padrón de Proveedores del Estado',
     summary: 'Solicitud de informes sobre las contrataciones y compras realizadas a proveedores y contratistas directos.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 3,
     title: 'Control de Gastos en Publicidad y Propaganda Oficial',
     summary: 'Pedido de aclaraciones sobre el presupuesto asignado a pautas publicitarias y propaganda institucional de Posadas.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 4,
     title: 'Auditoría de Aportes Previsionales al IPS',
     summary: 'Control del estado de transferencias de aportes jubilatorios de los empleados municipales al IPS Misiones.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 5,
     title: 'Registro de Donaciones y Legados Municipales',
     summary: 'Solicitud de informe detallado de las donaciones aceptadas por la comuna y su asignación patrimonial.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 6,
     title: 'Gastos de Urgencia sin Licitación Pública',
     summary: 'Pedido de informes sobre contrataciones directas encuadradas bajo régimen de urgencia o fuerza mayor.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 7,
     title: 'Estado de Juicios contra el Municipio',
     summary: 'Requerimiento de información sobre litigios judiciales activos y provisiones para fallos en contra del erario público.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 8,
     title: 'Rendición de Subsidios Otorgados a Terceros',
     summary: 'Control de las rendiciones de cuentas de los subsidios financieros otorgados a entidades civiles y comisiones.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 9,
     title: 'Auditoría de Subsidios al Transporte Urbano (SIT)',
     summary: 'Pedido de informes sobre los fondos y subsidios públicos distribuidos a empresas de transporte de Posadas.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 10,
     title: 'Gratuidades y Control del Boleto Estudiantil Estatal',
     summary: 'Requerimiento de datos sobre la cobertura, uso y financiamiento del boleto gratuito estudiantil (BEEG).',
-    category: 'Juventud'
+    , status: 'Aprobado'
   },
   {
     id: 11,
     title: 'Emisión de Licencias de Conducir y Descentralización de Trámites',
     summary: 'Proyecto para auditar los costos de emisión, exámenes médicos y descentralización del trámite del carnet.',
-    category: 'Modernización'
+    , status: 'Aprobado'
   },
   {
     id: 12,
     title: 'Recaudación y Gestión del Estacionamiento Medido (SEM)',
     summary: 'Pedido de informes sobre los fondos recaudados por la aplicación del SEM y su destino presupuestario.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 13,
     title: 'Cobro de Multas y Funcionamiento del Tribunal de Faltas',
     summary: 'Solicitud de estadísticas de infracciones labradas y la recaudación neta del Tribunal de Faltas municipal.',
-    category: 'Modernización'
+    , status: 'Aprobado'
   },
   {
     id: 14,
     title: 'Estado del Parque Vial y Maquinaria Municipal',
     summary: 'Control de inventario, mantenimiento y horas de uso de las máquinas viales del municipio.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 15,
     title: 'Simplificación de Habilitaciones Comerciales y Bajas',
     summary: 'Informe solicitado sobre la demora de habilitaciones comerciales y propuestas de trámites exprés.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 16,
     title: 'Tasa a Salas de Juego y Casinos de Posadas',
     summary: 'Control tributario y auditoría sobre los cánones abonados por salas de apuestas ubicadas en la ciudad.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 17,
     title: 'Infraestructura del Parque Industrial Posadas',
     summary: 'Estado de radicación de empresas y beneficios fiscales aplicados para el desarrollo industrial.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 18,
     title: 'Tasa de Espectáculos Públicos y Eventos Comerciales',
     summary: 'Auditoría sobre la exención o cobro de tasas a eventos comerciales y recitales de Posadas.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 19,
     title: 'Inspecciones Bromatológicas y Multas a Comercios',
     summary: 'Pedido de datos sobre actas labradas, decomisos y multas en comercios gastronómicos locales.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 20,
     title: 'Publicidad en Vía Pública y Cánones de Cartelería',
     summary: 'Control del cobro de derechos por carteles comerciales instalados en espacios públicos.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 21,
     title: 'Concesiones de Locales en la Costanera y Espacios Públicos',
     summary: 'Pedido de informes sobre pliegos, cánones mensuales y adjudicaciones de paradores municipales.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 22,
     title: 'Fondo de Compensaciones de la Entidad Binacional Yacyretá',
     summary: 'Solicitud de informe sobre las regalías y obras compensatorias pendientes de la EBY en la ciudad.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 23,
     title: 'Avance del Plan Estratégico Posadas 2010-2035',
     summary: 'Control de las metas viales y de planificación territorial cumplidas dentro del plan rector.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 24,
     title: 'Regularización Dominial y Ocupación de Tierras Fiscales',
     summary: 'Relevamiento de asentamientos y proyectos para la titulación y urbanización de terrenos.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 25,
     title: 'Tasas Punitorias a Terrenos Baldíos Abandonados',
     summary: 'Control del cobro de tasas punitivas y multas por malezas y abandono de terrenos privados.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 26,
     title: 'Eliminación de Barreras Arquitectónicas y Accesibilidad',
     summary: 'Proyecto para auditar la accesibilidad (rampas, sendas) en veredas y edificios del microcentro.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 27,
     title: 'Servicio de Agua Potable, Falta de Presión y Suministro',
     summary: 'Pedido de informes sobre cortes recurrentes y falta de presión de agua en Itaembé Miní.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 28,
     title: 'Gestión de Residuos Sólidos Urbanos (GIRSU)',
     summary: 'Control del sistema de recolección diferenciada y funcionamiento del relleno sanitario.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 29,
     title: 'Plan de Arbolado e Inventario Forestal Urbano',
     summary: 'Solicitud de informes sobre el reemplazo de especies exóticas y censo de árboles urbanos.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 30,
     title: 'Control y Medición de Ruidos Molestos',
     summary: 'Estadísticas de denuncias a locales nocturnos, escapes libres y sonómetros homologados.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 31,
     title: 'Erradicación de Microbasurales en Barrios',
     summary: 'Solicitud de informes sobre focos crónicos de basura acumulada en avenidas periféricas.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 32,
     title: 'Presupuesto y Cobertura del IMuSA',
     summary: 'Pedido de informes sobre campañas de castración, vacunación y presupuesto del instituto de salud animal.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 33,
     title: 'Control de Contaminación de Efluentes en Arroyos',
     summary: 'Auditoría ambiental de efluentes arrojados a los arroyos Mártires y El Zaimán.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 34,
     title: 'Ejecución del Presupuesto Participativo',
     summary: 'Pedido de informes sobre el estado de obras votadas por los vecinos que aún no se iniciaron.',
-    category: 'Modernización'
+    , status: 'Aprobado'
   },
   {
     id: 35,
     title: 'Padrones y Elecciones de Comisiones Vecinales',
     summary: 'Control de los llamados a elecciones y padrones de las comisiones en las delegaciones.',
-    category: 'Modernización'
+    , status: 'Aprobado'
   },
   {
     id: 36,
     title: 'Provisión de Medicamentos e Insumos en los CAPS',
     summary: 'Pedido de informes sobre insumos y médicos de guardia en los Centros de Atención Primaria.',
-    category: 'Modernización'
+    , status: 'Aprobado'
   },
   {
     id: 37,
     title: 'Gastos y Contrataciones en Eventos Culturales',
     summary: 'Auditoría de fondos destinados a festivales artísticos municipales y ferias culturales.',
-    category: 'Juventud'
+    , status: 'Aprobado'
   },
   {
     id: 38,
     title: 'Funcionamiento del Concejo Municipal de Turismo',
     summary: 'Pedido de informes sobre el uso del fondo de promoción turística y la agenda de la ciudad.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 39,
     title: 'Ingresos de Personal y Concursos de Oposición',
     summary: 'Auditoría sobre la designación de personal en planta permanente contratado sin concurso previo.',
-    category: 'Modernización'
+    , status: 'Aprobado'
   },
   {
     id: 40,
     title: 'Gasto en Software y Licencias Tecnológicas del Municipio',
     summary: 'Control del costo de licencias de software y desarrollos a medida de la web municipal.',
-    category: 'Modernización'
+    , status: 'Aprobado'
   },
   {
     id: 41,
     title: 'Transparencia en la Contratación de Cooperativas de Trabajo',
     summary: 'Pedido de informes sobre montos abonados a cooperativas para barrido y mantenimiento de plazas.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 42,
     title: 'Inventario General de Bienes Muebles Estatales',
     summary: 'Control de bajas, robos o pérdidas de computadoras y mobiliario de las oficinas del estado.',
-    category: 'Modernización'
+    , status: 'Aprobado'
   },
   {
     id: 43,
     title: 'Radares de Velocidad y Fotomultas',
     summary: 'Auditoría sobre convenios de radares colocados en avenidas clave y reparto de la recaudación.',
-    category: 'Modernización'
+    , status: 'Aprobado'
   },
   {
     id: 44,
     title: 'Cupo Laboral de Personas con Discapacidad en el Municipio',
     summary: 'Pedido de informes sobre el porcentaje de empleados con discapacidad contratados por la comuna.',
-    category: 'Juventud'
+    , status: 'Aprobado'
   },
   {
     id: 45,
     title: 'Registro de Antenas de Telecomunicaciones y Tasa Ambiental',
     summary: 'Relevamiento de antenas habilitadas y el cobro de la tasa ambiental por radiación.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 46,
     title: 'Capacidad e Infraestructura del Cementerio La Piedad',
     summary: 'Estado de columbarios, parcelas y proyectos para la construcción de un crematorio público.',
-    category: 'Urbanismo'
+    , status: 'Aprobado'
   },
   {
     id: 47,
     title: 'Fideicomisos y Sociedades Estatales con Participación Municipal',
     summary: 'Auditoría de cuentas y balances de las sociedades con participación municipal mayoritaria.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 48,
     title: 'Distribución de Recursos del Honorable Concejo Deliberante',
     summary: 'Control presupuestario de las dietas, contratos políticos y partidas presupuestarias del Concejo.',
-    category: 'Economía'
+    , status: 'Aprobado'
   },
   {
     id: 49,
     title: 'Publicación Digital del Boletín Oficial de Posadas',
     summary: 'Pedido de informes sobre demoras en la digitalización y publicación de ordenanzas aprobadas.',
-    category: 'Modernización'
+    , status: 'Aprobado'
   },
   {
     id: 50,
     title: 'Consumo de Combustible y Gastos de la Flota Oficial',
     summary: 'Auditoría de los gastos de mantenimiento y vales de combustible de la flota de vehículos oficiales.',
-    category: 'Economía'
+    , status: 'Aprobado'
   }
 ];
 
@@ -633,6 +633,7 @@ export default function ProjectsCatalog({ hideBandera = false }) {
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                       {isOrdenanza && <span className="badge" style={{ backgroundColor: 'var(--primary)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>⭐ ORDENANZA</span>}
                       <span className="badge badge-accent proj-cat-badge">{proj.category}</span>
+                        {proj.status && <span className="badge" style={{ backgroundColor: 'var(--success)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>{proj.status.toUpperCase()}</span>}
                     </div>
                   </div>
                   <h4 className="proj-card-title">{proj.title}</h4>
@@ -679,6 +680,7 @@ export default function ProjectsCatalog({ hideBandera = false }) {
                     <span className="td-category">
                       {isOrdenanza && <span className="badge" style={{ backgroundColor: 'var(--primary)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px', marginBottom: '0.2rem', display: 'inline-block' }}>ORDENANZA</span>}
                       <span className="badge badge-accent proj-cat-badge-small">{proj.category}</span>
+                        {proj.status && <span className="badge" style={{ backgroundColor: 'var(--success)', color: '#000', fontWeight: 'bold', fontSize: '0.68rem', padding: '0.2rem 0.5rem', borderRadius: '6px', display: 'inline-block', marginLeft: '0.5rem' }}>{proj.status.toUpperCase()}</span>}
                     </span>
                     <div className="td-actions">
                       <button 

@@ -116,8 +116,8 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
       
       const isExactTrackingSearch = cleanSearch !== '' && rep.trackingCode?.toString() === cleanSearch;
       
-      // Ocultar si no está aprobado y no es una búsqueda directa por código
-      if (rep.status !== 'aprobado' && !isExactTrackingSearch) {
+      // Ocultar si el admin lo marcó como oculto y no es una búsqueda directa por código
+      if (rep.isVisible === false && !isExactTrackingSearch) {
         return false;
       }
 

@@ -90,7 +90,7 @@ export default function Hero({ reportsCount }) {
           <div className="hero-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <Link 
               to="/reclamo" 
-              className="btn btn-primary"
+              className="btn btn-primary btn-hero-pulse"
               style={{ textDecoration: 'none' }}
             >
               <span>Hacer un Reclamo</span>

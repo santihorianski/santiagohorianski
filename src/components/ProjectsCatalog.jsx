@@ -975,23 +975,24 @@ export default function ProjectsCatalog({ hideBandera = false }) {
         .controls-row-bottom {
           display: flex;
           align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
           gap: 1rem;
           border-top: 1px solid var(--overlay-light);
           padding-top: 1rem;
         }
 
         .filter-label {
-          font-size: 0.88rem;
+          font-size: 0.95rem;
           font-weight: 600;
-          color: var(--text-muted);
-          white-space: nowrap;
+          color: var(--text-secondary);
         }
 
         .filter-pills {
           display: flex;
-          gap: 0.5rem;
-          overflow-x: auto;
-          scrollbar-width: none;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 0.6rem;
           width: 100%;
         }
 

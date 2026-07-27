@@ -118,7 +118,7 @@ export default function AdminMap({ reports, onOpenDetail }) {
     });
   }, [processedReports, filterCategory, filterStatus]);
 
-  const categories = ['Todas', '🌿 Espacios Verdes', '🧹 Limpieza', '🕳️ Calles y Asfalto', '💡 Iluminación', '🗑️ Residuos', '🚦 Tránsito', 'Otros'];
+  const categories = ['Todas', '🌿 Espacios Verdes', '🧹 Limpieza', '🕳️ Calles y Asfalto', '💡 Iluminación', '🗑️ Residuos', '🚦 Tránsito', '👮 Seguridad', '⚠️ Peligro en vía pública', '💬 Idea / Propuesta', '🔹 Otros'];
   const statuses = ['Todos', 'recibido', 'presentado', 'en_comision', 'en_votacion', 'aprobado'];
 
   return (

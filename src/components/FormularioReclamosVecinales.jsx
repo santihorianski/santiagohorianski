@@ -441,13 +441,15 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
   const categories = [
     { id: 'verdes', title: '🌿 Espacios Verdes', desc: 'Pedido de corte de césped / Malezas altas en terreno baldío.' },
-    { id: 'limpieza', title: '🧹 Limpieza', desc: 'Pedido de limpieza en la calle / Limpieza de boca de tormenta o alcantarilla.' },
+    { id: 'limpieza', title: '🧹 Limpieza', desc: 'Pedido de limpieza en la calle / Limpieza de boca de tormenta.' },
     { id: 'calles', title: '🕳️ Calles y Asfalto', desc: 'Pozo peligroso / Reparación de lomo de burro.' },
     { id: 'iluminacion', title: '💡 Iluminación', desc: 'Foco roto / Cuadra a oscuras.' },
     { id: 'residuos', title: '🗑️ Residuos', desc: 'Falta contenedor de basura / Basural a cielo abierto.' },
     { id: 'transito', title: '🚦 Tránsito', desc: 'Semáforo sin funcionar / Falta señalización.' },
     { id: 'seguridad', title: '👮 Seguridad', desc: 'Pedido de mayor presencia policial en la zona.' },
-    { id: 'peligro', title: '⚠️ Peligro en vía pública', desc: 'Poste inclinado / Árbol con riesgo de caída.' }
+    { id: 'peligro', title: '⚠️ Peligro en vía pública', desc: 'Poste inclinado / Árbol con riesgo de caída.' },
+    { id: 'idea', title: '💬 Idea / Propuesta', desc: 'Sugerencia de mejora o proyecto para la ciudad.' },
+    { id: 'otros', title: '🔹 Otros', desc: 'Cualquier otro tema no listado arriba.' }
   ];
 
   const handleInputChange = (e) => {

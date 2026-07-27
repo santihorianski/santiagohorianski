@@ -385,7 +385,7 @@ Párrafo final o conclusión de la noticia.`);
     return avgDays < 1 ? '< 1 día' : `${Math.round(avgDays)} días`;
   };
 
-  const categories = ['Todas', 'Infraestructura', 'Seguridad', 'Basura y Medioambiente', 'Transparencia', 'Otro'];
+  const categories = ['Todas', '🌿 Espacios Verdes', '🧹 Limpieza', '🕳️ Calles y Asfalto', '💡 Iluminación', '🗑️ Residuos', '🚦 Tránsito', '👮 Seguridad', '⚠️ Peligro en vía pública', '💬 Idea / Propuesta', '🔹 Otros'];
 
   // Filter reports
   const filteredReports = reports.filter(rep => {

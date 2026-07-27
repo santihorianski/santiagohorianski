@@ -494,13 +494,9 @@ export default function ProjectsCatalog({ hideBandera = false }) {
   const visibleProjects = filteredProjects.slice(0, visibleCount);
   const hasMore = visibleCount < filteredProjects.length;
 
-  const handleOpenModal = (projectTitle) => {
-    // Redirección directa a WhatsApp sin pasar por el formulario modal
-    const adminPhone = "5493764515738"; // Número de la campaña
-    const textMessage = `Hola Santiago, me pongo en contacto para solicitar el expediente completo o sumar una idea respecto al proyecto: "${projectTitle}".`;
-    const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(textMessage)}`;
-    
-    window.open(whatsappUrl, '_blank');
+  const handleOpenModal = (proj) => {
+    setModalProject(proj);
+    setIsModalOpen(true);
   };
 
   const handleModalSubmit = (e) => {

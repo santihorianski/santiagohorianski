@@ -2,7 +2,7 @@ export const PROJECTS_DATA = [
   {
     id: 101,
     title: 'Normas de Transparencia y Datos Abiertos en el HCD',
-    summary: 'Proyecto de Resoluci├│n para establecer normas de transparencia, publicidad, datos abiertos y control en absolutamente todos los procesos de contrataci├│n, adquisici├│n, locaci├│n y provisi├│n que realice el Honorable Concejo Deliberante.',
+    summary: 'Proyecto de Resolución para establecer normas de transparencia, publicidad, datos abiertos y control en absolutamente todos los procesos de contratación, adquisición, locación y provisión que realice el Honorable Concejo Deliberante.',
     status: 'Aprobado'
   },
   {
@@ -14,78 +14,78 @@ export const PROJECTS_DATA = [
   {
     id: 103,
     title: 'Balance Digital de Sumas y Saldos 2025',
-    summary: 'Proyecto de Resoluci├│n para requerir al DEM que remita en formato digital el Balance de Sumas y Saldos al 31/12/2025 con toda la documentaci├│n respaldatoria.',
+    summary: 'Proyecto de Resolución para requerir al DEM que remita en formato digital el Balance de Sumas y Saldos al 31/12/2025 con toda la documentación respaldatoria.',
     status: 'Aprobado'
   },
   {
     id: 104,
     title: 'Informe sobre Multa Infundada a Comercio Local',
-    summary: 'Proyecto de Resoluci├│n pidiendo informes al DEM sobre el cobro infundado de una multa de $190.000.000 al local comercial LE UTTHE.',
+    summary: 'Proyecto de Resolución pidiendo informes al DEM sobre el cobro infundado de una multa de $190.000.000 al local comercial LE UTTHE.',
     status: 'Aprobado'
   },
   {
     id: 105,
-    title: 'Rendici├│n de Fondos en Eventos Masivos (2025-2026)',
-    summary: 'Proyecto de Comunicaci├│n solicitando al DEM informe detallado sobre planificaci├│n, contrataci├│n, ejecuci├│n y rendici├│n de fondos destinados a eventos masivos.',
+    title: 'Rendición de Fondos en Eventos Masivos (2025-2026)',
+    summary: 'Proyecto de Comunicación solicitando al DEM informe detallado sobre planificación, contratación, ejecución y rendición de fondos destinados a eventos masivos.',
     status: 'Aprobado'
   },
   {
     id: 106,
-    title: 'Ejecuci├│n de Gastos de Cortes├¡a y Homenajes 2025',
-    summary: 'Proyecto de Comunicaci├│n para solicitar al DEM un informe detallado sobre la ejecuci├│n de la partida "Gastos de Cortes├¡a y Homenajes" del ejercicio 2025.',
+    title: 'Ejecución de Gastos de Cortesía y Homenajes 2025',
+    summary: 'Proyecto de Comunicación para solicitar al DEM un informe detallado sobre la ejecución de la partida "Gastos de Cortesía y Homenajes" del ejercicio 2025.',
     status: 'Aprobado'
   },
   {
     id: 107,
-    title: 'Prohibici├│n de Fotomultas Autom├íticas sin Constataci├│n Humana',
-    summary: 'Proyecto de Ordenanza para prohibir la utilizaci├│n de radares o fotomultas cuya configuraci├│n sea estrictamente algor├¡tmica, careciendo de constataci├│n humana en tiempo real.',
+    title: 'Prohibición de Fotomultas Automáticas sin Constatación Humana',
+    summary: 'Proyecto de Ordenanza para prohibir la utilización de radares o fotomultas cuya configuración sea estrictamente algorítmica, careciendo de constatación humana en tiempo real.',
     status: 'Aprobado'
   },
   {
     id: 108,
     title: 'Informes y Expedientes del Sistema de Estacionamiento Medido (SEM)',
-    summary: 'Proyecto de Comunicaci├│n exigiendo al DEM toda la informaci├│n, antecedentes y expedientes vinculados al Sistema de Estacionamiento Medido (SEM).',
+    summary: 'Proyecto de Comunicación exigiendo al DEM toda la información, antecedentes y expedientes vinculados al Sistema de Estacionamiento Medido (SEM).',
     status: 'Aprobado'
   },
   {
     id: 109,
     title: 'Puesta en Funcionamiento de la Junta Electoral Municipal',
-    summary: 'Proyecto de Comunicaci├│n para que el DEM arbitre las medidas necesarias para la constituci├│n e integraci├│n de la Junta Electoral Municipal.',
+    summary: 'Proyecto de Comunicación para que el DEM arbitre las medidas necesarias para la constitución e integración de la Junta Electoral Municipal.',
     status: 'Aprobado'
   },
   {
     id: 110,
-    title: 'Informe sobre el evento "UNA + FAN FEST ÔÇö Edici├│n Mundial"',
-    summary: 'Proyecto de Comunicaci├│n para solicitar al DEM un informe completo sobre la finalizaci├│n y realizaci├│n del evento "UNA + FAN FEST".',
+    title: 'Informe sobre el evento "UNA + FAN FEST ÔÇö Edición Mundial"',
+    summary: 'Proyecto de Comunicación para solicitar al DEM un informe completo sobre la finalización y realización del evento "UNA + FAN FEST".',
     status: 'Aprobado'
   },
   {
     id: 111,
-    title: 'Autorizaci├│n y Fondos de la "Casa del Streaming de Posadas"',
-    summary: 'Proyecto de Comunicaci├│n solicitando informaci├│n documentada sobre la autorizaci├│n municipal de los eventos realizados en calle Col├│n bajo la denominaci├│n "Casa del Streaming".',
+    title: 'Autorización y Fondos de la "Casa del Streaming de Posadas"',
+    summary: 'Proyecto de Comunicación solicitando información documentada sobre la autorización municipal de los eventos realizados en calle Colón bajo la denominación "Casa del Streaming".',
     status: 'Aprobado'
   },
   {
     id: 112,
     title: 'Contrataciones de Volquetes y Camiones Volcadores',
-    summary: 'Proyecto de Comunicaci├│n solicitando informes vinculados a las contrataciones, alquileres y locaciones de volquetes y servicios de camiones volcadores.',
+    summary: 'Proyecto de Comunicación solicitando informes vinculados a las contrataciones, alquileres y locaciones de volquetes y servicios de camiones volcadores.',
     status: 'Aprobado'
   },
   {
     id: 113,
-    title: 'Eliminaci├│n de Tasas Espec├¡ficas para Volquetes',
-    summary: 'Proyecto de Ordenanza para modificar la Ord. XVI-N┬░ 119 y eliminar la posibilidad de establecer tasas espec├¡ficas vinculadas a la autorizaci├│n e instalaci├│n de volquetes.',
+    title: 'Eliminación de Tasas Específicas para Volquetes',
+    summary: 'Proyecto de Ordenanza para modificar la Ord. XVI-N° 119 y eliminar la posibilidad de establecer tasas específicas vinculadas a la autorización e instalación de volquetes.',
     status: 'Aprobado'
   },
   {
     id: 1,
     title: 'Pedido de Informes sobre Alquileres de Edificios Municipales',
-    summary: 'Auditor├¡a y control de los contratos de alquiler vigentes de dependencias municipales para optimizar recursos p├║blicos.',
+    summary: 'Auditoría y control de los contratos de alquiler vigentes de dependencias municipales para optimizar recursos públicos.',
     status: 'Aprobado'
   },
   {
     id: 2,
-    title: 'Auditor├¡a y Padr├│n de Proveedores del Estado',
+    title: 'Auditoría y Padrón de Proveedores del Estado',
     summary: 'Solicitud de informes sobre las contrataciones y compras realizadas a proveedores y contratistas directos.',
     status: 'Aprobado'
   },
@@ -97,38 +97,38 @@ export const PROJECTS_DATA = [
   },
   {
     id: 4,
-    title: 'Auditor├¡a de Aportes Previsionales al IPS',
+    title: 'Auditoría de Aportes Previsionales al IPS',
     summary: 'Control del estado de transferencias de aportes jubilatorios de los empleados municipales al IPS Misiones.',
     status: 'Aprobado'
   },
   {
     id: 5,
     title: 'Registro de Donaciones y Legados Municipales',
-    summary: 'Solicitud de informe detallado de las donaciones aceptadas por la comuna y su asignaci├│n patrimonial.',
+    summary: 'Solicitud de informe detallado de las donaciones aceptadas por la comuna y su asignación patrimonial.',
     status: 'Aprobado'
   },
   {
     id: 6,
-    title: 'Gastos de Urgencia sin Licitaci├│n P├║blica',
+    title: 'Gastos de Urgencia sin Licitación Pública',
     summary: 'Pedido de informes sobre contrataciones directas encuadradas bajo r├®gimen de urgencia o fuerza mayor.',
     status: 'Aprobado'
   },
   {
     id: 7,
     title: 'Estado de Juicios contra el Municipio',
-    summary: 'Requerimiento de informaci├│n sobre litigios judiciales activos y provisiones para fallos en contra del erario p├║blico.',
+    summary: 'Requerimiento de información sobre litigios judiciales activos y provisiones para fallos en contra del erario público.',
     status: 'Aprobado'
   },
   {
     id: 8,
-    title: 'Rendici├│n de Subsidios Otorgados a Terceros',
+    title: 'Rendición de Subsidios Otorgados a Terceros',
     summary: 'Control de las rendiciones de cuentas de los subsidios financieros otorgados a entidades civiles y comisiones.',
     status: 'Aprobado'
   },
   {
     id: 9,
-    title: 'Auditor├¡a de Subsidios al Transporte Urbano (SIT)',
-    summary: 'Pedido de informes sobre los fondos y subsidios p├║blicos distribuidos a empresas de transporte de Posadas.',
+    title: 'Auditoría de Subsidios al Transporte Urbano (SIT)',
+    summary: 'Pedido de informes sobre los fondos y subsidios públicos distribuidos a empresas de transporte de Posadas.',
     status: 'Aprobado'
   },
   {
@@ -139,146 +139,146 @@ export const PROJECTS_DATA = [
   },
   {
     id: 11,
-    title: 'Emisi├│n de Licencias de Conducir y Descentralizaci├│n de Tr├ímites',
-    summary: 'Proyecto para auditar los costos de emisi├│n, ex├ímenes m├®dicos y descentralizaci├│n del tr├ímite del carnet.',
+    title: 'Emisión de Licencias de Conducir y Descentralización de Trámites',
+    summary: 'Proyecto para auditar los costos de emisión, exámenes m├®dicos y descentralización del trámite del carnet.',
     status: 'Aprobado'
   },
   {
     id: 12,
-    title: 'Recaudaci├│n y Gesti├│n del Estacionamiento Medido (SEM)',
-    summary: 'Pedido de informes sobre los fondos recaudados por la aplicaci├│n del SEM y su destino presupuestario.',
+    title: 'Recaudación y Gestión del Estacionamiento Medido (SEM)',
+    summary: 'Pedido de informes sobre los fondos recaudados por la aplicación del SEM y su destino presupuestario.',
     status: 'Aprobado'
   },
   {
     id: 13,
     title: 'Cobro de Multas y Funcionamiento del Tribunal de Faltas',
-    summary: 'Solicitud de estad├¡sticas de infracciones labradas y la recaudaci├│n neta del Tribunal de Faltas municipal.',
+    summary: 'Solicitud de estadísticas de infracciones labradas y la recaudación neta del Tribunal de Faltas municipal.',
     status: 'Aprobado'
   },
   {
     id: 14,
     title: 'Estado del Parque Vial y Maquinaria Municipal',
-    summary: 'Control de inventario, mantenimiento y horas de uso de las m├íquinas viales del municipio.',
+    summary: 'Control de inventario, mantenimiento y horas de uso de las máquinas viales del municipio.',
     status: 'Aprobado'
   },
   {
     id: 15,
-    title: 'Simplificaci├│n de Habilitaciones Comerciales y Bajas',
-    summary: 'Informe solicitado sobre la demora de habilitaciones comerciales y propuestas de tr├ímites expr├®s.',
+    title: 'Simplificación de Habilitaciones Comerciales y Bajas',
+    summary: 'Informe solicitado sobre la demora de habilitaciones comerciales y propuestas de trámites expr├®s.',
     status: 'Aprobado'
   },
   {
     id: 16,
     title: 'Tasa a Salas de Juego y Casinos de Posadas',
-    summary: 'Control tributario y auditor├¡a sobre los c├ínones abonados por salas de apuestas ubicadas en la ciudad.',
+    summary: 'Control tributario y auditoría sobre los cánones abonados por salas de apuestas ubicadas en la ciudad.',
     status: 'Aprobado'
   },
   {
     id: 17,
     title: 'Infraestructura del Parque Industrial Posadas',
-    summary: 'Estado de radicaci├│n de empresas y beneficios fiscales aplicados para el desarrollo industrial.',
+    summary: 'Estado de radicación de empresas y beneficios fiscales aplicados para el desarrollo industrial.',
     status: 'Aprobado'
   },
   {
     id: 18,
-    title: 'Tasa de Espect├ículos P├║blicos y Eventos Comerciales',
-    summary: 'Auditor├¡a sobre la exenci├│n o cobro de tasas a eventos comerciales y recitales de Posadas.',
+    title: 'Tasa de Espectáculos Públicos y Eventos Comerciales',
+    summary: 'Auditoría sobre la exención o cobro de tasas a eventos comerciales y recitales de Posadas.',
     status: 'Aprobado'
   },
   {
     id: 19,
-    title: 'Inspecciones Bromatol├│gicas y Multas a Comercios',
-    summary: 'Pedido de datos sobre actas labradas, decomisos y multas en comercios gastron├│micos locales.',
+    title: 'Inspecciones Bromatológicas y Multas a Comercios',
+    summary: 'Pedido de datos sobre actas labradas, decomisos y multas en comercios gastronómicos locales.',
     status: 'Aprobado'
   },
   {
     id: 20,
-    title: 'Publicidad en V├¡a P├║blica y C├ínones de Carteler├¡a',
-    summary: 'Control del cobro de derechos por carteles comerciales instalados en espacios p├║blicos.',
+    title: 'Publicidad en Vía Pública y Cánones de Cartelería',
+    summary: 'Control del cobro de derechos por carteles comerciales instalados en espacios públicos.',
     status: 'Aprobado'
   },
   {
     id: 21,
-    title: 'Concesiones de Locales en la Costanera y Espacios P├║blicos',
-    summary: 'Pedido de informes sobre pliegos, c├ínones mensuales y adjudicaciones de paradores municipales.',
+    title: 'Concesiones de Locales en la Costanera y Espacios Públicos',
+    summary: 'Pedido de informes sobre pliegos, cánones mensuales y adjudicaciones de paradores municipales.',
     status: 'Aprobado'
   },
   {
     id: 22,
-    title: 'Fondo de Compensaciones de la Entidad Binacional Yacyret├í',
-    summary: 'Solicitud de informe sobre las regal├¡as y obras compensatorias pendientes de la EBY en la ciudad.',
+    title: 'Fondo de Compensaciones de la Entidad Binacional Yacyretá',
+    summary: 'Solicitud de informe sobre las regalías y obras compensatorias pendientes de la EBY en la ciudad.',
     status: 'Aprobado'
   },
   {
     id: 23,
     title: 'Avance del Plan Estrat├®gico Posadas 2010-2035',
-    summary: 'Control de las metas viales y de planificaci├│n territorial cumplidas dentro del plan rector.',
+    summary: 'Control de las metas viales y de planificación territorial cumplidas dentro del plan rector.',
     status: 'Aprobado'
   },
   {
     id: 24,
-    title: 'Regularizaci├│n Dominial y Ocupaci├│n de Tierras Fiscales',
-    summary: 'Relevamiento de asentamientos y proyectos para la titulaci├│n y urbanizaci├│n de terrenos.',
+    title: 'Regularización Dominial y Ocupación de Tierras Fiscales',
+    summary: 'Relevamiento de asentamientos y proyectos para la titulación y urbanización de terrenos.',
     status: 'Aprobado'
   },
   {
     id: 25,
-    title: 'Tasas Punitorias a Terrenos Bald├¡os Abandonados',
+    title: 'Tasas Punitorias a Terrenos Baldíos Abandonados',
     summary: 'Control del cobro de tasas punitivas y multas por malezas y abandono de terrenos privados.',
     status: 'Aprobado'
   },
   {
     id: 26,
-    title: 'Eliminaci├│n de Barreras Arquitect├│nicas y Accesibilidad',
+    title: 'Eliminación de Barreras Arquitectónicas y Accesibilidad',
     summary: 'Proyecto para auditar la accesibilidad (rampas, sendas) en veredas y edificios del microcentro.',
     status: 'Aprobado'
   },
   {
     id: 27,
-    title: 'Servicio de Agua Potable, Falta de Presi├│n y Suministro',
-    summary: 'Pedido de informes sobre cortes recurrentes y falta de presi├│n de agua en Itaemb├® Min├¡.',
+    title: 'Servicio de Agua Potable, Falta de Presión y Suministro',
+    summary: 'Pedido de informes sobre cortes recurrentes y falta de presión de agua en Itaemb├® Miní.',
     status: 'Aprobado'
   },
   {
     id: 28,
-    title: 'Gesti├│n de Residuos S├│lidos Urbanos (GIRSU)',
-    summary: 'Control del sistema de recolecci├│n diferenciada y funcionamiento del relleno sanitario.',
+    title: 'Gestión de Residuos Sólidos Urbanos (GIRSU)',
+    summary: 'Control del sistema de recolección diferenciada y funcionamiento del relleno sanitario.',
     status: 'Aprobado'
   },
   {
     id: 29,
     title: 'Plan de Arbolado e Inventario Forestal Urbano',
-    summary: 'Solicitud de informes sobre el reemplazo de especies ex├│ticas y censo de ├írboles urbanos.',
+    summary: 'Solicitud de informes sobre el reemplazo de especies exóticas y censo de árboles urbanos.',
     status: 'Aprobado'
   },
   {
     id: 30,
-    title: 'Control y Medici├│n de Ruidos Molestos',
-    summary: 'Estad├¡sticas de denuncias a locales nocturnos, escapes libres y son├│metros homologados.',
+    title: 'Control y Medición de Ruidos Molestos',
+    summary: 'Estadísticas de denuncias a locales nocturnos, escapes libres y sonómetros homologados.',
     status: 'Aprobado'
   },
   {
     id: 31,
-    title: 'Erradicaci├│n de Microbasurales en Barrios',
-    summary: 'Solicitud de informes sobre focos cr├│nicos de basura acumulada en avenidas perif├®ricas.',
+    title: 'Erradicación de Microbasurales en Barrios',
+    summary: 'Solicitud de informes sobre focos crónicos de basura acumulada en avenidas perif├®ricas.',
     status: 'Aprobado'
   },
   {
     id: 32,
     title: 'Presupuesto y Cobertura del IMuSA',
-    summary: 'Pedido de informes sobre campa├▒as de castraci├│n, vacunaci├│n y presupuesto del instituto de salud animal.',
+    summary: 'Pedido de informes sobre campañas de castración, vacunación y presupuesto del instituto de salud animal.',
     status: 'Aprobado'
   },
   {
     id: 33,
-    title: 'Control de Contaminaci├│n de Efluentes en Arroyos',
-    summary: 'Auditor├¡a ambiental de efluentes arrojados a los arroyos M├írtires y El Zaim├ín.',
+    title: 'Control de Contaminación de Efluentes en Arroyos',
+    summary: 'Auditoría ambiental de efluentes arrojados a los arroyos Mártires y El Zaimán.',
     status: 'Aprobado'
   },
   {
     id: 34,
-    title: 'Ejecuci├│n del Presupuesto Participativo',
-    summary: 'Pedido de informes sobre el estado de obras votadas por los vecinos que a├║n no se iniciaron.',
+    title: 'Ejecución del Presupuesto Participativo',
+    summary: 'Pedido de informes sobre el estado de obras votadas por los vecinos que aún no se iniciaron.',
     status: 'Aprobado'
   },
   {
@@ -289,37 +289,37 @@ export const PROJECTS_DATA = [
   },
   {
     id: 36,
-    title: 'Provisi├│n de Medicamentos e Insumos en los CAPS',
-    summary: 'Pedido de informes sobre insumos y m├®dicos de guardia en los Centros de Atenci├│n Primaria.',
+    title: 'Provisión de Medicamentos e Insumos en los CAPS',
+    summary: 'Pedido de informes sobre insumos y m├®dicos de guardia en los Centros de Atención Primaria.',
     status: 'Aprobado'
   },
   {
     id: 37,
     title: 'Gastos y Contrataciones en Eventos Culturales',
-    summary: 'Auditor├¡a de fondos destinados a festivales art├¡sticos municipales y ferias culturales.',
+    summary: 'Auditoría de fondos destinados a festivales artísticos municipales y ferias culturales.',
     status: 'Aprobado'
   },
   {
     id: 38,
     title: 'Funcionamiento del Concejo Municipal de Turismo',
-    summary: 'Pedido de informes sobre el uso del fondo de promoci├│n tur├¡stica y la agenda de la ciudad.',
+    summary: 'Pedido de informes sobre el uso del fondo de promoción turística y la agenda de la ciudad.',
     status: 'Aprobado'
   },
   {
     id: 39,
-    title: 'Ingresos de Personal y Concursos de Oposici├│n',
-    summary: 'Auditor├¡a sobre la designaci├│n de personal en planta permanente contratado sin concurso previo.',
+    title: 'Ingresos de Personal y Concursos de Oposición',
+    summary: 'Auditoría sobre la designación de personal en planta permanente contratado sin concurso previo.',
     status: 'Aprobado'
   },
   {
     id: 40,
-    title: 'Gasto en Software y Licencias Tecnol├│gicas del Municipio',
+    title: 'Gasto en Software y Licencias Tecnológicas del Municipio',
     summary: 'Control del costo de licencias de software y desarrollos a medida de la web municipal.',
     status: 'Aprobado'
   },
   {
     id: 41,
-    title: 'Transparencia en la Contrataci├│n de Cooperativas de Trabajo',
+    title: 'Transparencia en la Contratación de Cooperativas de Trabajo',
     summary: 'Pedido de informes sobre montos abonados a cooperativas para barrido y mantenimiento de plazas.',
     status: 'Aprobado'
   },
@@ -332,7 +332,7 @@ export const PROJECTS_DATA = [
   {
     id: 43,
     title: 'Radares de Velocidad y Fotomultas',
-    summary: 'Auditor├¡a sobre convenios de radares colocados en avenidas clave y reparto de la recaudaci├│n.',
+    summary: 'Auditoría sobre convenios de radares colocados en avenidas clave y reparto de la recaudación.',
     status: 'Aprobado'
   },
   {
@@ -344,37 +344,37 @@ export const PROJECTS_DATA = [
   {
     id: 45,
     title: 'Registro de Antenas de Telecomunicaciones y Tasa Ambiental',
-    summary: 'Relevamiento de antenas habilitadas y el cobro de la tasa ambiental por radiaci├│n.',
+    summary: 'Relevamiento de antenas habilitadas y el cobro de la tasa ambiental por radiación.',
     status: 'Aprobado'
   },
   {
     id: 46,
     title: 'Capacidad e Infraestructura del Cementerio La Piedad',
-    summary: 'Estado de columbarios, parcelas y proyectos para la construcci├│n de un crematorio p├║blico.',
+    summary: 'Estado de columbarios, parcelas y proyectos para la construcción de un crematorio público.',
     status: 'Aprobado'
   },
   {
     id: 47,
-    title: 'Fideicomisos y Sociedades Estatales con Participaci├│n Municipal',
-    summary: 'Auditor├¡a de cuentas y balances de las sociedades con participaci├│n municipal mayoritaria.',
+    title: 'Fideicomisos y Sociedades Estatales con Participación Municipal',
+    summary: 'Auditoría de cuentas y balances de las sociedades con participación municipal mayoritaria.',
     status: 'Aprobado'
   },
   {
     id: 48,
-    title: 'Distribuci├│n de Recursos del Honorable Concejo Deliberante',
-    summary: 'Control presupuestario de las dietas, contratos pol├¡ticos y partidas presupuestarias del Concejo.',
+    title: 'Distribución de Recursos del Honorable Concejo Deliberante',
+    summary: 'Control presupuestario de las dietas, contratos políticos y partidas presupuestarias del Concejo.',
     status: 'Aprobado'
   },
   {
     id: 49,
-    title: 'Publicaci├│n Digital del Bolet├¡n Oficial de Posadas',
-    summary: 'Pedido de informes sobre demoras en la digitalizaci├│n y publicaci├│n de ordenanzas aprobadas.',
+    title: 'Publicación Digital del boletín Oficial de Posadas',
+    summary: 'Pedido de informes sobre demoras en la digitalización y publicación de ordenanzas aprobadas.',
     status: 'Aprobado'
   },
   {
     id: 50,
     title: 'Consumo de Combustible y Gastos de la Flota Oficial',
-    summary: 'Auditor├¡a de los gastos de mantenimiento y vales de combustible de la flota de veh├¡culos oficiales.',
+    summary: 'Auditoría de los gastos de mantenimiento y vales de combustible de la flota de vehículos oficiales.',
     status: 'Aprobado'
   }
 ,
@@ -951,25 +951,25 @@ export const FEATURED_PROJECTS = [
   {
     id: 'feat-1',
     title: 'Transparencia Legislativa',
-    summary: 'Auditor├¡a y optimizaci├│n de recursos.',
-    details: 'Llevamos a cabo una auditor├¡a exhaustiva en el Concejo Deliberante de Posadas, consolidando m├ís de 100 proyectos de pedido de informes y ordenanzas para transparentar contrataciones directas, compras p├║blicas, vi├íticos y el uso de vales de combustible de la flota municipal.',
-    badge: 'Auditor├¡a y Control',
+    summary: 'Auditoría y optimización de recursos.',
+    details: 'Llevamos a cabo una auditoría exhaustiva en el Concejo Deliberante de Posadas, consolidando más de 100 proyectos de pedido de informes y ordenanzas para transparentar contrataciones directas, compras públicas, viáticos y el uso de vales de combustible de la flota municipal.',
+    badge: 'Auditoría y Control',
     color: 'var(--primary)'
   },
   {
     id: 'feat-2',
     title: 'Eliminar el SEM',
-    summary: 'Pedido de informes para la eliminaci├│n del estacionamiento medido.',
-    details: 'Presentamos un exhaustivo pedido de informes sobre la recaudaci├│n y gesti├│n del Sistema de Estacionamiento Medido (SEM) en Posadas, con la propuesta y el objetivo final de eliminarlo para aliviar la carga econ├│mica sobre los vecinos y comerciantes del centro.',
-    badge: 'Tr├ínsito y Gesti├│n',
+    summary: 'Pedido de informes para la eliminación del estacionamiento medido.',
+    details: 'Presentamos un exhaustivo pedido de informes sobre la recaudación y gestión del Sistema de Estacionamiento Medido (SEM) en Posadas, con la propuesta y el objetivo final de eliminarlo para aliviar la carga económica sobre los vecinos y comerciantes del centro.',
+    badge: 'Tránsito y Gestión',
     color: 'var(--secondary)'
   },
   {
     id: 'feat-3',
     title: 'Fomento al Emprendedurismo Local',
-    summary: 'Apoyo y simplificaci├│n de recursos.',
-    details: 'Proyecto legislativo para crear un R├®gimen Simplificado de Habilitaci├│n Comercial expr├®s, exenci├│n de tasas por 6 meses para nuevos comercios familiares, y la provisi├│n de microcr├®ditos municipales para potenciar a emprendedores locales.',
-    badge: 'Econom├¡a y Empleo',
+    summary: 'Apoyo y simplificación de recursos.',
+    details: 'Proyecto legislativo para crear un R├®gimen Simplificado de Habilitación Comercial expr├®s, exención de tasas por 6 meses para nuevos comercios familiares, y la provisión de microcr├®ditos municipales para potenciar a emprendedores locales.',
+    badge: 'Economía y Empleo',
     color: 'var(--accent)'
   }
 ];

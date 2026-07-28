@@ -332,16 +332,24 @@ export default function ProjectsCatalog({ hideBandera = false }) {
                 <p style={{ margin: '0 0 0.5rem 0' }}><strong>Tipo:</strong> {modalProject ? getProjectType(modalProject) : ''}</p>
                 
                 {modalProject?.history && modalProject.history.length > 0 ? (
-                  <div style={{ marginTop: '1rem' }}>
-                    <strong>Historial de Estados:</strong>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0 0', fontSize: '0.85rem' }}>
-                      {modalProject.history.map((h, i) => (
-                        <li key={i} style={{ marginBottom: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                          <span style={{ color: 'var(--primary)', marginRight: '0.5rem' }}>→</span>
-                          {h}
-                        </li>
-                      ))}
-                    </ul>
+                  <div style={{ marginTop: '1.5rem' }}>
+                    <strong style={{ display: 'block', marginBottom: '1rem', color: 'var(--primary)' }}>Historial del Expediente:</strong>
+                    <div className="history-timeline">
+                      {modalProject.history.map((h, i) => {
+                        const match = h.match(/^(\d{2}\/\d{2}\/\d{4}):?\s*(.*)$/);
+                        const date = match ? match[1] : '';
+                        const desc = match ? match[2] : h;
+                        return (
+                          <div key={i} className="timeline-item">
+                            <div className="timeline-dot"></div>
+                            <div className="timeline-content">
+                              {date && <span className="timeline-date">{date}</span>}
+                              <span className="timeline-desc">{desc}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 ) : (
                   <p style={{ margin: '0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -889,20 +897,57 @@ export default function ProjectsCatalog({ hideBandera = false }) {
           color: var(--text-primary);
         }
 
-        .modal-subtitle-form {
-          font-size: 0.85rem;
-          color: var(--text-secondary);
-          line-height: 1.5;
-          margin-bottom: 1.5rem;
-          padding: 0.75rem 1rem;
-          background: var(--overlay-light);
-          border-radius: 10px;
-          border-left: 3px solid var(--primary);
+        .history-timeline {
+          margin-left: 0.5rem;
+          padding-left: 0.5rem;
+        }
+        
+        .timeline-item {
+          display: flex;
+          position: relative;
+          padding-bottom: 1.5rem;
         }
 
-        .modal-success {
-          text-align: center;
-          padding: 2rem 0;
+        .timeline-item:last-child {
+          padding-bottom: 0;
+        }
+
+        .timeline-dot {
+          position: absolute;
+          left: -4px;
+          top: 4px;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background-color: var(--primary);
+          z-index: 2;
+          box-shadow: 0 0 8px var(--primary);
+        }
+
+        .timeline-content {
+          padding-left: 1.5rem;
+          border-left: 2px solid rgba(255, 255, 255, 0.1);
+          margin-left: 0;
+          display: flex;
+          flex-direction: column;
+          font-size: 0.9rem;
+          width: 100%;
+        }
+
+        .timeline-date {
+          font-weight: bold;
+          color: var(--primary);
+          font-size: 0.8rem;
+          margin-bottom: 0.2rem;
+        }
+        
+        .timeline-desc {
+          color: var(--text-color);
+          line-height: 1.4;
+        }
+
+        .timeline-item:last-child .timeline-content {
+          border-left-color: transparent;
         }
 
         @media (max-width: 992px) {
@@ -961,11 +1006,6 @@ export default function ProjectsCatalog({ hideBandera = false }) {
           }
           .modal-form h3 {
             font-size: 1.25rem;
-          }
-          .modal-subtitle-form {
-            font-size: 0.78rem;
-            padding: 0.5rem 0.75rem;
-            margin-bottom: 1rem;
           }
           .catalog-controls {
             padding: 1rem;

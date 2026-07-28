@@ -331,6 +331,13 @@ export default function ProjectsCatalog({ hideBandera = false }) {
                 <p style={{ margin: '0 0 0.5rem 0' }}><strong>Categoría:</strong> {modalProject?.category}</p>
                 <p style={{ margin: '0 0 0.5rem 0' }}><strong>Tipo:</strong> {modalProject ? getProjectType(modalProject) : ''}</p>
                 
+                {/* Render Expediente if it exists, otherwise just show summary */}
+                {modalProject?.summary && modalProject.summary.toLowerCase().includes('expediente') ? (
+                  <p style={{ margin: '0 0 0.5rem 0', color: 'var(--primary)' }}><strong>Nº de {modalProject.summary.replace(/Expediente:\s*/i, 'Expediente: ')}</strong></p>
+                ) : (
+                  modalProject?.summary && <p style={{ margin: '0 0 0.5rem 0' }}><strong>Resumen:</strong> {modalProject.summary}</p>
+                )}
+                
                 {modalProject?.history && modalProject.history.length > 0 ? (
                   <div style={{ marginTop: '1.5rem' }}>
                     <strong style={{ display: 'block', marginBottom: '1rem', color: 'var(--primary)' }}>Historial del Expediente:</strong>

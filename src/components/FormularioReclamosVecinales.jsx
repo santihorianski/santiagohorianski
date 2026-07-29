@@ -1224,22 +1224,22 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
             {step === 4 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'center', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <div className={termsError ? 'shake-error' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.5rem', transition: 'all 0.3s ease', transform: termsError ? 'scale(1.05)' : 'scale(1)', background: termsError ? 'rgba(239, 68, 68, 0.2)' : 'transparent', borderRadius: '8px' }}>
+              <div className="verification-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'center', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <div className={termsError ? 'shake-error' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.2rem', transition: 'all 0.3s ease', transform: termsError ? 'scale(1.05)' : 'scale(1)', background: termsError ? 'rgba(239, 68, 68, 0.2)' : 'transparent', borderRadius: '8px' }}>
                   <input 
                     type="checkbox" 
                     id="bottom-terms-checkbox" 
                     checked={acceptedTerms} 
                     onChange={(e) => { setAcceptedTerms(e.target.checked); if (e.target.checked) setTermsError(false); }}
-                    style={{ width: '1.5rem', height: '1.5rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
+                    style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
                   />
-                  <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '1rem', color: termsError ? '#ff6b6b' : '#ffffff', cursor: 'pointer', margin: 0, fontWeight: '700', transition: 'color 0.3s ease' }}>
+                  <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '0.95rem', color: termsError ? '#ff6b6b' : '#ffffff', cursor: 'pointer', margin: 0, fontWeight: '700', transition: 'color 0.3s ease' }}>
                     Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: termsError ? '#ff6b6b' : '#ffffff', textDecoration: 'underline', textUnderlineOffset: '4px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900', transition: 'color 0.3s ease' }}>Términos y Condiciones</button>
                   </label>
                 </div>
                 
                 {/* Turnstile visible - protege el form y es claro para el usuario */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '1rem', marginBottom: '1rem' }}>
+                <div className="turnstile-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '0.5rem', marginBottom: '0.5rem' }}>
                   <Turnstile 
                     siteKey={turnstileSiteKey} 
                     onSuccess={(token) => {
@@ -1248,7 +1248,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     }}
                     options={{ theme: 'dark' }}
                   />
-                  {turnstileError && <span style={{ color: '#ff6b6b', fontSize: '0.9rem', fontWeight: '700', marginTop: '0.5rem', textAlign: 'center' }}>Por favor, completá la verificación de seguridad obligatoria.</span>}
+                  {turnstileError && <span style={{ color: '#ff6b6b', fontSize: '0.85rem', fontWeight: '700', marginTop: '0.25rem', textAlign: 'center' }}>Por favor, completá la verificación de seguridad obligatoria.</span>}
                 </div>
               </div>
             )}
@@ -1811,6 +1811,14 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           .btn-wizard-nav {
             padding: 0.6rem;
             font-size: 0.82rem;
+          }
+          .verification-container {
+            gap: 0 !important;
+            margin-bottom: 0 !important;
+          }
+          .turnstile-wrapper {
+            margin-top: 0.25rem !important;
+            margin-bottom: 0 !important;
           }
         }
 

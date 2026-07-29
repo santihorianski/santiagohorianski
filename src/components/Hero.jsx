@@ -56,7 +56,7 @@ const CountUp = ({ end, duration = 2000, suffix = '', prefix = '', decimals = 0 
   return <span>{prefix}{displayCount}{suffix}</span>;
 };
 
-export default function Hero({ reportsCount }) {
+export default function Hero({ reports = [] }) {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -102,19 +102,19 @@ export default function Hero({ reportsCount }) {
           <div className="hero-stats">
             <div className="stat-card glass-panel">
               <span className="stat-num gradient-text">
-                <CountUp end={reportsCount + 82} />
+                <CountUp end={reports.length} />
               </span>
               <span className="stat-label">Reportes Recibidos</span>
             </div>
             <div className="stat-card glass-panel">
               <span className="stat-num gradient-text-accent">
-                <CountUp end={85} suffix="%" />
+                <CountUp end={reports.length ? Math.round((reports.filter(r => r.status === 'aprobado').length / reports.length) * 100) : 0} suffix="%" />
               </span>
               <span className="stat-label">Casos Resueltos</span>
             </div>
             <div className="stat-card glass-panel">
               <span className="stat-num" style={{ color: 'var(--secondary)' }}>
-                <CountUp end={3.4} decimals={1} prefix="+" suffix="k" />
+                <CountUp end={reports.reduce((acc, curr) => acc + (curr.upvotes || 0), 0)} />
               </span>
               <span className="stat-label">Votos de Apoyo</span>
             </div>

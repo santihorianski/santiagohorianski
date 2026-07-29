@@ -1288,11 +1288,19 @@ input, textarea, select {
 
 @media (max-width: 768px) {
   .escuela-hero.has-bg-image {
-    background-position: 70% center !important;
+    background-position: center 10% !important;
+    align-items: flex-end;
+    padding-bottom: 3rem;
+  }
+  .hero-content {
+    margin-top: 18rem;
   }
   .hero-content-inner {
     text-align: center;
     margin: 0 auto;
+  }
+  .hero-title-solid {
+    font-size: 2.5rem;
   }
   .hero-subtitle-solid { margin: 0 auto; }
 }

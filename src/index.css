@@ -682,312 +682,537 @@ input, textarea, select {
 }
 
 
+
+
 /* ==========================================================================
-   ESCUELA DE DIRIGENTES - LANDING PAGE STYLES
+   ESCUELA DE DIRIGENTES - REDISEÑO MODERN / SERIOUS (NO AI)
    ========================================================================== */
 
 .escuela-page {
-  background-color: var(--bg-dark);
-  color: var(--text-primary);
+  background-color: #050505;
+  color: #ffffff;
   overflow-x: hidden;
+  font-family: var(--font-primary);
 }
 
-.escuela-hero {
+.text-accent-gold {
+  color: var(--primary); /* Dorado LLA */
+}
+
+/* HERO SECTION */
+.escuela-hero.has-bg-image {
   position: relative;
-  min-height: 90vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6rem 1rem 4rem;
-  overflow: hidden;
+  padding: 6rem 1rem;
+  background-image: url("/escuela/equipo.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
-.hero-geometric-bg {
+.hero-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: 
-    radial-gradient(circle at 15% 50%, rgba(217, 160, 36, 0.08), transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(217, 160, 36, 0.05), transparent 50%);
-  background-color: #0b0812;
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: center center;
+  background: linear-gradient(to bottom, rgba(5,5,5,0.7) 0%, rgba(5,5,5,0.95) 100%);
   z-index: 1;
 }
 
-.hero-geometric-bg::after {
-  content: "";
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 30vh;
-  background: linear-gradient(to top, var(--bg-dark), transparent);
-}
-
-.hero-logo {
-  max-width: 250px;
-  margin-bottom: 2rem;
-  filter: drop-shadow(0 0 20px rgba(217,160,36,0.3));
-}
-
-.hero-title {
-  font-size: 3.5rem;
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-  letter-spacing: -0.02em;
-}
-
-.hero-subtitle {
-  font-size: 1.25rem;
-  color: var(--text-secondary);
-  max-width: 600px;
-  margin: 0 auto;
-  font-weight: 400;
-}
-
-.section-padding {
-  padding: 6rem 1rem;
-}
-
-.intro-blocks {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-}
-
-.intro-text p {
-  font-size: 1.15rem;
-  line-height: 1.8;
-  color: var(--text-secondary);
-  margin-bottom: 1.5rem;
-}
-
-.batalla-cultural-box {
-  padding: 3rem;
-  border-left: 4px solid var(--primary);
+.hero-content {
   position: relative;
-  overflow: hidden;
+  z-index: 2;
+  max-width: 900px;
 }
 
-.batalla-cultural-box::before {
-  content: "";
-  position: absolute;
-  top: -50px;
-  right: -50px;
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, rgba(217,160,36,0.15) 0%, transparent 70%);
+.hero-logo-modern {
+  max-width: 220px;
+  margin-bottom: 2rem;
 }
 
-.batalla-cultural-box blockquote {
-  font-size: 1.3rem;
-  font-style: italic;
-  font-weight: 600;
-  line-height: 1.6;
-  margin: 1.5rem 0 0 0;
-  color: var(--text-primary);
-}
-
-.icon-accent {
-  color: var(--primary);
-  filter: drop-shadow(0 0 10px rgba(217,160,36,0.5));
-}
-
-.mv-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-}
-
-.mv-card {
-  padding: 3rem;
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.mv-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 20px rgba(217,160,36,0.15);
-}
-
-.mv-icon-wrapper {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: rgba(217,160,36,0.1);
-  color: var(--primary);
+.hero-title-solid {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1.05;
   margin-bottom: 1.5rem;
-  border: 1px solid rgba(217,160,36,0.3);
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
 }
 
-.mv-card h3 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: var(--text-primary);
+.hero-subtitle-solid {
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: #dddddd;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
-.mv-card p {
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-.pilares-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 2rem;
+.hero-cta-wrap {
   margin-top: 3rem;
 }
 
-.pilar-card {
-  padding: 2rem 1.5rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-top: 3px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.pilar-card:hover {
-  border-top-color: var(--primary);
-  background: rgba(255,255,255,0.05);
-}
-
-.pilar-icon {
-  color: var(--primary);
-  margin-bottom: 1.25rem;
-  opacity: 0.9;
-}
-
-.pilar-card h4 {
-  font-size: 1.1rem;
-  margin-bottom: 0.75rem;
-}
-
-.pilar-card p {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-
-.autoridades-principales {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  max-width: 800px;
-  margin: 3rem auto;
-}
-
-.autoridades-academica {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-}
-
-.autoridad-card {
-  padding: 2rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.autoridad-card.compact {
-  padding: 1.5rem;
-}
-
-.autoridad-cargo {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--primary);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.autoridad-nombre {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.autoridad-desc {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  margin-bottom: 1.5rem;
-}
-
-.btn-social-ig {
+.btn-modern-solid {
+  background-color: var(--primary);
+  color: #000;
+  font-weight: 800;
+  font-size: 1.2rem;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-  background: rgba(255,255,255,0.05);
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255,255,255,0.1);
-  margin-top: auto;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(217, 160, 36, 0.3);
 }
 
-.btn-social-ig:hover {
-  background: rgba(217,160,36,0.1);
-  color: var(--primary);
-  border-color: rgba(217,160,36,0.3);
+.btn-modern-solid:hover {
+  background-color: #f0b52c;
+  transform: translateY(-2px);
 }
 
-.btn-social-ig.small {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.8rem;
-  margin-top: 1rem;
+.icon-bounce {
+  animation: bounceDown 2s infinite;
 }
 
-.sumate-image-wrapper {
-  max-width: 800px;
-  margin: 3rem auto 0;
-  padding: 1rem;
-  border-radius: 20px;
+/* INTRO SOLID */
+.escuela-intro-solid {
+  padding: 6rem 0;
+  background-color: #050505;
 }
 
-.sumate-img {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  display: block;
-}
-
-.escuela-footer {
-  padding: 6rem 1rem;
-  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.8));
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-.footer-compromiso {
-  font-size: 1.5rem;
-  font-style: italic;
+.text-block-bold {
   max-width: 800px;
   margin: 0 auto;
-  line-height: 1.6;
-  color: var(--text-primary);
+}
+
+.display-heading {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.lead-text {
+  font-size: 1.5rem;
+  color: #cccccc;
   font-weight: 300;
 }
 
-/* Responsive adjustments */
+.lead-text strong {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.intro-grid-modern {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.intro-card-solid {
+  background-color: #111111;
+  padding: 3rem;
+  border-left: 6px solid var(--primary);
+}
+
+.intro-card-solid.dark-gold {
+  background-color: #1a160d;
+  border-left: 6px solid #fff;
+}
+
+.intro-card-solid h3 {
+  font-size: 2rem;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.highlight-text {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.modern-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modern-list li {
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.batalla-cultural-banner {
+  background-color: var(--primary);
+  color: #000;
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  font-weight: 800;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  border-radius: 4px;
+}
+
+.banner-icon {
+  flex-shrink: 0;
+}
+
+/* MISION Y VISION */
+.escuela-mv-solid {
+  padding: 6rem 0;
+  background-color: #0a0a0a;
+}
+
+.mv-grid-modern {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.mv-box {
+  background-color: #050505;
+  border: 1px solid #222;
+  padding: 3rem;
+}
+
+.mv-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+}
+
+.mv-header h3 {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.mv-box p {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #bbb;
+}
+
+/* PILARES */
+.escuela-pilares-solid {
+  padding: 6rem 0;
+  background-color: #050505;
+}
+
+.section-title-modern {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 4rem;
+}
+
+.pilares-grid-solid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.pilar-box-solid {
+  background-color: #111;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  border-top: 4px solid var(--primary);
+  transition: transform 0.2s;
+}
+
+.pilar-box-solid:hover {
+  transform: translateY(-5px);
+  background-color: #151515;
+}
+
+.pilar-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  background-color: #050505;
+  color: var(--primary);
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+}
+
+.pilar-box-solid h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.pilar-box-solid p {
+  color: #999;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* AUTORIDADES */
+.escuela-autoridades-premium {
+  padding: 8rem 0;
+  background-color: #020202;
+}
+
+.section-header-accent {
+  margin-bottom: 4rem;
+}
+
+.section-header-accent h2 {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.section-header-accent h3 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.accent-line {
+  height: 6px;
+  width: 100px;
+  background-color: var(--primary);
+  margin: 0 auto;
+}
+
+.accent-line.small {
+  width: 60px;
+  height: 4px;
+}
+
+.autoridades-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.aut-hero-card {
+  background-color: #111;
+  padding: 4rem 2rem;
+  text-align: center;
+  border: 1px solid #222;
+}
+
+.aut-tag {
+  display: inline-block;
+  background-color: var(--primary);
+  color: #000;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  padding: 0.3rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.aut-hero-card h3 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+}
+
+.aut-subtitle {
+  color: #999;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.btn-ig-solid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;
+  background-color: #222;
+  padding: 0.8rem 1.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.btn-ig-solid:hover {
+  background-color: var(--primary);
+  color: #000;
+}
+
+.autoridades-academica-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.aut-regular-card {
+  background-color: #0a0a0a;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  border: 1px solid #1a1a1a;
+}
+
+.aut-cargo-line {
+  width: 30px;
+  height: 3px;
+  background-color: var(--primary);
+  margin: 0 auto 1rem;
+}
+
+.aut-reg-cargo {
+  display: block;
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.aut-regular-card h4 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+}
+
+.aut-reg-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #888;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.aut-reg-link:hover {
+  color: #fff;
+}
+
+/* CTA FINAL */
+.escuela-cta-final {
+  padding: 8rem 0;
+  background-color: var(--primary);
+  color: #000;
+}
+
+.cta-huge-text {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+.cta-subtext {
+  font-size: 1.4rem;
+  font-weight: 600;
+  max-width: 600px;
+  margin: 0 auto 4rem;
+}
+
+.social-cta-grid {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.social-big-btn {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background-color: #000;
+  color: #fff;
+  padding: 1.5rem 2.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.social-big-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+}
+
+.social-btn-content {
+  text-align: left;
+}
+
+.social-btn-content span {
+  display: block;
+  font-size: 0.9rem;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.social-btn-content strong {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+/* FOOTER */
+.escuela-footer-solid {
+  padding: 4rem 0;
+  background-color: #020202;
+  border-top: 1px solid #111;
+}
+
+.footer-compromiso-solid {
+  font-size: 1.2rem;
+  font-style: italic;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #666;
+}
+
+/* RESPONSIVE */
 @media (max-width: 768px) {
-  .hero-title { font-size: 2.2rem; }
-  .intro-blocks, .mv-grid, .autoridades-principales {
+  .hero-title-solid { font-size: 2.8rem; }
+  .display-heading { font-size: 2.5rem; }
+  .intro-grid-modern, .mv-grid-modern, .autoridades-hero-grid, .social-cta-grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
   }
-  .batalla-cultural-box { padding: 2rem; }
-  .footer-compromiso { font-size: 1.2rem; }
+  .batalla-cultural-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+  }
+  .cta-huge-text { font-size: 3rem; }
+  .social-big-btn { width: 100%; justify-content: center; }
 }
 

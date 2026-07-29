@@ -8,11 +8,11 @@ export default function PdfViewer({ pdfUrl, title }) {
   // Usamos Google Docs Viewer en celulares para esquivar el bug de Safari/iOS que solo muestra la 1ra pagina
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   const fullPdfUrl = window.location.origin.includes('localhost') 
-    ? \`https://santiagohorianski.pages.dev\${pdfUrl}\` 
-    : \`\${window.location.origin}\${pdfUrl}\`;
+    ? `https://santiagohorianski.pages.dev${pdfUrl}` 
+    : `${window.location.origin}${pdfUrl}`;
     
   const iframeSrc = isMobile 
-    ? \`https://docs.google.com/viewer?url=\${encodeURIComponent(fullPdfUrl)}&embedded=true\`
+    ? `https://docs.google.com/viewer?url=${encodeURIComponent(fullPdfUrl)}&embedded=true`
     : pdfUrl;
 
   return (

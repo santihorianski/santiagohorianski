@@ -298,8 +298,7 @@ export default function ProjectsCatalog() {
           </div>
         ) : (
           <div style={{position: 'relative', animation: 'fadeIn 0.5s'}}>
-            <button onClick={() => setShowFeatured(false)} className="btn-link-action" style={{position: 'absolute', top: '-1.5rem', right: '0', zIndex: 10, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--text-muted)'}}>Cerrar destacado <X size={14}/></button>
-            <FeaturedProject />
+            <FeaturedProject onClose={() => setShowFeatured(false)} />
           </div>
         )}
 

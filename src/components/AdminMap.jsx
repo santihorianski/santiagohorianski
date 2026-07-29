@@ -75,11 +75,9 @@ export default function AdminMap({ reports, onOpenDetail }) {
 
   // Mapeo de estados para visualización de pills
   const statusLabels = {
-    recibido: { text: 'Recibido', color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)' },
-    presentado: { text: 'Presentado', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' },
-    en_comision: { text: 'En Comisión', color: '#a855f7', bg: 'rgba(168, 85, 247, 0.15)' },
-    en_votacion: { text: 'En Votación', color: '#ec4899', bg: 'rgba(236, 72, 153, 0.15)' },
-    aprobado: { text: 'Aprobado', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' }
+    'recibido': { text: 'Recibido (Pendiente)', color: '#eab308', bg: 'rgba(234, 179, 8, 0.1)' },
+    'en_tramite': { text: 'En Trámite Legislativo', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' },
+    'solucionado': { text: 'Solucionados / Respuestas', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.1)' }
   };
 
   // Procesamiento y geocodificación ficticia si no tiene coordenadas de GPS
@@ -119,7 +117,7 @@ export default function AdminMap({ reports, onOpenDetail }) {
   }, [processedReports, filterCategory, filterStatus]);
 
   const categories = ['Todas', '🌿 Espacios Verdes', '🧹 Limpieza', '🚧 Calles y Asfalto', '💡 Iluminación', '🗑️ Residuos', '🚦 Tránsito', '👮 Seguridad', '⚠️ Peligro en vía pública', '💬 Idea / Propuesta', '🔹 Otros'];
-  const statuses = ['Todos', 'recibido', 'presentado', 'en_comision', 'en_votacion', 'aprobado'];
+  const statuses = ['Todos', 'recibido', 'en_tramite', 'solucionado'];
 
   return (
     <div className="relative w-full h-full flex flex-col font-sans" style={{ minHeight: '450px' }}>

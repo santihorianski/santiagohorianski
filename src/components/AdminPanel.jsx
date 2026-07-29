@@ -368,11 +368,11 @@ Párrafo final o conclusión de la noticia.`);
   // KPIs calculations
   const totalReports = reports.length;
   const receivedReports = reports.filter(r => r.status === 'recibido').length;
-  const reviewReports = reports.filter(r => r.status === 'en_comision' || r.status === 'en_votacion' || r.status === 'presentado').length;
-  const resolvedReports = reports.filter(r => r.status === 'aprobado').length;
+  const reviewReports = reports.filter(r => r.status === 'en_tramite').length;
+  const resolvedReports = reports.filter(r => r.status === 'solucionado').length;
 
   const calculateAverageResolutionTime = () => {
-    const resolved = reports.filter(r => r.status === 'aprobado' && r.statusHistory && r.statusHistory.length > 1);
+    const resolved = reports.filter(r => r.status === 'solucionado' && r.statusHistory && r.statusHistory.length > 1);
     if (resolved.length === 0) return 'N/A';
     
     let totalMs = 0;
@@ -413,40 +413,25 @@ Párrafo final o conclusión de la noticia.`);
     switch (status) {
       case 'recibido':
         return {
-          text: '📥 Recibido por secretaría del concejal para armar el proyecto',
+          text: '📥 Recibido (Oculto al público hasta su aprobación)',
           badgeClass: 'admin-badge-recibido',
           shortText: 'Recibido'
         };
-      case 'presentado':
+      case 'en_tramite':
         return {
-          text: '📄 Proyecto presentado oficialmente',
-          badgeClass: 'admin-badge-presentado',
-          shortText: 'Presentado'
-        };
-      case 'en_comision':
-        const comision = report.comisionName || '[Pendiente]';
-        const concejal = report.comisionConcejal || '[Pendiente]';
-        return {
-          text: `👥 Proyecto en comisión de ${comision} a cargo del Concejal ${concejal}`,
+          text: '🏛️ En Trámite Legislativo',
           badgeClass: 'admin-badge-comision',
-          shortText: 'En Comisión'
+          shortText: 'En Trámite'
         };
-      case 'en_votacion':
-        const sesion = report.sesionNumber || '[Pendiente]';
+      case 'solucionado':
         return {
-          text: `🗳️ Proyecto en votación en la sesión N° ${sesion}`,
-          badgeClass: 'admin-badge-votacion',
-          shortText: 'En Votación'
-        };
-      case 'aprobado':
-        return {
-          text: '✅ Proyecto Aprobado - A esperar que el EJECUTIVO (La Municipalidad) lo ejecute',
+          text: '✅ Solucionado / Respuesta Oficial',
           badgeClass: 'admin-badge-aprobado',
-          shortText: 'Aprobado'
+          shortText: 'Solucionado'
         };
       default:
         return {
-          text: '📥 Recibido por secretaría del concejal para armar el proyecto',
+          text: '📥 Recibido (Oculto al público)',
           badgeClass: 'admin-badge-recibido',
           shortText: 'Recibido'
         };
@@ -655,9 +640,6 @@ Párrafo final o conclusión de la noticia.`);
       ...selectedReport,
       status: editStatus,
       candidateResponse: editResponse.trim() ? editResponse.trim() : null,
-      comisionName: editStatus === 'en_comision' ? editComisionName.trim() : null,
-      comisionConcejal: editStatus === 'en_comision' ? editComisionConcejal.trim() : null,
-      sesionNumber: editStatus === 'en_votacion' ? editSesionNumber.trim() : null
     };
 
     onUpdateReport(updated);
@@ -675,8 +657,8 @@ Párrafo final o conclusión de la noticia.`);
     if(window.confirm('¿Marcar este reclamo como solucionado / aprobado?')) {
       const updated = {
         ...report,
-        status: 'aprobado',
-        statusHistory: [...(report.statusHistory || []), { status: 'aprobado', date: new Date().toISOString() }]
+        status: 'solucionado',
+        statusHistory: [...(report.statusHistory || []), { status: 'solucionado', date: new Date().toISOString() }]
       };
       onUpdateReport(updated);
     }
@@ -1103,11 +1085,9 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                     className="sort-select"
                   >
                     <option value="Todos">Todos los Estados</option>
-                    <option value="recibido">Recibido (Pendiente)</option>
-                    <option value="presentado">Presentado</option>
-                    <option value="en_comision">En Comisión</option>
-                    <option value="en_votacion">En Votación</option>
-                    <option value="aprobado">Aprobado</option>
+                    <option value="recibido">Recibidos (Pendientes)</option>
+                    <option value="en_tramite">En Trámite Legislativo</option>
+                    <option value="solucionado">Solucionados / Respuestas</option>
                   </select>
                 </div>
 
@@ -1495,11 +1475,9 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                         <div className="form-group">
                           <label className="form-label">Estado del Reclamo</label>
                           <select value={editStatus} onChange={(e) => setEditStatus(e.target.value)} className="form-select">
-                            <option value="recibido">Recibido por secretaría del Concejo</option>
-                            <option value="presentado">Proyecto presentado</option>
-                            <option value="en_comision">Proyecto en comisión</option>
-                            <option value="en_votacion">Proyecto en votación en sesión</option>
-                            <option value="aprobado">Proyecto Aprobado (Ejecución Ejecutivo)</option>
+                            <option value="recibido">Recibido (Pendiente de Aprobación)</option>
+                            <option value="en_tramite">En Trámite Legislativo</option>
+                            <option value="solucionado">Solucionado / Respuesta Oficial</option>
                           </select>
                         </div>
                         

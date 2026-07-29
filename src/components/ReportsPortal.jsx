@@ -26,41 +26,26 @@ const getStatusDetails = (report) => {
   switch (status) {
     case 'recibido':
       return {
-        text: 'Recibido por secretaría del Concejo para armar el proyecto',
+        text: 'Recibido (Oculto al público hasta su aprobación)',
         badgeClass: 'badge-recibido',
         shortText: 'Recibido',
         style: { background: 'rgba(150, 150, 150, 0.12)', color: '#b0b0b0', border: '1px solid rgba(150, 150, 150, 0.25)' }
       };
-    case 'presentado':
+    case 'en_tramite':
       return {
-        text: 'Proyecto presentado',
-        badgeClass: 'badge-secondary', // cobre
-        shortText: 'Presentado'
+        text: 'En Trámite Legislativo',
+        badgeClass: 'badge-warning',
+        shortText: 'En Trámite'
       };
-    case 'en_comision':
-      const comision = report.comisionName || '[Pendiente]';
-      const concejal = report.comisionConcejal || '[Pendiente]';
+    case 'solucionado':
       return {
-        text: `Proyecto en comisión de ${comision} a cargo del Concejal ${concejal}`,
-        badgeClass: 'badge-warning', // ámbar
-        shortText: 'En Comisión'
-      };
-    case 'en_votacion':
-      const sesion = report.sesionNumber || '[Pendiente]';
-      return {
-        text: `Proyecto en votación en la sesión N° ${sesion}`,
-        badgeClass: 'badge-warning', // ámbar
-        shortText: 'En Votación'
-      };
-    case 'aprobado':
-      return {
-        text: 'Proyecto Aprobado - A esperar que el EJECUTIVO (La Municipalidad) lo haga',
-        badgeClass: 'badge-success', // éxito verde
-        shortText: 'Aprobado'
+        text: 'Solucionado / Respuesta Oficial',
+        badgeClass: 'badge-success',
+        shortText: 'Solucionado'
       };
     default:
       return {
-        text: 'Recibido por secretaría del Concejo para armar el proyecto',
+        text: 'Recibido (Pendiente de Aprobación)',
         badgeClass: 'badge-recibido',
         shortText: 'Recibido',
         style: { background: 'rgba(150, 150, 150, 0.12)', color: '#b0b0b0', border: '1px solid rgba(150, 150, 150, 0.25)' }
@@ -106,7 +91,7 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
   const [sortBy, setSortBy] = useState('recent'); // 'recent' or 'upvotes'
 
   const categories = ['Todas', '🌿 Espacios Verdes', '🧹 Limpieza', '🚧 Calles y Asfalto', '💡 Iluminación', '🗑️ Residuos', '🚦 Tránsito', '👮 Seguridad', '⚠️ Peligro en vía pública', '💬 Idea / Propuesta', '🔹 Otros'];
-  const statuses = ['Todos', 'recibido', 'presentado', 'en_comision', 'en_votacion', 'aprobado'];
+  const statuses = ['Todos', 'recibido', 'en_tramite', 'solucionado'];
 
   // Filtrar y ordenar reportes
   const filteredReports = reports
@@ -122,7 +107,7 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
       }
       
       // Filtrar para mostrar SOLO los que están aprobados o en proceso, ocultar recibidos (genéricos) o solucionados
-      const validStatuses = ['aprobado', 'presentado', 'en_comision', 'en_votacion'];
+      const validStatuses = ['solucionado', 'en_tramite'];
       if (!isExactTrackingSearch && !validStatuses.includes(rep.status)) {
         return false;
       }
@@ -265,14 +250,14 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
               <div className="metric-divider"></div>
               <div className="metric-item">
                 <span className="metric-value" style={{ color: 'var(--warning)' }}>
-                  {reports.filter(r => r.status === 'en_comision' || r.status === 'en_votacion' || r.status === 'presentado').length}
+                  {reports.filter(r => r.status === 'en_tramite').length}
                 </span>
                 <span className="metric-title">En Trámite Legislativo</span>
               </div>
               <div className="metric-divider"></div>
               <div className="metric-item">
                 <span className="metric-value" style={{ color: 'var(--success)' }}>
-                  {reports.filter(r => r.status === 'aprobado').length}
+                  {reports.filter(r => r.status === 'solucionado').length}
                 </span>
                 <span className="metric-title">Solucionados / Respuestas</span>
               </div>
@@ -368,7 +353,7 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
 
                       {/* Title & Location */}
                       <h3 className="report-card-title">
-                        {rep.status === 'aprobado' && <Check size={18} style={{ color: 'var(--success)', marginRight: '6px', display: 'inline-block', verticalAlign: 'middle' }} />}
+                        {rep.status === 'solucionado' && <Check size={18} style={{ color: 'var(--success)', marginRight: '6px', display: 'inline-block', verticalAlign: 'middle' }} />}
                         <span style={{ color: 'var(--primary)', marginRight: '8px', fontSize: '0.95em', fontFamily: 'var(--font-display)', fontWeight: '700' }}>#{rep.trackingCode || '----'}</span>
                         <span style={{ verticalAlign: 'middle' }}>{rep.title}</span>
                       </h3>
@@ -400,8 +385,8 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
 
                       {/* Official Candidate Response */}
                       {rep.candidateResponse ? (
-                        <div className={`candidate-response-box glass-panel ${rep.status === 'aprobado' ? 'resolved-box' : ''}`}>
-                          {rep.status === 'aprobado' && (
+                        <div className={`candidate-response-box glass-panel ${rep.status === 'solucionado' ? 'resolved-box' : ''}`}>
+                          {rep.status === 'solucionado' && (
                             <div className="resolved-status-tag">
                               <Check size={12} />
                               <span>Solución Aplicada</span>

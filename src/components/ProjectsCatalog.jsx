@@ -4,6 +4,7 @@ import { Search, Grid, List, Wrench, Laptop, CheckSquare, BarChart3, AlertCircle
 
 // Catálogo completo de los proyectos del HCD Misiones (Concejo Deliberante de Posadas)
 import { PROJECTS_DATA } from '../utils/projectsData';
+import { COMMISSIONS, COUNCILLORS, PARTIES } from '../utils/commissionsData';
 
   const getProjectType = (proj) => {
   if (!proj) return '';
@@ -24,6 +25,7 @@ export default function ProjectsCatalog() {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalProject, setModalProject] = useState(null);
+  const [expandedCommissionIndex, setExpandedCommissionIndex] = useState(null);
   const [modalSent, setModalSent] = useState(false);
   const [modalForm, setModalForm] = useState({ name: '', contact: '', message: '' });
 
@@ -122,9 +124,87 @@ export default function ProjectsCatalog() {
     return diffDays;
   };
 
+  const renderCommissionDetails = (commissionName) => {
+    const data = COMMISSIONS[commissionName];
+    if (!data) return null;
+    
+    const renderMember = (name, role) => {
+      const c = COUNCILLORS[name] || { party: 'Desconocido', prefix: '' };
+      const party = PARTIES[c.party] || PARTIES['Desconocido'];
+      return (
+        <div key={name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
+          <div style={{ flex: 1 }}>
+            <span style={{ fontWeight: role.includes('President') ? '700' : '500', fontSize: '0.85rem' }}>
+              {role}: {c.prefix ? c.prefix + ' ' : ''}{name}
+            </span>
+          </div>
+          <span style={{ 
+            fontSize: '0.7rem', 
+            padding: '0.15rem 0.5rem', 
+            borderRadius: '12px', 
+            backgroundColor: party.color, 
+            color: party.text,
+            whiteSpace: 'nowrap',
+            fontWeight: '600',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            {party.name}
+          </span>
+        </div>
+      );
+    };
+
+    return (
+      <div className="commission-details animate-fade-in" style={{ marginTop: '0.75rem', padding: '1rem', background: 'rgba(0,0,0,0.15)', borderRadius: '8px', borderLeft: '3px solid var(--primary)' }}>
+        <h5 style={{ margin: '0 0 1rem 0', fontSize: '0.9rem', color: 'var(--primary)' }}>Integrantes de {commissionName}</h5>
+        {renderMember(data.president, 'Presidente/a')}
+        {renderMember(data.vicepresident, 'Vicepresidente/a')}
+        {data.vocales.map(v => renderMember(v, 'Vocal'))}
+      </div>
+    );
+  };
+
+  const renderDescWithCommissions = (desc, index) => {
+    let matchFound = null;
+    for (const commName of Object.keys(COMMISSIONS)) {
+      if (desc.toLowerCase().includes(commName.toLowerCase())) {
+        matchFound = commName;
+        break;
+      }
+    }
+
+    if (!matchFound) return <span className="timeline-desc">{desc}</span>;
+
+    const regex = new RegExp(`(${matchFound})`, 'i');
+    const parts = desc.split(regex);
+
+    return (
+      <div className="timeline-desc" style={{ display: 'block', width: '100%' }}>
+        {parts.map((part, i) => {
+          if (part.toLowerCase() === matchFound.toLowerCase()) {
+            return (
+              <span 
+                key={i}
+                style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: '600', borderBottom: '1px dashed var(--primary)' }}
+                onClick={() => setExpandedCommissionIndex(expandedCommissionIndex === index ? null : index)}
+                title="Ver integrantes de la comisión"
+              >
+                {part}
+              </span>
+            );
+          }
+          return <span key={i}>{part}</span>;
+        })}
+        
+        {expandedCommissionIndex === index && renderCommissionDetails(matchFound)}
+      </div>
+    );
+  };
+
   const handleOpenModal = (proj) => {
     setModalProject(proj);
     setIsModalOpen(true);
+    setExpandedCommissionIndex(null);
   };
 
   const handleModalSubmit = (e) => {
@@ -354,9 +434,9 @@ export default function ProjectsCatalog() {
                         return (
                           <div key={i} className="timeline-item">
                             <div className="timeline-dot"></div>
-                            <div className="timeline-content">
+                            <div className="timeline-content" style={{ width: '100%' }}>
                               {date && <span className="timeline-date">{date}</span>}
-                              <span className="timeline-desc">{desc}</span>
+                              {renderDescWithCommissions(desc, i)}
                             </div>
                           </div>
                         );

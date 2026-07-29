@@ -87,11 +87,29 @@ export default function ProjectsCatalog() {
   const visibleProjects = filteredProjects.slice(0, visibleCount);
   const hasMore = visibleCount < filteredProjects.length;
 
-  const getDaysInComision = (status) => {
-    if (!status) return null;
-    if (!status.toLowerCase().includes('comisión de cabecera') && !status.toLowerCase().includes('comision de cabecera')) return null;
+  const getDaysInComision = (project) => {
+    if (!project) return null;
     
-    const match = status.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    let cabeceraEntry = null;
+    
+    if (project.history && project.history.length > 0) {
+      for (let i = project.history.length - 1; i >= 0; i--) {
+        const entry = project.history[i].toLowerCase();
+        if (entry.includes('comisión de cabecera') || entry.includes('comision de cabecera')) {
+          cabeceraEntry = project.history[i];
+          break;
+        }
+      }
+    } else if (project.status) {
+      const entry = project.status.toLowerCase();
+      if (entry.includes('comisión de cabecera') || entry.includes('comision de cabecera')) {
+        cabeceraEntry = project.status;
+      }
+    }
+    
+    if (!cabeceraEntry) return null;
+    
+    const match = cabeceraEntry.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
     if (!match) return null;
     
     const [_, day, month, year] = match;
@@ -355,7 +373,7 @@ export default function ProjectsCatalog() {
                 )}
                 
                 {(() => {
-                  const days = getDaysInComision(modalProject?.status);
+                  const days = getDaysInComision(modalProject);
                   if (days !== null) {
                     return (
                       <div style={{ marginTop: '1.5rem', color: '#ff4d4d', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 77, 77, 0.1)', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ff4d4d' }}>

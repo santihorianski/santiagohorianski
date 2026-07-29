@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Phone, MapPin, Image, Check, ChevronRight, ChevronLeft, ChevronDown, AlertCircle, Trash2, Shield, ShieldCheck, Search, FileText, Mail, X, MessageSquare } from 'lucide-react';
+import { Turnstile } from '@marsidev/react-turnstile';
 import jsPDF from 'jspdf';
 import { uploadFileToR2, isR2Configured } from '../r2Client';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
@@ -62,6 +63,10 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsError, setTermsError] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState(null);
+  const [turnstileError, setTurnstileError] = useState(false);
+
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
 
   // PDF Receipt Generation States & Methods
   const [isGeneratingReceipt, setIsGeneratingReceipt] = useState(false);
@@ -659,17 +664,24 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
     setStep(prev => prev - 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
-
+    
     if (!acceptedTerms) {
       setTermsError(true);
-      setTimeout(() => setTermsError(false), 1000);
       return;
     }
+    if (!turnstileToken) {
+      setTurnstileError(true);
+      return;
+    }
+    setTermsError(false);
+    setTurnstileError(false);
 
-    // Validar obligatorios
+    const confirmation = window.confirm("¿Confirmar el envío de este reclamo?");
+    if (!confirmation) return;
+    
     if (!formData.category || !formData.callePrincipal) {
       setErrorMessage('Faltan completar campos obligatorios del reclamo.');
       return;
@@ -1223,6 +1235,23 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                 </label>
               </div>
             )}
+
+            {step === 4 && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem', marginBottom: '1rem', flexDirection: 'column', alignItems: 'center' }}>
+                <div className={turnstileError ? 'shake-error' : ''} style={{ padding: turnstileError ? '0.2rem' : '0', background: turnstileError ? 'rgba(239, 68, 68, 0.2)' : 'transparent', borderRadius: '12px' }}>
+                  <Turnstile 
+                    siteKey={turnstileSiteKey} 
+                    onSuccess={(token) => {
+                      setTurnstileToken(token);
+                      setTurnstileError(false);
+                    }}
+                    options={{ theme: 'dark' }}
+                  />
+                </div>
+                {turnstileError && <span style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', fontWeight: '600' }}>Por favor, completa la verificación para continuar.</span>}
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: '1rem', width: '100%', flexDirection: 'row' }}>
               {step > 1 && (
                 <button type="button" onClick={prevStep} className="btn btn-secondary wizard-btn-next" style={{ flex: '0 0 auto' }}>

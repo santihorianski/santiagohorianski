@@ -362,6 +362,12 @@ export default function ProjectsCatalog() {
                         );
                       })}
                     </div>
+                    <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '6px', fontSize: '0.8rem', color: 'var(--text-muted)', borderLeft: '3px solid var(--primary)', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+                      <AlertCircle size={16} style={{ minWidth: '16px', marginTop: '2px' }} />
+                      <span>
+                        La información de los seguimientos de los expedientes se actualiza de forma manual cada 7 días para mantenerte al tanto de las novedades.
+                      </span>
+                    </div>
                   </div>
                 ) : (
                   <p style={{ margin: '0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

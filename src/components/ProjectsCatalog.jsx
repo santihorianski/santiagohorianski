@@ -5,6 +5,7 @@ import { Search, Grid, List, Wrench, Laptop, CheckSquare, BarChart3, AlertCircle
 // Catálogo completo de los proyectos del HCD Misiones (Concejo Deliberante de Posadas)
 import { PROJECTS_DATA } from '../utils/projectsData';
 import { COMMISSIONS, COUNCILLORS, PARTIES } from '../utils/commissionsData';
+import FeaturedProject from './FeaturedProject';
 
   const getProjectType = (proj) => {
   if (!proj) return '';
@@ -21,6 +22,7 @@ export default function ProjectsCatalog() {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' o 'list'
+  const [showFeatured, setShowFeatured] = useState(false);
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -281,6 +283,25 @@ export default function ProjectsCatalog() {
             Proyectos presentados en el CONCEJO DE POSADAS
           </h3>
         </div>
+
+        {/* Banner Promo */}
+        {!showFeatured ? (
+          <div className="promo-banner-slim glass-panel" data-aos="fade-up" onClick={() => setShowFeatured(true)} style={{cursor: 'pointer', padding: '1rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(90deg, rgba(116,59,188,0.15) 0%, rgba(217,160,36,0.1) 100%)', border: '1px solid rgba(116,59,188,0.4)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.3s'}}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+              <span style={{fontSize: '1.8rem'}}>🚀</span>
+              <div>
+                <strong style={{color: 'var(--text-primary)', display: 'block', fontSize: '1.05rem', marginBottom: '0.2rem'}}>Nuevo Proyecto Destacado: Posadas Libre para Emprender</strong>
+                <span style={{color: 'var(--text-secondary)', fontSize: '0.85rem'}}>Alivio fiscal y cero burocracia para comerciantes.</span>
+              </div>
+            </div>
+            <button className="btn btn-primary btn-sm" style={{whiteSpace: 'nowrap'}}>Ver Proyecto</button>
+          </div>
+        ) : (
+          <div style={{position: 'relative', animation: 'fadeIn 0.5s'}}>
+            <button onClick={() => setShowFeatured(false)} className="btn-link-action" style={{position: 'absolute', top: '-1.5rem', right: '0', zIndex: 10, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--text-muted)'}}>Cerrar destacado <X size={14}/></button>
+            <FeaturedProject />
+          </div>
+        )}
 
         {/* Filtros, Buscador y Alternador de Vistas */}
         <div className="catalog-controls glass-panel" data-aos="fade-up">

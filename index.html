@@ -10,7 +10,14 @@
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
           for (let registration of registrations) {
             registration.unregister();
+            console.log("ServiceWorker unregistered");
           }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+            for (let name of names)
+                caches.delete(name);
         });
       }
       
@@ -41,22 +48,6 @@
           }
         } catch (e) {}
       })();
-      
-      // EXTERMINATE SERVICE WORKER
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister();
-            console.log("ServiceWorker unregistered");
-          }
-        });
-      }
-      if ('caches' in window) {
-        caches.keys().then(function(names) {
-            for (let name of names)
-                caches.delete(name);
-        });
-      }
     </script>
     <!-- SEO & Social Meta Tags -->
     <meta name="description" content="Plataforma digital interactiva para conectar al candidato municipal con los vecinos. Reporta reclamos, sube denuncias anónimas y vota en encuestas municipales para mejorar nuestra comunidad." />

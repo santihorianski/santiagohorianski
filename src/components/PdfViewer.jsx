@@ -2,8 +2,18 @@ import React from 'react';
 import { ArrowLeft, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export default function PdfViewer({ pdfUrl, title, images = [] }) {
+export default function PdfViewer({ pdfUrl, title }) {
   const navigate = useNavigate();
+  
+  // Usamos Google Docs Viewer en celulares para esquivar el bug de Safari/iOS que solo muestra la 1ra pagina
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const fullPdfUrl = window.location.origin.includes('localhost') 
+    ? \`https://santiagohorianski.pages.dev\${pdfUrl}\` 
+    : \`\${window.location.origin}\${pdfUrl}\`;
+    
+  const iframeSrc = isMobile 
+    ? \`https://docs.google.com/viewer?url=\${encodeURIComponent(fullPdfUrl)}&embedded=true\`
+    : pdfUrl;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', position: 'fixed', top: 0, left: 0, zIndex: 9999, backgroundColor: '#f5f5f5' }}>
@@ -31,25 +41,14 @@ export default function PdfViewer({ pdfUrl, title, images = [] }) {
         )}
       </div>
       
-      <div style={{ flexGrow: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-        {images && images.length > 0 ? (
-          images.map((imgSrc, idx) => (
-            <img 
-              key={idx} 
-              src={imgSrc} 
-              alt={`Página ${idx + 1}`} 
-              style={{ maxWidth: '100%', width: '800px', height: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', borderRadius: '4px', backgroundColor: '#fff' }} 
-            />
-          ))
-        ) : (
-          <iframe 
-            src={pdfUrl} 
-            width="100%" 
-            height="100%" 
-            style={{ border: 'none', backgroundColor: '#fff', minHeight: '800px', width: '100%', maxWidth: '1000px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} 
-            title="Visualizador PDF" 
-          />
-        )}
+      <div style={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <iframe 
+          src={iframeSrc} 
+          width="100%" 
+          height="100%" 
+          style={{ border: 'none', backgroundColor: '#fff', width: '100%', height: '100%' }} 
+          title="Visualizador PDF" 
+        />
       </div>
     </div>
   );

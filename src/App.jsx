@@ -504,11 +504,6 @@ export default function App() {
             <Route path="/ver-pdf/emprender" element={
               <PdfViewer 
                 pdfUrl="/proyectos/emprender/SANTIAGO HORIANSKI - EMPRENDER LIBRE POSADAS (1).pdf" 
-                images={[
-                  "/proyectos/emprender/1.jpeg",
-                  "/proyectos/emprender/2.jpeg",
-                  "/proyectos/emprender/3.jpeg"
-                ]}
                 title="Posadas Libre para Emprender" 
               />
             } />

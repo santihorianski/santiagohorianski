@@ -3,3 +3,7 @@
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+/reset/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Clear-Site-Data: "cache", "cookies", "storage", "executionContexts"

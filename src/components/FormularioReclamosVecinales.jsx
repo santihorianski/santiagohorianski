@@ -1095,8 +1095,10 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     <label className="form-label">Número de DNI *</label>
                     <div className="input-with-icon" style={showValidationAlerts && !formData.dni.trim() ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
                       <ShieldCheck size={18} className="input-icon" />
-                      <input maxLength="500" type="text" 
+                      <input maxLength="500" type="tel" 
                         name="dni"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         value={formData.dni || ''}
                         onChange={handleInputChange}
                         placeholder="Ej. 34567890"
@@ -1236,18 +1238,18 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                   </label>
                 </div>
                 
-                {/* Turnstile invisible - no ocupa espacio visual pero protege el form */}
-                <div style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
+                {/* Turnstile visible - protege el form y es claro para el usuario */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '1rem', marginBottom: '1rem' }}>
                   <Turnstile 
                     siteKey={turnstileSiteKey} 
                     onSuccess={(token) => {
                       setTurnstileToken(token);
                       setTurnstileError(false);
                     }}
-                    options={{ theme: 'dark', size: 'invisible' }}
+                    options={{ theme: 'dark' }}
                   />
+                  {turnstileError && <span style={{ color: '#ff6b6b', fontSize: '0.9rem', fontWeight: '700', marginTop: '0.5rem', textAlign: 'center' }}>Por favor, completá la verificación de seguridad obligatoria.</span>}
                 </div>
-                {turnstileError && <span style={{ color: '#ff6b6b', fontSize: '0.85rem', fontWeight: '600' }}>Completá la verificación invisible de seguridad.</span>}
               </div>
             )}
 

@@ -20,6 +20,7 @@ const AdminPanel = lazy(() => import('./components/AdminPanel'));
 const ReclamoPage = lazy(() => import('./components/ReclamoPage'));
 const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
 const EscuelaDirigentes = lazy(() => import('./components/EscuelaDirigentes'));
+const PdfViewer = lazy(() => import('./components/PdfViewer'));
 
 // Seed inicial de reportes
 const INITIAL_REPORTS = [];
@@ -459,7 +460,7 @@ export default function App() {
       </Helmet>
       
       <div className={`app-wrapper ${theme}-theme`}>
-        {location.pathname !== '/admin' && (
+        {location.pathname !== '/admin' && !location.pathname.startsWith('/ver-pdf') && (
           <Header 
             theme={theme} 
             toggleTheme={toggleTheme} 
@@ -500,6 +501,7 @@ export default function App() {
             <Route path="/noticias" element={<PressKit newsList={newsList} />} />
             <Route path="/contacto" element={<ContactPage />} />
             <Route path="/escuela" element={<EscuelaDirigentes />} />
+            <Route path="/ver-pdf/emprender" element={<PdfViewer pdfUrl="/proyectos/emprender/SANTIAGO HORIANSKI - EMPRENDER LIBRE POSADAS (1).pdf" title="Posadas Libre para Emprender" />} />
             <Route path="/privacidad" element={<PrivacyPolicy />} />
             <Route path="/login" element={<Navigate to="/admin" replace />} />
             <Route path="/admin" element={
@@ -520,7 +522,7 @@ export default function App() {
           </Suspense>
         </main>
 
-        {location.pathname !== '/admin' && (
+        {location.pathname !== '/admin' && !location.pathname.startsWith('/ver-pdf') && (
           <>
             <Footer />
             <WhatsAppButton />

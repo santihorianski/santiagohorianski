@@ -1,5 +1,6 @@
 import React from 'react';
 import { FileText, ArrowRight, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function FeaturedProject({ onClose }) {
   return (
@@ -35,16 +36,14 @@ export default function FeaturedProject({ onClose }) {
         </ul>
 
         <div className="featured-actions">
-          <a 
-            href="/proyectos/emprender/SANTIAGO HORIANSKI - EMPRENDER LIBRE POSADAS (1).pdf" 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <Link 
+            to="/ver-pdf/emprender"
             className="btn btn-primary featured-btn"
           >
             <FileText size={20} /> Ver Proyecto Completo <ArrowRight size={18} />
-          </a>
+          </Link>
           <button onClick={onClose} className="btn btn-secondary featured-btn">
-            <ArrowLeft size={18} /> Volver al menú
+            <ArrowLeft size={18} /> Cerrar destacado
           </button>
         </div>
       </div>

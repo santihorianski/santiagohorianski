@@ -1304,5 +1304,17 @@ input, textarea, select {
   }
   .hero-subtitle-solid { margin: 0 auto; }
 }
-
-\n/* Escuela Mobile Image */\n.hero-mobile-img {\n  display: none;\n  width: 100%;\n  object-fit: cover;\n}\n@media (max-width: 768px) {\n  .hero-mobile-img {\n    display: block;\n  }\n  .escuela-hero.has-bg-image {\n    background-image: none !important;\n  }\n}\n
+/* Escuela Mobile Image */
+.hero-mobile-img {
+  display: none;
+  width: 100%;
+  object-fit: cover;
+}
+@media (max-width: 768px) {
+  .hero-mobile-img {
+    display: block;
+  }
+  .escuela-hero.has-bg-image {
+    background-image: none !important;
+  }
+}

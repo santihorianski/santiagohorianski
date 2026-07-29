@@ -1,390 +1,74 @@
 export const PROJECTS_DATA = [
   {
-    id: 101,
-    title: 'Normas de Transparencia y Datos Abiertos en el HCD',
-    summary: 'Proyecto de Resolución para establecer normas de transparencia, publicidad, datos abiertos y control en absolutamente todos los procesos de contratación, adquisición, locación y provisión que realice el Honorable Concejo Deliberante.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 102,
-    title: 'Programa "Posadas Libre para Emprender"',
-    summary: 'Proyecto de Ordenanza para crear el programa "Posadas Libre para Emprender", facilitando y promoviendo el desarrollo de nuevos emprendimientos en la ciudad.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 103,
-    title: 'Balance Digital de Sumas y Saldos 2025',
-    summary: 'Proyecto de Resolución para requerir al DEM que remita en formato digital el Balance de Sumas y Saldos al 31/12/2025 con toda la documentación respaldatoria.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 104,
-    title: 'Informe sobre Multa Infundada a Comercio Local',
-    summary: 'Proyecto de Resolución pidiendo informes al DEM sobre el cobro infundado de una multa de $190.000.000 al local comercial LE UTTHE.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 105,
-    title: 'Rendición de Fondos en Eventos Masivos (2025-2026)',
-    summary: 'Proyecto de Comunicación solicitando al DEM informe detallado sobre planificación, contratación, ejecución y rendición de fondos destinados a eventos masivos.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 106,
-    title: 'Ejecución de Gastos de Cortesía y Homenajes 2025',
-    summary: 'Proyecto de Comunicación para solicitar al DEM un informe detallado sobre la ejecución de la partida "Gastos de Cortesía y Homenajes" del ejercicio 2025.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 107,
-    title: 'Prohibición de Fotomultas Automáticas sin Constatación Humana',
-    summary: 'Proyecto de Ordenanza para prohibir la utilización de radares o fotomultas cuya configuración sea estrictamente algorítmica, careciendo de constatación humana en tiempo real.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 108,
-    title: 'Informes y Expedientes del Sistema de Estacionamiento Medido (SEM)',
-    summary: 'Proyecto de Comunicación exigiendo al DEM toda la información, antecedentes y expedientes vinculados al Sistema de Estacionamiento Medido (SEM).',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 109,
-    title: 'Puesta en Funcionamiento de la Junta Electoral Municipal',
-    summary: 'Proyecto de Comunicación para que el DEM arbitre las medidas necesarias para la constitución e integración de la Junta Electoral Municipal.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 110,
-    title: 'Informe sobre el evento "UNA + FAN FEST ÔÇö Edición Mundial"',
-    summary: 'Proyecto de Comunicación para solicitar al DEM un informe completo sobre la finalización y realización del evento "UNA + FAN FEST".',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 111,
-    title: 'Autorización y Fondos de la "Casa del Streaming de Posadas"',
-    summary: 'Proyecto de Comunicación solicitando información documentada sobre la autorización municipal de los eventos realizados en calle Colón bajo la denominación "Casa del Streaming".',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 112,
-    title: 'Contrataciones de Volquetes y Camiones Volcadores',
-    summary: 'Proyecto de Comunicación solicitando informes vinculados a las contrataciones, alquileres y locaciones de volquetes y servicios de camiones volcadores.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 113,
-    title: 'Eliminación de Tasas Específicas para Volquetes',
-    summary: 'Proyecto de Ordenanza para modificar la Ord. XVI-N° 119 y eliminar la posibilidad de establecer tasas específicas vinculadas a la autorización e instalación de volquetes.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 1,
-    title: 'Pedido de Informes sobre Alquileres de Edificios Municipales',
-    summary: 'Auditoría y control de los contratos de alquiler vigentes de dependencias municipales para optimizar recursos públicos.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 2,
-    title: 'Auditoría y Padrón de Proveedores del Estado',
-    summary: 'Solicitud de informes sobre las contrataciones y compras realizadas a proveedores y contratistas directos.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 3,
-    title: 'Control de Gastos en Publicidad y Propaganda Oficial',
-    summary: 'Pedido de aclaraciones sobre el presupuesto asignado a pautas publicitarias y propaganda institucional de Posadas.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 4,
-    title: 'Auditoría de Aportes Previsionales al IPS',
-    summary: 'Control del estado de transferencias de aportes jubilatorios de los empleados municipales al IPS Misiones.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 5,
-    title: 'Registro de Donaciones y Legados Municipales',
-    summary: 'Solicitud de informe detallado de las donaciones aceptadas por la comuna y su asignación patrimonial.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 6,
-    title: 'Gastos de Urgencia sin Licitación Pública',
-    summary: 'Pedido de informes sobre contrataciones directas encuadradas bajo r├®gimen de urgencia o fuerza mayor.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 7,
-    title: 'Estado de Juicios contra el Municipio',
-    summary: 'Requerimiento de información sobre litigios judiciales activos y provisiones para fallos en contra del erario público.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 8,
-    title: 'Rendición de Subsidios Otorgados a Terceros',
-    summary: 'Control de las rendiciones de cuentas de los subsidios financieros otorgados a entidades civiles y comisiones.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 9,
-    title: 'Auditoría de Subsidios al Transporte Urbano (SIT)',
-    summary: 'Pedido de informes sobre los fondos y subsidios públicos distribuidos a empresas de transporte de Posadas.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 10,
-    title: 'Gratuidades y Control del Boleto Estudiantil Estatal',
-    summary: 'Requerimiento de datos sobre la cobertura, uso y financiamiento del boleto gratuito estudiantil (BEEG).',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 11,
-    title: 'Emisión de Licencias de Conducir y Descentralización de Trámites',
-    summary: 'Proyecto para auditar los costos de emisión, exámenes m├®dicos y descentralización del trámite del carnet.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 12,
-    title: 'Recaudación y Gestión del Estacionamiento Medido (SEM)',
-    summary: 'Pedido de informes sobre los fondos recaudados por la aplicación del SEM y su destino presupuestario.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 13,
-    title: 'Cobro de Multas y Funcionamiento del Tribunal de Faltas',
-    summary: 'Solicitud de estadísticas de infracciones labradas y la recaudación neta del Tribunal de Faltas municipal.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 14,
-    title: 'Estado del Parque Vial y Maquinaria Municipal',
-    summary: 'Control de inventario, mantenimiento y horas de uso de las máquinas viales del municipio.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 15,
-    title: 'Simplificación de Habilitaciones Comerciales y Bajas',
-    summary: 'Informe solicitado sobre la demora de habilitaciones comerciales y propuestas de trámites expr├®s.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 16,
-    title: 'Tasa a Salas de Juego y Casinos de Posadas',
-    summary: 'Control tributario y auditoría sobre los cánones abonados por salas de apuestas ubicadas en la ciudad.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 17,
-    title: 'Infraestructura del Parque Industrial Posadas',
-    summary: 'Estado de radicación de empresas y beneficios fiscales aplicados para el desarrollo industrial.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 18,
-    title: 'Tasa de Espectáculos Públicos y Eventos Comerciales',
-    summary: 'Auditoría sobre la exención o cobro de tasas a eventos comerciales y recitales de Posadas.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 19,
-    title: 'Inspecciones Bromatológicas y Multas a Comercios',
-    summary: 'Pedido de datos sobre actas labradas, decomisos y multas en comercios gastronómicos locales.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 20,
-    title: 'Publicidad en Vía Pública y Cánones de Cartelería',
-    summary: 'Control del cobro de derechos por carteles comerciales instalados en espacios públicos.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 21,
-    title: 'Concesiones de Locales en la Costanera y Espacios Públicos',
-    summary: 'Pedido de informes sobre pliegos, cánones mensuales y adjudicaciones de paradores municipales.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 22,
-    title: 'Fondo de Compensaciones de la Entidad Binacional Yacyretá',
-    summary: 'Solicitud de informe sobre las regalías y obras compensatorias pendientes de la EBY en la ciudad.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 23,
-    title: 'Avance del Plan Estrat├®gico Posadas 2010-2035',
-    summary: 'Control de las metas viales y de planificación territorial cumplidas dentro del plan rector.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 24,
-    title: 'Regularización Dominial y Ocupación de Tierras Fiscales',
-    summary: 'Relevamiento de asentamientos y proyectos para la titulación y urbanización de terrenos.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 25,
-    title: 'Tasas Punitorias a Terrenos Baldíos Abandonados',
-    summary: 'Control del cobro de tasas punitivas y multas por malezas y abandono de terrenos privados.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 26,
-    title: 'Eliminación de Barreras Arquitectónicas y Accesibilidad',
-    summary: 'Proyecto para auditar la accesibilidad (rampas, sendas) en veredas y edificios del microcentro.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 27,
-    title: 'Servicio de Agua Potable, Falta de Presión y Suministro',
-    summary: 'Pedido de informes sobre cortes recurrentes y falta de presión de agua en Itaemb├® Miní.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 28,
-    title: 'Gestión de Residuos Sólidos Urbanos (GIRSU)',
-    summary: 'Control del sistema de recolección diferenciada y funcionamiento del relleno sanitario.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 29,
-    title: 'Plan de Arbolado e Inventario Forestal Urbano',
-    summary: 'Solicitud de informes sobre el reemplazo de especies exóticas y censo de árboles urbanos.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 30,
-    title: 'Control y Medición de Ruidos Molestos',
-    summary: 'Estadísticas de denuncias a locales nocturnos, escapes libres y sonómetros homologados.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 31,
-    title: 'Erradicación de Microbasurales en Barrios',
-    summary: 'Solicitud de informes sobre focos crónicos de basura acumulada en avenidas perif├®ricas.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 32,
-    title: 'Presupuesto y Cobertura del IMuSA',
-    summary: 'Pedido de informes sobre campañas de castración, vacunación y presupuesto del instituto de salud animal.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 33,
-    title: 'Control de Contaminación de Efluentes en Arroyos',
-    summary: 'Auditoría ambiental de efluentes arrojados a los arroyos Mártires y El Zaimán.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 34,
-    title: 'Ejecución del Presupuesto Participativo',
-    summary: 'Pedido de informes sobre el estado de obras votadas por los vecinos que aún no se iniciaron.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 35,
-    title: 'Padrones y Elecciones de Comisiones Vecinales',
-    summary: 'Control de los llamados a elecciones y padrones de las comisiones en las delegaciones.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 36,
-    title: 'Provisión de Medicamentos e Insumos en los CAPS',
-    summary: 'Pedido de informes sobre insumos y m├®dicos de guardia en los Centros de Atención Primaria.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 37,
-    title: 'Gastos y Contrataciones en Eventos Culturales',
-    summary: 'Auditoría de fondos destinados a festivales artísticos municipales y ferias culturales.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 38,
-    title: 'Funcionamiento del Concejo Municipal de Turismo',
-    summary: 'Pedido de informes sobre el uso del fondo de promoción turística y la agenda de la ciudad.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 39,
-    title: 'Ingresos de Personal y Concursos de Oposición',
-    summary: 'Auditoría sobre la designación de personal en planta permanente contratado sin concurso previo.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 40,
-    title: 'Gasto en Software y Licencias Tecnológicas del Municipio',
-    summary: 'Control del costo de licencias de software y desarrollos a medida de la web municipal.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 41,
-    title: 'Transparencia en la Contratación de Cooperativas de Trabajo',
-    summary: 'Pedido de informes sobre montos abonados a cooperativas para barrido y mantenimiento de plazas.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 42,
-    title: 'Inventario General de Bienes Muebles Estatales',
-    summary: 'Control de bajas, robos o p├®rdidas de computadoras y mobiliario de las oficinas del estado.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 43,
-    title: 'Radares de Velocidad y Fotomultas',
-    summary: 'Auditoría sobre convenios de radares colocados en avenidas clave y reparto de la recaudación.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 44,
-    title: 'Cupo Laboral de Personas con Discapacidad en el Municipio',
-    summary: 'Pedido de informes sobre el porcentaje de empleados con discapacidad contratados por la comuna.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 45,
-    title: 'Registro de Antenas de Telecomunicaciones y Tasa Ambiental',
-    summary: 'Relevamiento de antenas habilitadas y el cobro de la tasa ambiental por radiación.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 46,
-    title: 'Capacidad e Infraestructura del Cementerio La Piedad',
-    summary: 'Estado de columbarios, parcelas y proyectos para la construcción de un crematorio público.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 47,
-    title: 'Fideicomisos y Sociedades Estatales con Participación Municipal',
-    summary: 'Auditoría de cuentas y balances de las sociedades con participación municipal mayoritaria.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 48,
-    title: 'Distribución de Recursos del Honorable Concejo Deliberante',
-    summary: 'Control presupuestario de las dietas, contratos políticos y partidas presupuestarias del Concejo.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 49,
-    title: 'Publicación Digital del boletín Oficial de Posadas',
-    summary: 'Pedido de informes sobre demoras en la digitalización y publicación de ordenanzas aprobadas.',
-    status: 'Aprobado su giro a Comisión'
-  },
-  {
-    id: 50,
-    title: 'Consumo de Combustible y Gastos de la Flota Oficial',
-    summary: 'Auditoría de los gastos de mantenimiento y vales de combustible de la flota de vehículos oficiales.',
-    status: 'Aprobado su giro a Comisión'
-  }
-,
-  {
     id: 1000,
     title: "5° de la Ord. XVI-N° 119.-",
     original_title: "Proy. Ord. P/Modificar el artículo 5° de la Ord. XVI-N° 119.-",
     summary: "Expediente: 1475-C -2026",
     status: "25/06/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 14 - 25/06/2026) - Comisión de Cabecera",
     history: ["25/06/2026: Departamento de Mesa de Entradas y Salidas","25/06/2026: Dirección General de Asuntos Legislativos y Comisiones","25/06/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 14 - 25/06/2026) - Comisión de Cabecera"],
+    category: 'Gestión Institucional'
+  },
+  {
+    id: 1006,
+    title: "Prohibición de Fotomultas Automáticas sin Constatación Humana",
+    original_title: "Proy. Ord. P/prohibir la utilización de sistemas automáticos de captación de imágenes, radares o dispositivos electrónicos destinados a la emisión automática de actas de infracción cuya configuración sea estrictamente algorítmica o sistematizada (“fotomultas”), careciendo de la constatación humana en tiempo real.-",
+    summary: "Expediente: 1151-C -2026",
+    status: "14/05/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 8 - 14/05/2026) - Comisión de Cabecera",
+    history: ["14/05/2026: Departamento de Mesa de Entradas y Salidas","14/05/2026: Dirección General de Asuntos Legislativos y Comisiones","14/05/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 8 - 14/05/2026)","14/05/2026: Comisión de Transporte y Tránsito (Sesión Ordinaria Nº 8 - 14/05/2026)","14/05/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 8 - 14/05/2026) - Comisión de Cabecera"],
+    category: 'Gestión Institucional'
+  },
+  {
+    id: 1011,
+    title: "Proy. Ord. P/Crear el Programa \"Posadas Libre para Emprender\".-",
+    original_title: "Proy. Ord. P/Crear el Programa \"Posadas Libre para Emprender\".-",
+    summary: "Expediente: 936-C -2026",
+    status: "16/04/2026: Comisión de Asuntos Sociales y Desarrollo Vecinal (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera",
+    history: ["14/04/2026: Departamento de Mesa de Entradas y Salidas","14/04/2026: Dirección General de Asuntos Legislativos y Comisiones","16/04/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 5 - 16/04/2026)","16/04/2026: Comisión de Asuntos Sociales y Desarrollo Vecinal (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera"],
+    category: 'Gestión Institucional'
+  },
+  {
+    id: 1014,
+    title: "En un plazo de diez (10) días hábiles: Nómina de Ediciones, Ordenanzas Pendientes de Publicación,...",
+    original_title: "Proy. Com. s/al DEM informe de manera detallada en un plazo de diez (10) días hábiles: Nómina de Ediciones, Ordenanzas Pendientes de Publicación, Justificación de Demoras, Tirada y Distribución Física, Accesibilidad Digital.-",
+    summary: "Expediente: 636-C -2026",
+    status: "12/03/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 2 - 12/03/2026)",
+    history: ["11/03/2026: Departamento de Mesa de Entradas y Salidas","11/03/2026: Dirección General de Asuntos Legislativos y Comisiones","12/03/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera","12/03/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 2 - 12/03/2026)"],
+    category: 'Gestión Institucional'
+  },
+  {
+    id: 1009,
+    title: "Proy. Res. P/Requerir al DEM, remita un informe a este Honorable Cuerpo, en un plazo perentorio d...",
+    original_title: "Proy. Res. P/Requerir al DEM, remita un informe a este Honorable Cuerpo, en un plazo perentorio de 10 días hábiles, lo referente al cobro infundado de una multa de pesos ciento noventa millones ($190.000.000) al local comercial LE UTTHE.-",
+    summary: "Expediente: 949-C -2026",
+    status: "16/04/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera",
+    history: ["15/04/2026: Departamento de Mesa de Entradas y Salidas","15/04/2026: Dirección General de Asuntos Legislativos y Comisiones","16/04/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera"],
+    category: 'Gestión Institucional'
+  },
+  {
+    id: 1010,
+    title: "Proy. Res. P/Requerir al DEM remita en formato digital el Balance de Sumas y Saldos al 31/12/2025...",
+    original_title: "Proy. Res. P/Requerir al DEM remita en formato digital el Balance de Sumas y Saldos al 31/12/2025 con la totalidad de la documentación referente al mismo en el mismo formato.-",
+    summary: "Expediente: 952-C -2026",
+    status: "17/05/2026: Departamento Ejecutivo Municipal NOTA Nº 97/26",
+    history: ["16/04/2026: Departamento de Mesa de Entradas y Salidas","16/04/2026: Dirección General de Asuntos Legislativos y Comisiones","16/04/2026: Comisión de Hacienda y Presupuesto \"SOBRE TABLAS\" (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera","16/04/2026: Departamento de Mesa de Entradas y Salidas RES. N°29/26.-","24/04/2026: Dirección General de Asuntos Legislativos y Comisiones","24/04/2026: Departamento de Mesa de Entradas y Salidas","30/04/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 6 - 30/04/2026) - Comisión de Cabecera","17/05/2026: Departamento Ejecutivo Municipal NOTA Nº 97/26"],
+    category: 'Gestión Institucional'
+  },
+  {
+    id: 1012,
+    title: "Proy. Res. P/Establecer normas de transparencia, publicidad, datos abiertos y control en absoluta...",
+    original_title: "Proy. Res. P/Establecer normas de transparencia, publicidad, datos abiertos y control en absolutamente todos los procesos de contratación, adquisición, locación y provisión que realice el Honorable Concejo Deliberante de la Ciudad de Posadas.-",
+    summary: "Expediente: 728-C -2026",
+    status: "26/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 3 - 26/03/2026) - Comisión de Cabecera",
+    history: ["26/03/2026: Departamento de Mesa de Entradas y Salidas","26/03/2026: Dirección General de Asuntos Legislativos y Comisiones","26/03/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 3 - 26/03/2026)","26/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 3 - 26/03/2026) - Comisión de Cabecera"],
+    category: 'Gestión Institucional'
+  },
+  {
+    id: 1061,
+    title: "En un plazo de diez (10) días hábiles: Registro de Proveedores, Concentración de Contratación, Mo...",
+    original_title: "Proy. Com. s/al DEM informe de manera detallada en un plazo de diez (10) días hábiles: Registro de Proveedores, Concentración de Contratación, Modalidad de Adjudicación, Intervención de Contralor y Declaración de Incompatibilidades.-",
+    summary: "Expediente: 589-C -2026",
+    status: "12/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 2 - 12/03/2026)",
+    history: ["11/03/2026: Departamento de Mesa de Entradas y Salidas","11/03/2026: Dirección General de Asuntos Legislativos y Comisiones","12/03/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera","12/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 2 - 12/03/2026)"],
     category: 'Gestión Institucional'
   },
   {
@@ -433,15 +117,6 @@ export const PROJECTS_DATA = [
     category: 'Gestión Institucional'
   },
   {
-    id: 1006,
-    title: "Prohibición de Fotomultas Automáticas sin Constatación Humana",
-    original_title: "Proy. Ord. P/prohibir la utilización de sistemas automáticos de captación de imágenes, radares o dispositivos electrónicos destinados a la emisión automática de actas de infracción cuya configuración sea estrictamente algorítmica o sistematizada (“fotomultas”), careciendo de la constatación humana en tiempo real.-",
-    summary: "Expediente: 1151-C -2026",
-    status: "14/05/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 8 - 14/05/2026) - Comisión de Cabecera",
-    history: ["14/05/2026: Departamento de Mesa de Entradas y Salidas","14/05/2026: Dirección General de Asuntos Legislativos y Comisiones","14/05/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 8 - 14/05/2026)","14/05/2026: Comisión de Transporte y Tránsito (Sesión Ordinaria Nº 8 - 14/05/2026)","14/05/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 8 - 14/05/2026) - Comisión de Cabecera"],
-    category: 'Gestión Institucional'
-  },
-  {
     id: 1007,
     title: "Proy. Com. S/al DEM remita en un plazo de diez (10) días hábiles, un informe detallado sobre la e...",
     original_title: "Proy. Com. S/al DEM remita en un plazo de diez (10) días hábiles, un informe detallado sobre la ejecución de la partida \"Gastos de Cortesía y Homenajes\" del ejercicio 2025.-",
@@ -460,57 +135,12 @@ export const PROJECTS_DATA = [
     category: 'Gestión Institucional'
   },
   {
-    id: 1009,
-    title: "Proy. Res. P/Requerir al DEM, remita un informe a este Honorable Cuerpo, en un plazo perentorio d...",
-    original_title: "Proy. Res. P/Requerir al DEM, remita un informe a este Honorable Cuerpo, en un plazo perentorio de 10 días hábiles, lo referente al cobro infundado de una multa de pesos ciento noventa millones ($190.000.000) al local comercial LE UTTHE.-",
-    summary: "Expediente: 949-C -2026",
-    status: "16/04/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera",
-    history: ["15/04/2026: Departamento de Mesa de Entradas y Salidas","15/04/2026: Dirección General de Asuntos Legislativos y Comisiones","16/04/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera"],
-    category: 'Gestión Institucional'
-  },
-  {
-    id: 1010,
-    title: "Proy. Res. P/Requerir al DEM remita en formato digital el Balance de Sumas y Saldos al 31/12/2025...",
-    original_title: "Proy. Res. P/Requerir al DEM remita en formato digital el Balance de Sumas y Saldos al 31/12/2025 con la totalidad de la documentación referente al mismo en el mismo formato.-",
-    summary: "Expediente: 952-C -2026",
-    status: "17/05/2026: Departamento Ejecutivo Municipal NOTA Nº 97/26",
-    history: ["16/04/2026: Departamento de Mesa de Entradas y Salidas","16/04/2026: Dirección General de Asuntos Legislativos y Comisiones","16/04/2026: Comisión de Hacienda y Presupuesto \"SOBRE TABLAS\" (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera","16/04/2026: Departamento de Mesa de Entradas y Salidas RES. N°29/26.-","24/04/2026: Dirección General de Asuntos Legislativos y Comisiones","24/04/2026: Departamento de Mesa de Entradas y Salidas","30/04/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 6 - 30/04/2026) - Comisión de Cabecera","17/05/2026: Departamento Ejecutivo Municipal NOTA Nº 97/26"],
-    category: 'Gestión Institucional'
-  },
-  {
-    id: 1011,
-    title: "Proy. Ord. P/Crear el Programa \"Posadas Libre para Emprender\".-",
-    original_title: "Proy. Ord. P/Crear el Programa \"Posadas Libre para Emprender\".-",
-    summary: "Expediente: 936-C -2026",
-    status: "16/04/2026: Comisión de Asuntos Sociales y Desarrollo Vecinal (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera",
-    history: ["14/04/2026: Departamento de Mesa de Entradas y Salidas","14/04/2026: Dirección General de Asuntos Legislativos y Comisiones","16/04/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 5 - 16/04/2026)","16/04/2026: Comisión de Asuntos Sociales y Desarrollo Vecinal (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera"],
-    category: 'Gestión Institucional'
-  },
-  {
-    id: 1012,
-    title: "Proy. Res. P/Establecer normas de transparencia, publicidad, datos abiertos y control en absoluta...",
-    original_title: "Proy. Res. P/Establecer normas de transparencia, publicidad, datos abiertos y control en absolutamente todos los procesos de contratación, adquisición, locación y provisión que realice el Honorable Concejo Deliberante de la Ciudad de Posadas.-",
-    summary: "Expediente: 728-C -2026",
-    status: "26/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 3 - 26/03/2026) - Comisión de Cabecera",
-    history: ["26/03/2026: Departamento de Mesa de Entradas y Salidas","26/03/2026: Dirección General de Asuntos Legislativos y Comisiones","26/03/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 3 - 26/03/2026)","26/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 3 - 26/03/2026) - Comisión de Cabecera"],
-    category: 'Gestión Institucional'
-  },
-  {
     id: 1013,
     title: "En un plazo de diez (10) días hábiles: Inventario de Flota (Livianos y Motos), Estado de Conserva...",
     original_title: "Proy. Com. s/al DEM informe de manera detallada en un plazo de diez (10) días hábiles: Inventario de Flota (Livianos y Motos), Estado de Conservación y Seguridad, Equipamiento de Emergencia, Registro de Mantenimiento y Service, Control de Combustible y Ploteo.-",
     summary: "Expediente: 637-C -2026",
     status: "12/03/2026: Comisión de Transporte y Tránsito (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera",
     history: ["11/03/2026: Departamento de Mesa de Entradas y Salidas","11/03/2026: Dirección General de Asuntos Legislativos y Comisiones","12/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 2 - 12/03/2026)","12/03/2026: Comisión de Transporte y Tránsito (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera"],
-    category: 'Gestión Institucional'
-  },
-  {
-    id: 1014,
-    title: "En un plazo de diez (10) días hábiles: Nómina de Ediciones, Ordenanzas Pendientes de Publicación,...",
-    original_title: "Proy. Com. s/al DEM informe de manera detallada en un plazo de diez (10) días hábiles: Nómina de Ediciones, Ordenanzas Pendientes de Publicación, Justificación de Demoras, Tirada y Distribución Física, Accesibilidad Digital.-",
-    summary: "Expediente: 636-C -2026",
-    status: "12/03/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 2 - 12/03/2026)",
-    history: ["11/03/2026: Departamento de Mesa de Entradas y Salidas","11/03/2026: Dirección General de Asuntos Legislativos y Comisiones","12/03/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera","12/03/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 2 - 12/03/2026)"],
     category: 'Gestión Institucional'
   },
   {
@@ -829,15 +459,6 @@ export const PROJECTS_DATA = [
     category: 'Gestión Institucional'
   },
   {
-    id: 1050,
-    title: "Proy. Com/ S al DEM informe en un plazo de 10 días hábiles: balance de infracciones, condonacione...",
-    original_title: "Proy. Com/ S al DEM informe en un plazo de 10 días hábiles: balance de infracciones, condonaciones y descuentos, auditoría informática y nómina de magistrados respecto a los Juzgados de Faltas de la ciudad de Posadas.",
-    summary: "Expediente: 600-C -2026",
-    status: "12/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera",
-    history: ["11/03/2026: Departamento de Mesa de Entradas y Salidas","11/03/2026: Dirección General de Asuntos Legislativos y Comisiones","12/03/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 2 - 12/03/2026)","12/03/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 2 - 12/03/2026)","12/03/2026: Comisión de Transporte y Tránsito (Sesión Ordinaria Nº 2 - 12/03/2026)","12/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera"],
-    category: 'Gestión Institucional'
-  },
-  {
     id: 1051,
     title: "En un plazo de diez (10) días hábiles: Recaudación Bruta, Contrato y Comisiones, Trazabilidad de ...",
     original_title: "Proy. Com. s/al DEM informe de manera detallada en un plazo de diez (10) días hábiles: Recaudación Bruta, Contrato y Comisiones, Trazabilidad de Fondos, Anulaciones Manuales, Lista de Excepciones, Personal de Fiscalización e Inversión de Excedentes.-",
@@ -928,15 +549,6 @@ export const PROJECTS_DATA = [
     category: 'Gestión Institucional'
   },
   {
-    id: 1061,
-    title: "En un plazo de diez (10) días hábiles: Registro de Proveedores, Concentración de Contratación, Mo...",
-    original_title: "Proy. Com. s/al DEM informe de manera detallada en un plazo de diez (10) días hábiles: Registro de Proveedores, Concentración de Contratación, Modalidad de Adjudicación, Intervención de Contralor y Declaración de Incompatibilidades.-",
-    summary: "Expediente: 589-C -2026",
-    status: "12/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 2 - 12/03/2026)",
-    history: ["11/03/2026: Departamento de Mesa de Entradas y Salidas","11/03/2026: Dirección General de Asuntos Legislativos y Comisiones","12/03/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera","12/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 2 - 12/03/2026)"],
-    category: 'Gestión Institucional'
-  },
-  {
     id: 1062,
     title: "S de manera detalladas.-",
     original_title: "Proy. Com. S/Al DEM, informes de manera detalladas.-",
@@ -944,32 +556,44 @@ export const PROJECTS_DATA = [
     status: "12/03/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera",
     history: ["11/03/2026: Departamento de Mesa de Entradas y Salidas","11/03/2026: Dirección General de Asuntos Legislativos y Comisiones","12/03/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera"],
     category: 'Gestión Institucional'
+  },
+  {
+    id: 1050,
+    title: "Proy. Com/ S al DEM informe en un plazo de 10 días hábiles: balance de infracciones, condonacione...",
+    original_title: "Proy. Com/ S al DEM informe en un plazo de 10 días hábiles: balance de infracciones, condonaciones y descuentos, auditoría informática y nómina de magistrados respecto a los Juzgados de Faltas de la ciudad de Posadas.",
+    summary: "Expediente: 600-C -2026",
+    status: "12/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera",
+    history: ["11/03/2026: Departamento de Mesa de Entradas y Salidas","11/03/2026: Dirección General de Asuntos Legislativos y Comisiones","12/03/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 2 - 12/03/2026)","12/03/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 2 - 12/03/2026)","12/03/2026: Comisión de Transporte y Tránsito (Sesión Ordinaria Nº 2 - 12/03/2026)","12/03/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 2 - 12/03/2026) - Comisión de Cabecera"],
+    category: 'Gestión Institucional'
   }
 ];
 
 export const FEATURED_PROJECTS = [
   {
-    id: 'feat-1',
-    title: 'Transparencia Legislativa',
-    summary: 'Auditoría y optimización de recursos.',
-    details: 'Llevamos a cabo una auditoría exhaustiva en el Concejo Deliberante de Posadas, consolidando más de 100 proyectos de pedido de informes y ordenanzas para transparentar contrataciones directas, compras públicas, viáticos y el uso de vales de combustible de la flota municipal.',
-    badge: 'Auditoría y Control',
-    color: 'var(--primary)'
+    id: 1000,
+    title: "5° de la Ord. XVI-N° 119.-",
+    original_title: "Proy. Ord. P/Modificar el artículo 5° de la Ord. XVI-N° 119.-",
+    summary: "Expediente: 1475-C -2026",
+    status: "25/06/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 14 - 25/06/2026) - Comisión de Cabecera",
+    history: ["25/06/2026: Departamento de Mesa de Entradas y Salidas","25/06/2026: Dirección General de Asuntos Legislativos y Comisiones","25/06/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 14 - 25/06/2026) - Comisión de Cabecera"],
+    category: 'Gestión Institucional'
   },
   {
-    id: 'feat-2',
-    title: 'Eliminar el SEM',
-    summary: 'Pedido de informes para la eliminación del estacionamiento medido.',
-    details: 'Presentamos un exhaustivo pedido de informes sobre la recaudación y gestión del Sistema de Estacionamiento Medido (SEM) en Posadas, con la propuesta y el objetivo final de eliminarlo para aliviar la carga económica sobre los vecinos y comerciantes del centro.',
-    badge: 'Tránsito y Gestión',
-    color: 'var(--secondary)'
+    id: 1006,
+    title: "Prohibición de Fotomultas Automáticas sin Constatación Humana",
+    original_title: "Proy. Ord. P/prohibir la utilización de sistemas automáticos de captación de imágenes, radares o dispositivos electrónicos destinados a la emisión automática de actas de infracción cuya configuración sea estrictamente algorítmica o sistematizada (“fotomultas”), careciendo de la constatación humana en tiempo real.-",
+    summary: "Expediente: 1151-C -2026",
+    status: "14/05/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 8 - 14/05/2026) - Comisión de Cabecera",
+    history: ["14/05/2026: Departamento de Mesa de Entradas y Salidas","14/05/2026: Dirección General de Asuntos Legislativos y Comisiones","14/05/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 8 - 14/05/2026)","14/05/2026: Comisión de Transporte y Tránsito (Sesión Ordinaria Nº 8 - 14/05/2026)","14/05/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 8 - 14/05/2026) - Comisión de Cabecera"],
+    category: 'Gestión Institucional'
   },
   {
-    id: 'feat-3',
-    title: 'Fomento al Emprendedurismo Local',
-    summary: 'Apoyo y simplificación de recursos.',
-    details: 'Proyecto legislativo para crear un R├®gimen Simplificado de Habilitación Comercial expr├®s, exención de tasas por 6 meses para nuevos comercios familiares, y la provisión de microcr├®ditos municipales para potenciar a emprendedores locales.',
-    badge: 'Economía y Empleo',
-    color: 'var(--accent)'
+    id: 1011,
+    title: "Proy. Ord. P/Crear el Programa \"Posadas Libre para Emprender\".-",
+    original_title: "Proy. Ord. P/Crear el Programa \"Posadas Libre para Emprender\".-",
+    summary: "Expediente: 936-C -2026",
+    status: "16/04/2026: Comisión de Asuntos Sociales y Desarrollo Vecinal (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera",
+    history: ["14/04/2026: Departamento de Mesa de Entradas y Salidas","14/04/2026: Dirección General de Asuntos Legislativos y Comisiones","16/04/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 5 - 16/04/2026)","16/04/2026: Comisión de Asuntos Sociales y Desarrollo Vecinal (Sesión Ordinaria Nº 5 - 16/04/2026) - Comisión de Cabecera"],
+    category: 'Gestión Institucional'
   }
 ];

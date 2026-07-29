@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Search, Grid, List, Wrench, Laptop, CheckSquare, BarChart3, AlertCircle, FileText, Send, X, MessageSquare } from 'lucide-react';
 
 // Catálogo completo de los proyectos del HCD Misiones (Concejo Deliberante de Posadas)
-import { PROJECTS_DATA, FEATURED_PROJECTS } from '../utils/projectsData';
+import { PROJECTS_DATA } from '../utils/projectsData';
 
   const getProjectType = (proj) => {
   if (!proj) return '';
@@ -16,7 +16,7 @@ import { PROJECTS_DATA, FEATURED_PROJECTS } from '../utils/projectsData';
   return 'Proyecto';
 };
 
-export default function ProjectsCatalog({ hideBandera = false }) {
+export default function ProjectsCatalog() {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' o 'list'
@@ -117,30 +117,7 @@ export default function ProjectsCatalog({ hideBandera = false }) {
         </div>
 
         {/* Sección Proyectos Bandera (Top 3 destacados) */}
-        {!hideBandera && (
-        <div className="featured-section" data-aos="fade-up">
-          <h3 className="section-subtitle-small">
-            <span className="bullet-glow"></span>
-            Proyectos Bandera
-          </h3>
-          <div className="featured-grid">
-            {FEATURED_PROJECTS.map((feat) => (
-              <div 
-                key={feat.id} 
-                className="featured-card card glass-panel"
-                style={{ '--feat-color': feat.color }}
-              >
-                <div className="feat-header">
-                  <span className="badge badge-primary feat-badge" style={{ color: feat.color, borderColor: feat.color, backgroundColor: 'transparent' }}>
-                    {feat.badge}
-                  </span>
-                  <span className="feat-highlight-dot" style={{ backgroundColor: feat.color }}></span>
-                </div>
-                <h4 className="feat-title">{feat.title}</h4>
-                <p className="feat-summary">{feat.summary}</p>
-                <p className="feat-details">{feat.details}</p>
-                <button 
-                  onClick={() => handleOpenModal(feat.title)} 
+         
                   className="btn btn-primary btn-sm feat-cta"
                   style={{ marginTop: 'auto' }}
                 >

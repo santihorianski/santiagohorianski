@@ -553,7 +553,7 @@ export default function App() {
             <Route path="/inicio" element={
               <>
                 <Hero reportsCount={reports.length} />
-                <ProjectsCatalog hideBandera={true} />
+                <ProjectsCatalog  />
               </>
             } />
             <Route path="/proyectos" element={<ProjectsCatalog />} />

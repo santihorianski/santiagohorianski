@@ -5,8 +5,29 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script>
+      // Destruir Service Workers antiguos para forzar actualización y borrar caché
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (let registration of registrations) {
+            registration.unregister();
+          }
+        });
+      }
+      
+      // Manejar error de carga de módulos (Failed to fetch dynamically imported module)
       window.addEventListener('vite:preloadError', (event) => {
-        window.location.reload();
+        const isReloaded = sessionStorage.getItem('vite-reloaded-v2');
+        if (!isReloaded) {
+          sessionStorage.setItem('vite-reloaded-v2', 'true');
+          if ('caches' in window) {
+            caches.keys().then((names) => {
+              for (let name of names) caches.delete(name);
+            });
+          }
+          setTimeout(() => {
+            window.location.reload();
+          }, 300);
+        }
       });
 
       (function() {

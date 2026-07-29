@@ -191,7 +191,7 @@ export default function Hero({ reports = [] }) {
       {/* Hero-specific styles */}
       <style dangerouslySetInnerHTML={{__html: `
         .hero-section {
-          padding: 6rem 0 6rem 0;
+          padding: 8.5rem 0 6rem 0;
           position: relative;
           overflow: hidden;
         }
@@ -549,7 +549,7 @@ export default function Hero({ reports = [] }) {
 
         @media (max-width: 768px) {
           .hero-section {
-            padding: 1.5rem 0 4rem 0;
+            padding: 5.5rem 0 4rem 0;
           }
           .marquee-content {
             animation-duration: 35s;

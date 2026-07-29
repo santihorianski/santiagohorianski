@@ -1286,13 +1286,20 @@ input, textarea, select {
   font-weight: 600;
 }
 
+.mobile-team-img { display: none; }
+
 @media (max-width: 768px) {
   .escuela-hero.has-bg-image {
-    background-image: url('/escuela/equipocelular.jpg') !important;
     background-position: center top !important;
-    background-size: cover !important;
     align-items: center;
     padding: 6rem 0 3rem 0;
+  }
+  .mobile-team-img {
+    display: block;
+    width: 100%;
+    border-radius: 12px;
+    margin-top: 2.5rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
   }
   .hero-content {
     margin-top: 2rem;

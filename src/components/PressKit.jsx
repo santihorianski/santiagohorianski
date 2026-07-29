@@ -217,7 +217,8 @@ export default function PressKit({ newsList }) {
                 </div>
               </div>
             );
-          })}
+          })
+          )}
           </div>
           </div>
           <div className="press-sidebar">

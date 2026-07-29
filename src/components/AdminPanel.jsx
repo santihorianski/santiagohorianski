@@ -5,6 +5,7 @@ import { SignedIn, SignedOut, SignIn, UserButton, useUser } from '@clerk/clerk-r
 import santiagoImg from '../assets/santiago.jpg';
 import { generateLegislativeProject } from '../utils/wordGenerator';
 import AdminMap from './AdminMap';
+import { COMMISSIONS } from '../utils/commissionsData';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import ReportFichaPDF from './ReportFichaPDF';
@@ -661,16 +662,24 @@ Párrafo final o conclusión de la noticia.`);
 
     onUpdateReport(updated);
     
-    // Disparar WhatsApp automático suspendido por baneo de cuenta. Se gestiona de forma manual.
-    
     setIsSaveSuccess(true);
-    
     setSelectedReport(updated);
 
     setTimeout(() => {
       setIsSaveSuccess(false);
-      setSelectedReport(null);
+      setIsEditingReport(false);
     }, 1500);
+  };
+
+  const handleResolveReport = (report) => {
+    if(window.confirm('¿Marcar este reclamo como solucionado / aprobado?')) {
+      const updated = {
+        ...report,
+        status: 'aprobado',
+        statusHistory: [...(report.statusHistory || []), { status: 'aprobado', date: new Date().toISOString() }]
+      };
+      onUpdateReport(updated);
+    }
   };
 
   // Generador de mensaje de estado
@@ -1182,6 +1191,11 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                           <td data-label="Acción" style={{ display: 'flex', gap: '0.5rem' }}>
                             {userRole === 'admin' && (
                               <>
+                                {rep.status !== 'aprobado' && (
+                                  <button onClick={() => handleResolveReport(rep)} className="action-btn-circle outline" style={{ color: 'var(--success)', borderColor: 'var(--success)' }} title="Marcar como Solucionado/Aprobado">
+                                    <CheckCircle size={16} />
+                                  </button>
+                                )}
                                 <button onClick={() => handleToggleReportVisibility(rep.id)} className="action-btn-circle outline" title={rep.isVisible !== false ? "Ocultar al público" : "Hacer visible"}>
                                   {rep.isVisible !== false ? <EyeOff size={16} /> : <Eye size={16} />}
                                 </button>
@@ -1488,6 +1502,37 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                             <option value="aprobado">Proyecto Aprobado (Ejecución Ejecutivo)</option>
                           </select>
                         </div>
+                        
+                        {editStatus === 'en_comision' && (
+                          <>
+                            <div className="form-group" style={{ marginTop: '1rem' }}>
+                              <label className="form-label">Comisión asignada</label>
+                              <select 
+                                value={editComisionName} 
+                                onChange={(e) => {
+                                  const name = e.target.value;
+                                  setEditComisionName(name);
+                                  const comm = COMMISSIONS[name];
+                                  if (comm && comm.president) {
+                                    setEditComisionConcejal(comm.president);
+                                  } else {
+                                    setEditComisionConcejal('');
+                                  }
+                                }} 
+                                className="form-select"
+                              >
+                                <option value="">Seleccionar comisión...</option>
+                                {Object.keys(COMMISSIONS).map(c => (
+                                  <option key={c} value={c}>{c}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="form-group" style={{ marginTop: '1rem' }}>
+                              <label className="form-label">Persona a cargo (Presidente)</label>
+                              <input type="text" value={editComisionConcejal} onChange={(e) => setEditComisionConcejal(e.target.value)} className="form-input" />
+                            </div>
+                          </>
+                        )}
                         <div className="form-group" style={{ marginTop: '1rem' }}>
                           <label className="form-label">Respuesta Oficial del Concejal</label>
                           <textarea value={editResponse} onChange={(e) => setEditResponse(e.target.value)} className="form-textarea" rows="5"></textarea>

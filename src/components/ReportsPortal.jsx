@@ -255,20 +255,20 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
           {!isSeguimientoMode && (
             <div className="portal-metrics-bar glass-panel" data-aos="zoom-in">
               <div className="metric-item">
-                <span className="metric-value">{reports.length + 82}</span>
+                <span className="metric-value">{reports.length}</span>
                 <span className="metric-title">Reclamos Recibidos</span>
               </div>
               <div className="metric-divider"></div>
               <div className="metric-item">
                 <span className="metric-value" style={{ color: 'var(--warning)' }}>
-                  {reports.filter(r => r.status === 'en_comision' || r.status === 'en_votacion' || r.status === 'presentado').length + 12}
+                  {reports.filter(r => r.status === 'en_comision' || r.status === 'en_votacion' || r.status === 'presentado').length}
                 </span>
                 <span className="metric-title">En Trámite Legislativo</span>
               </div>
               <div className="metric-divider"></div>
               <div className="metric-item">
                 <span className="metric-value" style={{ color: 'var(--success)' }}>
-                  {reports.filter(r => r.status === 'aprobado').length + 70}
+                  {reports.filter(r => r.status === 'aprobado').length}
                 </span>
                 <span className="metric-title">Solucionados / Respuestas</span>
               </div>

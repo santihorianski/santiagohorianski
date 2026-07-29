@@ -124,6 +124,39 @@ export default function ProjectsCatalog() {
     return diffDays;
   };
 
+  const getDaysSinceFinalStage = (project) => {
+    if (!project) return null;
+    
+    let finalEntry = null;
+    if (project.history && project.history.length > 0) {
+      for (let i = project.history.length - 1; i >= 0; i--) {
+        const entry = project.history[i];
+        if (entry.includes('COM. N°') || entry.includes('COM. Nº') || entry.includes('NOTA H.C.D. N°')) {
+          finalEntry = entry;
+          break;
+        }
+      }
+    } else if (project.status) {
+      if (project.status.includes('COM. N°') || project.status.includes('COM. Nº') || project.status.includes('NOTA H.C.D. N°')) {
+        finalEntry = project.status;
+      }
+    }
+    
+    if (!finalEntry) return null;
+    
+    const match = finalEntry.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (!match) return null;
+    
+    const [_, day, month, year] = match;
+    const statusDate = new Date(`${year}-${month}-${day}`);
+    const today = new Date();
+    
+    const diffTime = Math.abs(today - statusDate);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
+    
+    return diffDays;
+  };
+
   const renderCommissionDetails = (commissionName) => {
     const data = COMMISSIONS[commissionName];
     if (!data) return null;
@@ -196,18 +229,18 @@ export default function ProjectsCatalog() {
         })}
         
         {/* New Logic for Final Stages */}
-        {(desc.includes('COM. N°') || desc.includes('COM. Nº')) && (
+        {desc.includes('NOTA H.C.D. N°') && (
           <div style={{ marginTop: '0.5rem' }}>
             <span className="badge" style={{ backgroundColor: '#ff9800', color: '#fff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 'bold' }}>
-              FUE APROBADO PERO NO TUVIMOS EJECUCIÓN DESDE EL MUNICIPIO
+              FUE APROBADO PERO NO TUVIMOS EJECUCIÓN DESDE EL MUNICIPIO - SIN RESPUESTAS
             </span>
           </div>
         )}
         
-        {desc.includes('NOTA H.C.D. N°') && (
+        {(desc.includes('COM. N°') || desc.includes('COM. Nº')) && (
           <div style={{ marginTop: '0.5rem' }}>
             <span className="badge" style={{ backgroundColor: '#f44336', color: '#fff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 'bold' }}>
-              SIN RESPUESTAS
+              FUE APROBADO PERO NO TUVIMOS EJECUCIÓN DESDE EL MUNICIPIO - SIN RESPUESTAS
             </span>
           </div>
         )}
@@ -473,17 +506,17 @@ export default function ProjectsCatalog() {
                         {modalProject?.status?.toUpperCase()}
                       </span>
                     </p>
-                    {modalProject?.status && (modalProject.status.includes('COM. N°') || modalProject.status.includes('COM. Nº')) && (
+                    {modalProject?.status && modalProject.status.includes('NOTA H.C.D. N°') && (
                       <div style={{ marginTop: '0.5rem' }}>
                         <span className="badge" style={{ backgroundColor: '#ff9800', color: '#fff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 'bold' }}>
-                          FUE APROBADO PERO NO TUVIMOS EJECUCIÓN DESDE EL MUNICIPIO
+                          FUE APROBADO PERO NO TUVIMOS EJECUCIÓN DESDE EL MUNICIPIO - SIN RESPUESTAS
                         </span>
                       </div>
                     )}
-                    {modalProject?.status && modalProject.status.includes('NOTA H.C.D. N°') && (
+                    {modalProject?.status && (modalProject.status.includes('COM. N°') || modalProject.status.includes('COM. Nº')) && (
                       <div style={{ marginTop: '0.5rem' }}>
                         <span className="badge" style={{ backgroundColor: '#f44336', color: '#fff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 'bold' }}>
-                          SIN RESPUESTAS
+                          FUE APROBADO PERO NO TUVIMOS EJECUCIÓN DESDE EL MUNICIPIO - SIN RESPUESTAS
                         </span>
                       </div>
                     )}
@@ -491,6 +524,16 @@ export default function ProjectsCatalog() {
                 )}
                 
                 {(() => {
+                  const daysSinRespuesta = getDaysSinceFinalStage(modalProject);
+                  if (daysSinRespuesta !== null) {
+                    return (
+                      <div style={{ marginTop: '1.5rem', color: '#f44336', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(244, 67, 54, 0.1)', padding: '0.75rem', borderRadius: '8px', border: '1px solid #f44336' }}>
+                        <AlertCircle size={20} />
+                        Lleva {daysSinRespuesta} días sin respuesta
+                      </div>
+                    );
+                  }
+
                   const days = getDaysInComision(modalProject);
                   if (days !== null) {
                     return (

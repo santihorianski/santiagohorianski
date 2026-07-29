@@ -102,21 +102,21 @@ export default function Hero({ reports = [] }) {
           <div className="hero-stats">
             <div className="stat-card glass-panel">
               <span className="stat-num gradient-text">
-                <CountUp end={reports.length} />
+                <CountUp end={reports.filter(r => r.isVisible !== false).length} />
               </span>
-              <span className="stat-label">Reportes Recibidos</span>
+              <span className="stat-label">Reclamos Recibidos</span>
             </div>
             <div className="stat-card glass-panel">
               <span className="stat-num gradient-text-accent">
-                <CountUp end={reports.length ? Math.round((reports.filter(r => r.status === 'aprobado').length / reports.length) * 100) : 0} suffix="%" />
+                <CountUp end={reports.filter(r => r.isVisible !== false && ['presentado', 'en_comision', 'en_votacion'].includes(r.status)).length} />
               </span>
-              <span className="stat-label">Casos Resueltos</span>
+              <span className="stat-label">En Trámite Legislativo</span>
             </div>
             <div className="stat-card glass-panel">
               <span className="stat-num" style={{ color: 'var(--secondary)' }}>
-                <CountUp end={reports.reduce((acc, curr) => acc + (curr.upvotes || 0), 0)} />
+                <CountUp end={reports.filter(r => r.isVisible !== false && ['aprobado', 'resuelto', 'solucionado'].includes(r.status)).length} />
               </span>
-              <span className="stat-label">Votos de Apoyo</span>
+              <span className="stat-label">Solucionados / Respuestas</span>
             </div>
           </div>
         </div>

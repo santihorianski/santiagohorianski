@@ -175,11 +175,13 @@ export default function PressKit({ newsList }) {
                 </div>
                 
                 <div className="gacetilla-content news-article-view">
-                  <div className="news-image-container">
-                    {idx === 0 && <div className="news-badge">ÚLTIMA NOTICIA</div>}
-                    <img src={news.image || semImage} alt="Noticia portada" className="news-image" />
-                    <div className="news-image-overlay"></div>
-                  </div>
+                  {news.image && (
+                    <div className="news-image-container">
+                      {idx === 0 && <div className="news-badge">ÚLTIMA NOTICIA</div>}
+                      <img src={news.image} alt="Noticia portada" className="news-image" />
+                      <div className="news-image-overlay"></div>
+                    </div>
+                  )}
                   
                   <h4 className="news-headline">{headline}</h4>
                   <p className="news-date" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem', marginTop: '-0.5rem', fontWeight: '500', padding: '0 1.5rem' }}>
@@ -202,19 +204,21 @@ export default function PressKit({ newsList }) {
                 </div>
 
                 {/* Descargables dentro de la tarjeta */}
-                <div className="downloads-section" style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--overlay-medium)' }}>
-                  <h5 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>Material Descargable</h5>
-                  <a href={news.image || semImage} download={`Gacetilla_${dateStr}.jpg`} className="download-btn glass-panel" style={{ width: '100%', maxWidth: '350px' }}>
-                    <div className="download-icon-wrapper image-wrapper">
-                      <ImageIcon size={24} />
-                    </div>
-                    <div className="download-text">
-                      <h4>Foto Oficial</h4>
-                      <span>Imagen Alta Resolución (JPG)</span>
-                    </div>
-                    <Download className="download-action-icon" size={20} />
-                  </a>
-                </div>
+                {news.image && (
+                  <div className="downloads-section" style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--overlay-medium)' }}>
+                    <h5 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>Material Descargable</h5>
+                    <a href={news.image} download={`Gacetilla_${dateStr}.jpg`} className="download-btn glass-panel" style={{ width: '100%', maxWidth: '350px' }}>
+                      <div className="download-icon-wrapper image-wrapper">
+                        <ImageIcon size={24} />
+                      </div>
+                      <div className="download-text">
+                        <h4>Foto Oficial</h4>
+                        <span>Imagen Alta Resolución (JPG)</span>
+                      </div>
+                      <Download className="download-action-icon" size={20} />
+                    </a>
+                  </div>
+                )}
               </div>
             );
           })
@@ -235,6 +239,25 @@ export default function PressKit({ newsList }) {
                 className="form-input" 
                 style={{ width: '100%' }}
               />
+            </div>
+            
+            <div className="press-sidebar-card glass-panel" style={{ marginTop: '1.5rem' }}>
+              <h4 style={{ marginBottom: '1.5rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FileText size={18} />
+                Últimas Noticias
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {newsList.slice(0, 5).map((n) => (
+                  <div key={n.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600', textTransform: 'uppercase' }}>
+                      {new Date(n.date || n.created_at || new Date()).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                    </span>
+                    <a href={`#${n.id}`} onClick={(e) => { e.preventDefault(); document.getElementById(n.id)?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.9rem', lineHeight: '1.4', fontWeight: '500', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = 'var(--primary)'} onMouseLeave={(e) => e.target.style.color = 'var(--text-primary)'}>
+                      {n.title}
+                    </a>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

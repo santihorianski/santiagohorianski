@@ -1222,7 +1222,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
             {step === 4 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', justifyContent: 'center', alignItems: 'center', marginBottom: '1rem', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'center', alignItems: 'center', marginBottom: '0.5rem' }}>
                 <div className={termsError ? 'shake-error' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.5rem', transition: 'all 0.3s ease', transform: termsError ? 'scale(1.05)' : 'scale(1)', background: termsError ? 'rgba(239, 68, 68, 0.2)' : 'transparent', borderRadius: '8px' }}>
                   <input 
                     type="checkbox" 

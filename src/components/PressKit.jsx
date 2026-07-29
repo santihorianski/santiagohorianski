@@ -147,7 +147,7 @@ export default function PressKit({ newsList }) {
             const copyContent = `GACETILLA DE PRENSA - SANTIAGO HORIANSKI\n\n${headline}\n\n${news.content || fallbackText}`;
 
             return (
-              <div key={news.id} className="press-card glass-panel">
+              <div key={news.id} id={news.id} className="press-card glass-panel">
                 <div className="press-card-header">
                   <div className="press-card-title">
                     <FileText className="press-icon" size={24} />
@@ -190,6 +190,13 @@ export default function PressKit({ newsList }) {
                   
                   <div className={`news-body ${expandedNews[news.id || idx] ? 'expanded' : 'collapsed'}`}>
                     {renderContent(news.content)}
+                    {news.external_link && (
+                      <div style={{ marginTop: '1rem' }}>
+                        <a href={news.external_link} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                          Leer nota completa <ExternalLink size={14} />
+                        </a>
+                      </div>
+                    )}
                     {!expandedNews[news.id || idx] && <div className="fade-out-bottom"></div>}
                   </div>
                   
@@ -237,8 +244,22 @@ export default function PressKit({ newsList }) {
                     <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600', textTransform: 'uppercase' }}>
                       {new Date(n.date || n.created_at || new Date()).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                     </span>
-                    <a href={`#${n.id}`} onClick={(e) => { e.preventDefault(); document.getElementById(n.id)?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.9rem', lineHeight: '1.4', fontWeight: '500', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = 'var(--primary)'} onMouseLeave={(e) => e.target.style.color = 'var(--text-primary)'}>
+                    <a 
+                      href={n.external_link || `#${n.id}`} 
+                      target={n.external_link ? "_blank" : "_self"}
+                      rel={n.external_link ? "noopener noreferrer" : ""}
+                      onClick={(e) => { 
+                        if (!n.external_link) {
+                          e.preventDefault(); 
+                          document.getElementById(n.id)?.scrollIntoView({ behavior: 'smooth' }); 
+                        }
+                      }} 
+                      style={{ color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.9rem', lineHeight: '1.4', fontWeight: '500', transition: 'color 0.2s' }} 
+                      onMouseEnter={(e) => e.target.style.color = 'var(--primary)'} 
+                      onMouseLeave={(e) => e.target.style.color = 'var(--text-primary)'}
+                    >
                       {n.title}
+                      {n.external_link && <ExternalLink size={12} style={{ display: 'inline', marginLeft: '4px', opacity: 0.7 }} />}
                     </a>
                   </div>
                 ))}

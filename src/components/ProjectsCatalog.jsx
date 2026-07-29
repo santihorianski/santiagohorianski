@@ -195,6 +195,23 @@ export default function ProjectsCatalog() {
           return <span key={i}>{part}</span>;
         })}
         
+        {/* New Logic for Final Stages */}
+        {(desc.includes('COM. N°') || desc.includes('COM. Nº')) && (
+          <div style={{ marginTop: '0.5rem' }}>
+            <span className="badge" style={{ backgroundColor: '#ff9800', color: '#fff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 'bold' }}>
+              FUE APROBADO PERO NO TUVIMOS EJECUCIÓN DESDE EL MUNICIPIO
+            </span>
+          </div>
+        )}
+        
+        {desc.includes('NOTA H.C.D. N°') && (
+          <div style={{ marginTop: '0.5rem' }}>
+            <span className="badge" style={{ backgroundColor: '#f44336', color: '#fff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 'bold' }}>
+              SIN RESPUESTAS
+            </span>
+          </div>
+        )}
+
         {expandedCommissionIndex === index && renderCommissionDetails(matchFound)}
       </div>
     );
@@ -449,12 +466,28 @@ export default function ProjectsCatalog() {
                     </div>
                   </div>
                 ) : (
-                  <p style={{ margin: '0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <strong>Estado actual:</strong> 
-                    <span className="badge" style={{ backgroundColor: 'var(--success)', color: '#000', fontWeight: 'bold', fontSize: '0.8rem', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
-                      {modalProject?.status?.toUpperCase()}
-                    </span>
-                  </p>
+                  <div style={{ margin: '0' }}>
+                    <p style={{ margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <strong>Estado actual:</strong> 
+                      <span className="badge" style={{ backgroundColor: 'var(--success)', color: '#000', fontWeight: 'bold', fontSize: '0.8rem', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
+                        {modalProject?.status?.toUpperCase()}
+                      </span>
+                    </p>
+                    {modalProject?.status && (modalProject.status.includes('COM. N°') || modalProject.status.includes('COM. Nº')) && (
+                      <div style={{ marginTop: '0.5rem' }}>
+                        <span className="badge" style={{ backgroundColor: '#ff9800', color: '#fff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 'bold' }}>
+                          FUE APROBADO PERO NO TUVIMOS EJECUCIÓN DESDE EL MUNICIPIO
+                        </span>
+                      </div>
+                    )}
+                    {modalProject?.status && modalProject.status.includes('NOTA H.C.D. N°') && (
+                      <div style={{ marginTop: '0.5rem' }}>
+                        <span className="badge" style={{ backgroundColor: '#f44336', color: '#fff', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 'bold' }}>
+                          SIN RESPUESTAS
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 )}
                 
                 {(() => {

@@ -35,43 +35,6 @@ export default function FeaturedProject({ onClose }) {
           </li>
         </ul>
 
-        <div className="featured-timeline">
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>Historial del Expediente</h3>
-          <div className="timeline-container">
-            <div className="timeline-item">
-              <div className="timeline-dot"></div>
-              <div className="timeline-content">
-                <div className="timeline-date">14/04/2026</div>
-                <div className="timeline-text">Departamento de Mesa de Entradas y Salidas</div>
-              </div>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-dot"></div>
-              <div className="timeline-content">
-                <div className="timeline-date">14/04/2026</div>
-                <div className="timeline-text">Dirección General de Asuntos Legislativos y Comisiones</div>
-              </div>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-dot"></div>
-              <div className="timeline-content">
-                <div className="timeline-date">16/04/2026</div>
-                <div className="timeline-text">Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 5)</div>
-              </div>
-            </div>
-            <div className="timeline-item active">
-              <div className="timeline-dot active"></div>
-              <div className="timeline-content">
-                <div className="timeline-date" style={{color: 'var(--primary)', fontWeight: 'bold'}}>16/04/2026 (Actual)</div>
-                <div className="timeline-text">
-                  <strong>Comisión de Asuntos Sociales y Desarrollo Vecinal</strong><br/>
-                  <span style={{fontSize: '0.85em', color: 'var(--text-muted)'}}>Comisión de Cabecera</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="featured-actions">
           <Link 
             to="/ver-pdf/emprender"
@@ -186,53 +149,6 @@ export default function FeaturedProject({ onClose }) {
           gap: 0.75rem;
           padding: 0.8rem 1.5rem;
           font-size: 1rem;
-        }
-
-        .featured-timeline {
-          margin-bottom: 2.5rem;
-        }
-        
-        .timeline-container {
-          position: relative;
-          padding-left: 20px;
-          border-left: 2px solid var(--border-color);
-        }
-        
-        .timeline-item {
-          position: relative;
-          margin-bottom: 1.5rem;
-        }
-        
-        .timeline-item:last-child {
-          margin-bottom: 0;
-        }
-        
-        .timeline-dot {
-          position: absolute;
-          left: -27px;
-          top: 4px;
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background: var(--text-muted);
-          border: 2px solid var(--bg-card);
-        }
-        
-        .timeline-dot.active {
-          background: var(--primary);
-          box-shadow: 0 0 10px var(--primary);
-        }
-        
-        .timeline-date {
-          font-size: 0.85rem;
-          color: var(--text-muted);
-          margin-bottom: 0.2rem;
-          font-family: var(--font-mono);
-        }
-        
-        .timeline-text {
-          font-size: 0.95rem;
-          color: var(--text-secondary);
         }
 
         @media (max-width: 576px) {

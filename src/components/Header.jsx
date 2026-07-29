@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Menu, X, MessageSquare, Home, BarChart3, FileText, Lock, Sun, Moon, Phone } from 'lucide-react';
+import { Menu, X, MessageSquare, Home, BarChart3, FileText, Lock, Sun, Moon, Phone, GraduationCap } from 'lucide-react';
 
 export default function Header({ theme, toggleTheme }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +10,7 @@ export default function Header({ theme, toggleTheme }) {
     { id: '/inicio', label: 'Inicio', icon: Home },
     { id: '/proyectos', label: 'Proyectos', icon: FileText },
     { id: '/gestion', label: 'Gestión Territorial', icon: MessageSquare },
+    { id: '/escuela', label: 'Escuela de Dirigentes', icon: GraduationCap },
     { id: '/noticias', label: 'Noticias y Prensa', icon: FileText },
     { id: '/contacto', label: 'Contacto', icon: Phone }
   ];

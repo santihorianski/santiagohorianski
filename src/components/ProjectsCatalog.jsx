@@ -87,6 +87,23 @@ export default function ProjectsCatalog() {
   const visibleProjects = filteredProjects.slice(0, visibleCount);
   const hasMore = visibleCount < filteredProjects.length;
 
+  const getDaysInComision = (status) => {
+    if (!status) return null;
+    if (!status.toLowerCase().includes('comisión de cabecera') && !status.toLowerCase().includes('comision de cabecera')) return null;
+    
+    const match = status.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (!match) return null;
+    
+    const [_, day, month, year] = match;
+    const statusDate = new Date(`${year}-${month}-${day}`);
+    const today = new Date();
+    
+    const diffTime = Math.abs(today - statusDate);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
+    
+    return diffDays;
+  };
+
   const handleOpenModal = (proj) => {
     setModalProject(proj);
     setIsModalOpen(true);
@@ -336,6 +353,19 @@ export default function ProjectsCatalog() {
                     </span>
                   </p>
                 )}
+                
+                {(() => {
+                  const days = getDaysInComision(modalProject?.status);
+                  if (days !== null) {
+                    return (
+                      <div style={{ marginTop: '1.5rem', color: '#ff4d4d', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 77, 77, 0.1)', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ff4d4d' }}>
+                        <AlertCircle size={20} />
+                        Lleva {days} días en comisión de cabecera
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
               <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>
                 Si querés acceder al texto completo del expediente o sumar tu idea sobre este proyecto, contactate por WhatsApp de manera directa.

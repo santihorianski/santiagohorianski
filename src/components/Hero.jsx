@@ -484,11 +484,11 @@ export default function Hero({ reports = [] }) {
           bottom: 0;
           left: 0;
           width: 100%;
-          background: rgba(255, 255, 255, 0.4);
-          border-top: 1px solid var(--overlay-light);
+          background: linear-gradient(90deg, rgba(116, 59, 188, 0.85), rgba(60, 20, 110, 0.85));
+          border-top: 1px solid rgba(255, 255, 255, 0.15);
           padding: 0.75rem 0;
           overflow: hidden;
-          backdrop-filter: blur(10px);
+          backdrop-filter: blur(12px);
         }
 
         .marquee-container {
@@ -510,13 +510,13 @@ export default function Hero({ reports = [] }) {
           gap: 0.5rem;
           font-size: 0.85rem;
           font-weight: 700;
-          color: var(--primary);
+          color: #ffffff;
           padding: 0 1.5rem;
           white-space: nowrap;
         }
 
         .marquee-dot {
-          color: rgba(116, 59, 188, 0.4);
+          color: rgba(255, 255, 255, 0.5);
           font-size: 0.75rem;
         }
 

@@ -58,7 +58,7 @@ export default function SocialBento({ hideHeader = false }) {
           </a>
 
           {/* Tarjeta WhatsApp (Horizontal) */}
-          <a href="#" className="bento-card bento-wsp glass-panel" target="_blank" rel="noreferrer">
+          <a href="https://wa.me/5493764515738?text=Hola%20Santiago%2C%20estuve%20viendo%20tu%20sitio%20y%20me%20gustar%C3%ADa%20contactarme." className="bento-card bento-wsp glass-panel" target="_blank" rel="noreferrer">
             <div className="bento-icon-wrapper wsp-gradient">
               <WhatsAppIcon size={28} color="white" />
             </div>

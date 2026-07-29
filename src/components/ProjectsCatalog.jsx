@@ -116,18 +116,7 @@ export default function ProjectsCatalog() {
           </p>
         </div>
 
-        {/* Sección Proyectos Bandera (Top 3 destacados) */}
-         
-                  className="btn btn-primary btn-sm feat-cta"
-                  style={{ marginTop: 'auto' }}
-                >
-                  <span>Solicitar proyecto completo</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-        )}
+
 
         {/* Separator / Subtitle */}
         <div className="catalog-controls-title" data-aos="fade-right">

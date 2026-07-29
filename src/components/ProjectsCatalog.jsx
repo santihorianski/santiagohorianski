@@ -247,7 +247,7 @@ export default function ProjectsCatalog() {
                       onClick={() => handleOpenModal(proj)}
                       className="btn btn-secondary btn-sm proj-card-cta"
                     >
-                      <span>Solicitar completo</span>
+                      <span>Info completa</span>
                     </button>
                     <button 
                       onClick={() => handleOpenModal(proj)}
@@ -292,7 +292,7 @@ export default function ProjectsCatalog() {
                         onClick={() => handleOpenModal(proj)}
                         className="btn btn-secondary btn-xs-table"
                       >
-                        Solicitar
+                        Info completa
                       </button>
                       <button 
                         onClick={() => handleOpenModal(proj)}

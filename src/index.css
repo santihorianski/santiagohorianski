@@ -1288,12 +1288,14 @@ input, textarea, select {
 
 @media (max-width: 768px) {
   .escuela-hero.has-bg-image {
-    background-position: center 10% !important;
-    align-items: flex-end;
-    padding-bottom: 3rem;
+    background-image: url('/escuela/equipocelular.jpg') !important;
+    background-position: center top !important;
+    background-size: cover !important;
+    align-items: center;
+    padding: 6rem 0 3rem 0;
   }
   .hero-content {
-    margin-top: 18rem;
+    margin-top: 2rem;
   }
   .hero-content-inner {
     text-align: center;
@@ -1303,18 +1305,4 @@ input, textarea, select {
     font-size: 2.5rem;
   }
   .hero-subtitle-solid { margin: 0 auto; }
-}
-/* Escuela Mobile Image */
-.hero-mobile-img {
-  display: none;
-  width: 100%;
-  object-fit: cover;
-}
-@media (max-width: 768px) {
-  .hero-mobile-img {
-    display: block;
-  }
-  .escuela-hero.has-bg-image {
-    background-image: none !important;
-  }
 }

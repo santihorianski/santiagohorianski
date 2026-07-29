@@ -6,6 +6,7 @@ import semImage from '../assets/sem.jpg';
 export default function PressKit({ newsList }) {
   const [copiedId, setCopiedId] = useState(null);
   const [expandedNews, setExpandedNews] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
 
   const toggleExpand = (id) => {
     setExpandedNews(prev => ({ ...prev, [id]: !prev[id] }));
@@ -13,10 +14,15 @@ export default function PressKit({ newsList }) {
 
   const fallbackText = "No hay noticias recientes cargadas en este momento.";
 
-  // Safe sort of news by date, and filter out hidden news
-  // Backward compatibility: if isVisible is undefined, treat as true
   const sortedNews = [...(newsList || [])]
     .filter(n => n.isVisible !== false)
+    .filter(n => {
+      if (!searchTerm) return true;
+      const lowerSearch = searchTerm.toLowerCase();
+      const titleMatch = n.title?.toLowerCase().includes(lowerSearch);
+      const contentMatch = n.content?.toLowerCase().includes(lowerSearch);
+      return titleMatch || contentMatch;
+    })
     .sort((a,b) => new Date(b.date) - new Date(a.date));
 
   const renderContent = (text) => {
@@ -126,8 +132,15 @@ export default function PressKit({ newsList }) {
           </p>
         </div>
 
-        <div className="press-grid">
-          {sortedNews.map((news, idx) => {
+        <div className="press-layout">
+          <div className="press-main-col">
+            <div className="press-grid">
+              {sortedNews.length === 0 ? (
+                <div className="glass-panel" style={{ padding: '3rem 2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  {searchTerm ? 'No se encontraron noticias que coincidan con tu búsqueda.' : 'No hay noticias publicadas aún.'}
+                </div>
+              ) : (
+                sortedNews.map((news, idx) => {
             const headline = news.title || "Noticias del Concejo";
             const dateStr = news.date || new Date().toISOString();
             const formattedDate = new Date(dateStr).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -205,6 +218,24 @@ export default function PressKit({ newsList }) {
               </div>
             );
           })}
+          </div>
+          </div>
+          <div className="press-sidebar">
+            <div className="press-sidebar-card glass-panel">
+              <h4 style={{ marginBottom: '1rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Buscar Noticias
+              </h4>
+              <input 
+                type="text" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Palabra clave, tema..." 
+                className="form-input" 
+                style={{ width: '100%' }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -218,10 +249,39 @@ export default function PressKit({ newsList }) {
           display: flex;
           flex-direction: column;
           gap: 3rem;
+        }
+
+        .press-layout {
+          display: grid;
+          grid-template-columns: 1fr 320px;
+          gap: 2.5rem;
           margin-top: 3rem;
-          max-width: 850px;
+          max-width: 1100px;
           margin-left: auto;
           margin-right: auto;
+          align-items: start;
+        }
+
+        .press-sidebar {
+          position: sticky;
+          top: 100px;
+        }
+        
+        .press-sidebar-card {
+          padding: 1.5rem;
+          border-radius: 12px;
+        }
+
+        @media (max-width: 900px) {
+          .press-layout {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+          }
+          .press-sidebar {
+            position: relative;
+            top: 0;
+            order: -1; /* Muestra el buscador arriba en móvil */
+          }
         }
 
         /* Press Card (Gacetilla) */

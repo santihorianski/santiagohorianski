@@ -202,7 +202,10 @@ export default function ProjectsCatalog() {
                         
                     </div>
                   </div>
-                  <h4 className="proj-card-title" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }} title={proj.original_title || proj.title}>{proj.title}</h4>
+                  <div style={{ position: 'relative' }}>
+                    <h4 className="proj-card-title" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem' }} title={proj.original_title || proj.title}>{proj.title}</h4>
+                    <span onClick={(e) => { e.stopPropagation(); handleOpenModal(proj); }} style={{color: 'var(--primary)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '0.8rem'}}>ver más</span>
+                  </div>
                   <p className="proj-card-summary">{proj.summary}</p>
                   <div className="proj-card-actions">
                     <button 
@@ -241,6 +244,7 @@ export default function ProjectsCatalog() {
                         <span style={{ color: 'var(--primary)', marginRight: '0.4rem' }}>⭐</span>
                         {proj.title}
                       </span>
+                      <span onClick={(e) => { e.stopPropagation(); handleOpenModal(proj); }} style={{color: 'var(--primary)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginTop: '0.2rem'}}>ver más</span>
                       <span className="td-summary-inline">{proj.summary}</span>
                     </div>
                     <span className="td-category">

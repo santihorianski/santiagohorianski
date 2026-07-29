@@ -158,7 +158,6 @@ export default function ProjectsCatalog() {
       <div className="commission-details animate-fade-in" style={{ marginTop: '0.75rem', padding: '1rem', background: 'rgba(0,0,0,0.15)', borderRadius: '8px', borderLeft: '3px solid var(--primary)' }}>
         <h5 style={{ margin: '0 0 1rem 0', fontSize: '0.9rem', color: 'var(--primary)' }}>Integrantes de {commissionName}</h5>
         {renderMember(data.president, 'Presidente/a')}
-        {renderMember(data.vicepresident, 'Vicepresidente/a')}
         {data.vocales.map(v => renderMember(v, 'Vocal'))}
       </div>
     );

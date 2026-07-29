@@ -19,68 +19,57 @@ export const COUNCILLORS = {
   'Ángel Martínez': { party: 'La Vida y los Valores' }, // Ángel Mario Martínez
   'Pablo Argañaraz': { party: 'La Libertad Avanza', prefix: 'Vet.' },
   'Jair Dib': { party: 'Encuentro Misionero', prefix: 'Abg.' },
-  'Valeria Gómez de Oliveira': { party: 'La Libertad Avanza', prefix: 'Abg.' }
+  'Valeria Gómez de Oliveira': { party: 'La Libertad Avanza', prefix: 'Abg.' },
+  'María Elena Fernández': { party: 'La Libertad Avanza' }
 };
 
 export const COMMISSIONS = {
   'Hacienda y Presupuesto': {
     president: 'Luciana Scromeda',
-    vicepresident: 'María Elena Fernández',
-    vocales: ['Samira Almirón', 'Héctor Cardozo', 'Laura Traid', 'Fernando Zarza', 'Judith Salom']
+    vocales: ['María Elena Fernández', 'Samira Almirón', 'Héctor Cardozo', 'Laura Traid', 'Fernando Zarza', 'Judith Salom']
   },
   'Transporte y Tránsito': {
     president: 'Santiago Horianski',
-    vicepresident: 'Fernando Zarza',
-    vocales: ['Laura Traid', 'Luciana Scromeda', 'Héctor Cardozo', 'Ángel Martínez', 'María Elena Fernández']
+    vocales: ['Fernando Zarza', 'Laura Traid', 'Luciana Scromeda', 'Héctor Cardozo', 'Ángel Martínez', 'María Elena Fernández']
   },
   'Obras Públicas y Urbanismo': {
     president: 'Héctor Cardozo',
-    vicepresident: 'Ángel Martínez',
-    vocales: ['Jair Dib', 'Luciana Scromeda', 'Pablo Argañaraz', 'Judith Salom', 'Valeria Gómez de Oliveira']
+    vocales: ['Ángel Martínez', 'Jair Dib', 'Luciana Scromeda', 'Pablo Argañaraz', 'Judith Salom', 'Valeria Gómez de Oliveira']
   },
   'Salud Pública y Discapacidad': {
     president: 'Judith Salom',
-    vicepresident: 'Malena Mazal',
-    vocales: ['Laura Traid', 'Héctor Cardozo', 'Pablo Argañaraz', 'Ángel Martínez', 'Santiago Horianski']
+    vocales: ['Malena Mazal', 'Laura Traid', 'Héctor Cardozo', 'Pablo Argañaraz', 'Ángel Martínez', 'Santiago Horianski']
   },
   'Ambiente y Desarrollo Sustentable': {
     president: 'Fernando Zarza',
-    vicepresident: 'Judith Salom',
-    vocales: ['Héctor Cardozo', 'Samira Almirón', 'Laura Traid', 'María Elena Fernández', 'Ángel Martínez']
+    vocales: ['Judith Salom', 'Héctor Cardozo', 'Samira Almirón', 'Laura Traid', 'María Elena Fernández', 'Ángel Martínez']
   },
   'Asuntos Sociales y Desarrollo Vecinal': {
     president: 'Laura Traid',
-    vicepresident: 'Judith Salom',
-    vocales: ['Malena Mazal', 'Jair Dib', 'Héctor Cardozo', 'Valeria Gómez de Oliveira', 'Pablo Argañaraz']
+    vocales: ['Judith Salom', 'Malena Mazal', 'Jair Dib', 'Héctor Cardozo', 'Valeria Gómez de Oliveira', 'Pablo Argañaraz']
   },
   'Cultura, Educación y Deporte': {
     president: 'Malena Mazal',
-    vicepresident: 'Pablo Argañaraz',
-    vocales: ['Samira Almirón', 'Luciana Scromeda', 'Héctor Cardozo', 'María Elena Fernández', 'Judith Salom']
+    vocales: ['Pablo Argañaraz', 'Samira Almirón', 'Luciana Scromeda', 'Héctor Cardozo', 'María Elena Fernández', 'Judith Salom']
   },
   'Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento': {
     president: 'Valeria Gómez de Oliveira',
-    vicepresident: 'Luciana Scromeda',
-    vocales: ['Jair Dib', 'Samira Almirón', 'Malena Mazal', 'Pablo Argañaraz', 'María Elena Fernández']
+    vocales: ['Luciana Scromeda', 'Jair Dib', 'Samira Almirón', 'Malena Mazal', 'Pablo Argañaraz', 'María Elena Fernández']
   },
   'Mercosur e Integración Regional': {
     president: 'María Elena Fernández',
-    vicepresident: 'Fernando Zarza',
-    vocales: ['Samira Almirón', 'Laura Traid', 'Valeria Gómez de Oliveira', 'Judith Salom', 'Santiago Horianski']
+    vocales: ['Fernando Zarza', 'Samira Almirón', 'Laura Traid', 'Valeria Gómez de Oliveira', 'Judith Salom', 'Santiago Horianski']
   },
   'Inclusión y Equidad de Género': {
     president: 'Judith Salom',
-    vicepresident: 'Malena Mazal',
-    vocales: ['Laura Traid', 'Héctor Cardozo', 'Pablo Argañaraz', 'Ángel Martínez', 'Santiago Horianski']
+    vocales: ['Malena Mazal', 'Laura Traid', 'Héctor Cardozo', 'Pablo Argañaraz', 'Ángel Martínez', 'Santiago Horianski']
   },
   'Turismo': {
     president: 'Ángel Martínez',
-    vicepresident: 'Fernando Zarza',
-    vocales: ['Samira Almirón', 'Laura Traid', 'Valeria Gómez de Oliveira', 'Judith Salom', 'Santiago Horianski']
+    vocales: ['Fernando Zarza', 'Samira Almirón', 'Laura Traid', 'Valeria Gómez de Oliveira', 'Judith Salom', 'Santiago Horianski']
   },
   'Innovación, Ciencia y Tecnológica': {
     president: 'Samira Almirón',
-    vicepresident: 'Santiago Horianski',
-    vocales: ['Malena Mazal', 'Laura Traid', 'Héctor Cardozo', 'Valeria Gómez de Oliveira', 'Fernando Zarza']
+    vocales: ['Santiago Horianski', 'Malena Mazal', 'Laura Traid', 'Héctor Cardozo', 'Valeria Gómez de Oliveira', 'Fernando Zarza']
   }
 };

@@ -80,6 +80,7 @@ export default function Header({ theme, toggleTheme }) {
           </button>
           <button className="mobile-toggle" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle Menu">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
+            <span className="mobile-toggle-text">{isOpen ? 'Cerrar' : 'Menú'}</span>
           </button>
         </div>
       </div>
@@ -230,8 +231,10 @@ export default function Header({ theme, toggleTheme }) {
 
         .mobile-toggle {
           display: none;
-          background: transparent;
-          border: none;
+          background: rgba(116, 59, 188, 0.1);
+          border: 1px solid rgba(116, 59, 188, 0.3);
+          padding: 0.3rem 0.6rem;
+          border-radius: 8px;
           color: var(--text-primary);
           cursor: pointer;
         }
@@ -311,7 +314,11 @@ export default function Header({ theme, toggleTheme }) {
             display: none;
           }
           .mobile-toggle {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+            font-weight: 600;
           }
           .mobile-only-flex {
             display: flex;

@@ -226,28 +226,13 @@ export default function PressKit({ newsList }) {
           </div>
           </div>
           <div className="press-sidebar">
-            <div className="press-sidebar-card glass-panel">
-              <h4 style={{ marginBottom: '1rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                Buscar Noticias
-              </h4>
-              <input 
-                type="text" 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Palabra clave, tema..." 
-                className="form-input" 
-                style={{ width: '100%' }}
-              />
-            </div>
-            
-            <div className="press-sidebar-card glass-panel" style={{ marginTop: '1.5rem' }}>
+            <div className="press-sidebar-card glass-panel" style={{ marginTop: '0' }}>
               <h4 style={{ marginBottom: '1.5rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <FileText size={18} />
                 Últimas Noticias
               </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {newsList.slice(0, 5).map((n) => (
+              <div className="news-scroll-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '450px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                {newsList.map((n) => (
                   <div key={n.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600', textTransform: 'uppercase' }}>
                       {new Date(n.date || n.created_at || new Date()).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}

@@ -1222,7 +1222,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
             {step === 4 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', alignItems: 'center', marginBottom: '1rem', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', justifyContent: 'center', alignItems: 'center', marginBottom: '1rem', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className={termsError ? 'shake-error' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.5rem', transition: 'all 0.3s ease', transform: termsError ? 'scale(1.05)' : 'scale(1)', background: termsError ? 'rgba(239, 68, 68, 0.2)' : 'transparent', borderRadius: '8px' }}>
                   <input 
                     type="checkbox" 
@@ -1235,21 +1235,19 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: termsError ? '#ff6b6b' : '#ffffff', textDecoration: 'underline', textUnderlineOffset: '4px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900', transition: 'color 0.3s ease' }}>Términos y Condiciones</button>
                   </label>
                 </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div className={turnstileError ? 'shake-error' : ''} style={{ padding: turnstileError ? '0.2rem' : '0', background: turnstileError ? 'rgba(239, 68, 68, 0.2)' : 'transparent', borderRadius: '12px' }}>
-                    <Turnstile 
-                      siteKey={turnstileSiteKey} 
-                      onSuccess={(token) => {
-                        setTurnstileToken(token);
-                        setTurnstileError(false);
-                      }}
-                      options={{ theme: 'dark', size: 'flexible' }}
-                      style={{ maxWidth: '300px' }}
-                    />
-                  </div>
-                  {turnstileError && <span style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', fontWeight: '600' }}>Por favor, completa la verificación.</span>}
+                
+                {/* Turnstile invisible - no ocupa espacio visual pero protege el form */}
+                <div style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
+                  <Turnstile 
+                    siteKey={turnstileSiteKey} 
+                    onSuccess={(token) => {
+                      setTurnstileToken(token);
+                      setTurnstileError(false);
+                    }}
+                    options={{ theme: 'dark', size: 'invisible' }}
+                  />
                 </div>
+                {turnstileError && <span style={{ color: '#ff6b6b', fontSize: '0.85rem', fontWeight: '600' }}>Completá la verificación invisible de seguridad.</span>}
               </div>
             )}
 

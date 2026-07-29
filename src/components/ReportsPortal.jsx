@@ -120,13 +120,17 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
       if (rep.isVisible === false && !isExactTrackingSearch) {
         return false;
       }
+      
+      // Filtrar para mostrar SOLO los que están aprobados o en proceso, ocultar recibidos (genéricos) o solucionados
+      const validStatuses = ['aprobado', 'presentado', 'en_comision', 'en_votacion'];
+      if (!isExactTrackingSearch && !validStatuses.includes(rep.status)) {
+        return false;
+      }
 
       // Filtro por Estado (ignorar si es búsqueda directa por código de seguimiento)
       if (selectedStatus !== 'Todos' && rep.status !== selectedStatus && !isExactTrackingSearch) {
         return false;
       }
-      
-      // Filtro por Categoría (ignorar si es búsqueda directa por código de seguimiento)
       if (selectedCategory !== 'Todas' && rep.category !== selectedCategory && !isExactTrackingSearch) {
         return false;
       }

@@ -99,30 +99,24 @@ export default function Hero({ reports = [] }) {
           </div>
 
           {/* Quick Stats Grid */}
-          <div className="hero-stats">
+          <div className="hero-stats" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
             <div className="stat-card glass-panel">
               <span className="stat-num gradient-text">
                 <CountUp end={reports.length} />
               </span>
-              <span className="stat-label">Recibidos</span>
-            </div>
-            <div className="stat-card glass-panel">
-              <span className="stat-num" style={{ color: 'var(--danger)' }}>
-                <CountUp end={reports.filter(r => r.status === 'recibido').length} />
-              </span>
-              <span className="stat-label">Pendientes</span>
+              <span className="stat-label">Reclamos Recibidos</span>
             </div>
             <div className="stat-card glass-panel">
               <span className="stat-num gradient-text-accent">
                 <CountUp end={reports.filter(r => r.status === 'en_tramite').length} />
               </span>
-              <span className="stat-label">En Trámite</span>
+              <span className="stat-label">En Trámite Legislativo</span>
             </div>
             <div className="stat-card glass-panel">
               <span className="stat-num" style={{ color: 'var(--success)' }}>
                 <CountUp end={reports.filter(r => r.status === 'solucionado').length} />
               </span>
-              <span className="stat-label">Aprobados</span>
+              <span className="stat-label">Solucionados / Respuestas</span>
             </div>
           </div>
         </div>
@@ -571,7 +565,7 @@ export default function Hero({ reports = [] }) {
             font-size: 2.3rem;
           }
           .hero-stats {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(1, 1fr);
             gap: 0.5rem;
           }
           .stat-card {

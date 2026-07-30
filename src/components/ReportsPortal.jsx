@@ -98,39 +98,49 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
     .filter(rep => {
       const searchTermLower = searchTerm.toLowerCase().trim();
       const cleanSearch = searchTermLower.replace('#', '');
-      
       const isExactTrackingSearch = cleanSearch !== '' && rep.trackingCode?.toString() === cleanSearch;
-      
-      // Ocultar si el admin lo marcó como oculto y no es una búsqueda directa por código
+
+      // 1. Si el admin lo ocultó explícitamente y no es búsqueda exacta, ocultarlo.
       if (rep.isVisible === false && !isExactTrackingSearch) {
         return false;
       }
-      
-      // Filtrar para mostrar SOLO los que están aprobados o en proceso, ocultar recibidos (genéricos) o solucionados
-      // EXCEPTO si el admin explícitamente marcó el reporte como visible (isVisible === true)
-      const validStatuses = ['solucionado', 'en_tramite'];
-      if (!isExactTrackingSearch && !validStatuses.includes(rep.status) && rep.isVisible !== true) {
+
+      // 2. Si es una búsqueda exacta por código, mostrarlo sin aplicar los demás filtros
+      if (isExactTrackingSearch) {
+        return true;
+      }
+
+      // 3. Si el estado es "recibido" (nuevo) y NO está explícitamente marcado como visible por el admin, lo ocultamos.
+      // (Por defecto los reclamos nuevos son privados hasta que se aprueban o el admin los hace visibles)
+      if (rep.status === 'recibido' && rep.isVisible !== true) {
         return false;
       }
 
-      // Filtro por Estado (ignorar si es búsqueda directa por código de seguimiento)
-      if (selectedStatus !== 'Todos' && rep.status !== selectedStatus && !isExactTrackingSearch) {
-        return false;
-      }
-      if (selectedCategory !== 'Todas' && rep.category !== selectedCategory && !isExactTrackingSearch) {
+      // 4. Filtro por Categoría
+      if (selectedCategory !== 'Todas' && rep.category !== selectedCategory) {
         return false;
       }
 
-      const matchesSearch = rep.title.toLowerCase().includes(searchTermLower) || 
-                            rep.description.toLowerCase().includes(searchTermLower) ||
-                            rep.location.toLowerCase().includes(searchTermLower) ||
-                            (rep.anonymousName && rep.anonymousName.toLowerCase().includes(searchTermLower)) ||
-                            (rep.trackingCode && rep.trackingCode.toString().includes(cleanSearch) && cleanSearch !== '');
-      
-      const matchesCategory = selectedCategory === 'Todas' || rep.category === selectedCategory || isExactTrackingSearch;
-      const matchesStatus = selectedStatus === 'Todos' || rep.status === selectedStatus || isExactTrackingSearch;
+      // 5. Filtro por Estado (por si en el futuro se reactiva el selector de estados)
+      if (selectedStatus !== 'Todos' && rep.status !== selectedStatus) {
+        return false;
+      }
 
-      return matchesSearch && matchesCategory && matchesStatus;
+      // 6. Filtro por Búsqueda de Texto
+      if (cleanSearch !== '') {
+        const matchesSearch = 
+          (rep.title && rep.title.toLowerCase().includes(searchTermLower)) || 
+          (rep.description && rep.description.toLowerCase().includes(searchTermLower)) ||
+          (rep.location && rep.location.toLowerCase().includes(searchTermLower)) ||
+          (rep.anonymousName && rep.anonymousName.toLowerCase().includes(searchTermLower)) ||
+          (rep.trackingCode && rep.trackingCode.toString().includes(cleanSearch));
+          
+        if (!matchesSearch) {
+          return false;
+        }
+      }
+
+      return true;
     })
     .sort((a, b) => {
       if (sortBy === 'upvotes') {
@@ -243,31 +253,24 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
 
           {/* Live Progress Metrics Bar (Hidden in Seguimiento mode) */}
           {!isSeguimientoMode && (
-            <div className="portal-metrics-bar glass-panel" data-aos="zoom-in">
+            <div className="portal-metrics-bar glass-panel" data-aos="zoom-in" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
               <div className="metric-item">
                 <span className="metric-value">{reports.length}</span>
-                <span className="metric-title">Recibidos</span>
-              </div>
-              <div className="metric-divider"></div>
-              <div className="metric-item">
-                <span className="metric-value" style={{ color: 'var(--danger)' }}>
-                  {reports.filter(r => r.status === 'recibido').length}
-                </span>
-                <span className="metric-title">Pendientes</span>
+                <span className="metric-title">Reclamos Recibidos</span>
               </div>
               <div className="metric-divider"></div>
               <div className="metric-item">
                 <span className="metric-value" style={{ color: 'var(--warning)' }}>
                   {reports.filter(r => r.status === 'en_tramite').length}
                 </span>
-                <span className="metric-title">En Trámite</span>
+                <span className="metric-title">En Trámite Legislativo</span>
               </div>
               <div className="metric-divider"></div>
               <div className="metric-item">
                 <span className="metric-value" style={{ color: 'var(--success)' }}>
                   {reports.filter(r => r.status === 'solucionado').length}
                 </span>
-                <span className="metric-title">Aprobados</span>
+                <span className="metric-title">Solucionados / Respuestas</span>
               </div>
             </div>
           )}

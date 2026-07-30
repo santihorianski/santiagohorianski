@@ -1072,29 +1072,20 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
             {/* Dashboard KPIs Grid */}
             <div className="admin-kpis-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
               
-              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.15)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
-                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><Inbox size={48} /></div>
+              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(59, 130, 246, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
+                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><FileText size={48} color="#a8c0ff" /></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-                  <Inbox size={16} className="text-indigo-400" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Recibidos</span>
+                  <FileText size={16} color="#a8c0ff" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Reclamos Recibidos</span>
                 </div>
                 <span style={{ fontSize: '2.5rem', fontWeight: 800, background: 'linear-gradient(to right, #a8c0ff, #3f2b96)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1 }}>{totalReports}</span>
-              </div>
-
-              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
-                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><AlertCircle size={48} color="var(--danger)" /></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-                  <AlertCircle size={16} color="var(--danger)" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pendientes</span>
-                </div>
-                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--danger)', lineHeight: 1 }}>{receivedReports}</span>
               </div>
 
               <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(168, 85, 247, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
                 <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><Activity size={48} color="var(--warning)" /></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
                   <Activity size={16} color="var(--warning)" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>En Trámite</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>En Trámite Legislativo</span>
                 </div>
                 <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--warning)', lineHeight: 1 }}>{reviewReports}</span>
               </div>
@@ -1103,7 +1094,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><CheckCircle size={48} color="var(--success)" /></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
                   <CheckCircle size={16} color="var(--success)" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Aprobados</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Solucionados / Respuestas</span>
                 </div>
                 <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--success)', lineHeight: 1 }}>{resolvedReports}</span>
               </div>

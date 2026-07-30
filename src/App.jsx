@@ -21,7 +21,6 @@ const ReclamoPage = lazy(() => import('./components/ReclamoPage'));
 const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
 const EscuelaDirigentes = lazy(() => import('./components/EscuelaDirigentes'));
 const PdfViewer = lazy(() => import('./components/PdfViewer'));
-const SecretSignup = lazy(() => import('./components/SecretSignup'));
 
 // Seed inicial de reportes
 const INITIAL_REPORTS = [];
@@ -523,7 +522,6 @@ export default function App() {
                 onToggleNewsVisibility={handleToggleNewsVisibility}
               />
             } />
-            <Route path="/registro-secreto-admin" element={<SecretSignup />} />
             <Route path="*" element={<Navigate to="/inicio" replace />} />
             </Routes>
           </Suspense>

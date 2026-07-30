@@ -559,7 +559,7 @@ export default function ProjectsCatalog() {
                 className="btn btn-primary" 
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: '#25D366', boxShadow: '0 0 15px rgba(37, 211, 102, 0.4)' }}
                 onClick={() => {
-                  window.open(`https://wa.me/5493764515738?text=Hola Santiago, quisiera pedirte más información o aportar sobre el proyecto: ${modalProject?.title}`, '_blank');
+                  window.open(`https://wa.me/5493765383604?text=Hola Santiago, quisiera pedirte más información o aportar sobre el proyecto: ${modalProject?.title}`, '_blank');
                 }}
               >
                 <MessageSquare size={18} /> Solicitar por WhatsApp

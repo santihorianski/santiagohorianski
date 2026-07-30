@@ -795,7 +795,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem', flexWrap: 'wrap' }}>
             <a 
-              href={`https://wa.me/5493764515738?text=${encodeURIComponent(`Hola Santiago, acabo de presentar un reclamo con el código #${createdTrackingCode}. Quería avisarte para tener una respuesta más rápida.`)}`} 
+              href={`https://wa.me/5493765383604?text=${encodeURIComponent(`Hola Santiago, acabo de presentar un reclamo con el código #${createdTrackingCode}. Quería avisarte para tener una respuesta más rápida.`)}`} 
               target="_blank" 
               rel="noopener noreferrer" 
               className="btn btn-primary" 

@@ -245,21 +245,28 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
             <div className="portal-metrics-bar glass-panel" data-aos="zoom-in">
               <div className="metric-item">
                 <span className="metric-value">{reports.length}</span>
-                <span className="metric-title">Reclamos Recibidos</span>
+                <span className="metric-title">Recibidos</span>
+              </div>
+              <div className="metric-divider"></div>
+              <div className="metric-item">
+                <span className="metric-value" style={{ color: 'var(--danger)' }}>
+                  {reports.filter(r => r.status === 'recibido').length}
+                </span>
+                <span className="metric-title">Pendientes</span>
               </div>
               <div className="metric-divider"></div>
               <div className="metric-item">
                 <span className="metric-value" style={{ color: 'var(--warning)' }}>
                   {reports.filter(r => r.status === 'en_tramite').length}
                 </span>
-                <span className="metric-title">En Trámite Legislativo</span>
+                <span className="metric-title">En Trámite</span>
               </div>
               <div className="metric-divider"></div>
               <div className="metric-item">
                 <span className="metric-value" style={{ color: 'var(--success)' }}>
                   {reports.filter(r => r.status === 'solucionado').length}
                 </span>
-                <span className="metric-title">Solucionados / Respuestas</span>
+                <span className="metric-title">Aprobados</span>
               </div>
             </div>
           )}
@@ -438,6 +445,7 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
           display: flex;
           align-items: center;
           justify-content: space-around;
+          flex-wrap: wrap;
           padding: 1.5rem 2.5rem;
           max-width: 850px;
           margin: 2rem auto 0 auto;

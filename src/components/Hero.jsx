@@ -102,21 +102,27 @@ export default function Hero({ reports = [] }) {
           <div className="hero-stats">
             <div className="stat-card glass-panel">
               <span className="stat-num gradient-text">
-                <CountUp end={reports.filter(r => r.isVisible !== false).length} />
+                <CountUp end={reports.length} />
               </span>
-              <span className="stat-label">Reclamos Recibidos</span>
+              <span className="stat-label">Recibidos</span>
+            </div>
+            <div className="stat-card glass-panel">
+              <span className="stat-num" style={{ color: 'var(--danger)' }}>
+                <CountUp end={reports.filter(r => r.status === 'recibido').length} />
+              </span>
+              <span className="stat-label">Pendientes</span>
             </div>
             <div className="stat-card glass-panel">
               <span className="stat-num gradient-text-accent">
-                <CountUp end={reports.filter(r => r.isVisible !== false && ['en_tramite'].includes(r.status)).length} />
+                <CountUp end={reports.filter(r => r.status === 'en_tramite').length} />
               </span>
-              <span className="stat-label">En Trámite Legislativo</span>
+              <span className="stat-label">En Trámite</span>
             </div>
             <div className="stat-card glass-panel">
-              <span className="stat-num" style={{ color: 'var(--secondary)' }}>
-                <CountUp end={reports.filter(r => r.isVisible !== false && ['solucionado'].includes(r.status)).length} />
+              <span className="stat-num" style={{ color: 'var(--success)' }}>
+                <CountUp end={reports.filter(r => r.status === 'solucionado').length} />
               </span>
-              <span className="stat-label">Solucionados / Respuestas</span>
+              <span className="stat-label">Aprobados</span>
             </div>
           </div>
         </div>
@@ -321,7 +327,7 @@ export default function Hero({ reports = [] }) {
 
         .hero-stats {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(4, 1fr);
           gap: 1rem;
         }
 
@@ -567,9 +573,6 @@ export default function Hero({ reports = [] }) {
           .hero-stats {
             grid-template-columns: repeat(2, 1fr);
             gap: 0.5rem;
-          }
-          .hero-stats .stat-card:last-child {
-            grid-column: span 2;
           }
           .stat-card {
             padding: 1rem 0.5rem;

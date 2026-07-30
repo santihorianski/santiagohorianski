@@ -70,7 +70,7 @@ export default function PressKit({ newsList }) {
         await navigator.share({
           title: news.title || 'Noticias de Santiago Horianski',
           text: news.title ? `Gacetilla de Prensa: ${news.title}` : 'Mirá esta noticia oficial del Buzón Ciudadano',
-          url: window.location.href,
+          url: `${window.location.origin}${window.location.pathname}#${news.id}`,
         });
       } catch (err) {
         // user cancelled share or it failed

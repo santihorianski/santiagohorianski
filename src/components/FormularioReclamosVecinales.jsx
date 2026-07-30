@@ -1178,9 +1178,37 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                 </div>
               )}
 
-              <div className="disclaimer-text" style={{ marginTop: '1.5rem' }}>
+              <div className="disclaimer-text" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
                 <Shield size={12} />
                 <span>Tu información de contacto se procesará de forma segura y confidencial (ya que los datos del reclamo son públicos).</span>
+              </div>
+
+              <div className="verification-container" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', marginBottom: '4rem', width: '100%' }}>
+                <div className={termsError ? 'shake-error' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '0.4rem', padding: '0.4rem', transition: 'all 0.3s ease', transform: termsError ? 'scale(1.05)' : 'scale(1)', background: termsError ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.05)', borderRadius: '12px', border: termsError ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(255,255,255,0.1)', flex: '1', minWidth: '0' }}>
+                  <input 
+                    type="checkbox" 
+                    id="content-terms-checkbox" 
+                    checked={acceptedTerms} 
+                    onChange={(e) => { setAcceptedTerms(e.target.checked); if (e.target.checked) setTermsError(false); }}
+                    style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer', accentColor: 'var(--primary)', flexShrink: 0 }}
+                  />
+                  <label htmlFor="content-terms-checkbox" style={{ fontSize: '0.75rem', color: termsError ? '#ff6b6b' : '#ffffff', cursor: 'pointer', margin: 0, fontWeight: '700', transition: 'color 0.3s ease', lineHeight: '1.2' }}>
+                    Acepto <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: termsError ? '#ff6b6b' : '#ffffff', textDecoration: 'underline', textUnderlineOffset: '4px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900', transition: 'color 0.3s ease' }}>Términos y Condiciones</button>
+                  </label>
+                </div>
+                
+                {/* Turnstile compact - protege el form ahorrando espacio */}
+                <div className="turnstile-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0.2rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
+                  <Turnstile 
+                    siteKey={turnstileSiteKey} 
+                    onSuccess={(token) => {
+                      setTurnstileToken(token);
+                      setTurnstileError(false);
+                    }}
+                    options={{ theme: 'dark', size: 'compact' }}
+                  />
+                  {turnstileError && <span style={{ color: '#ff6b6b', fontSize: '0.7rem', fontWeight: '700', marginTop: '0.1rem', textAlign: 'center' }}>Requerido</span>}
+                </div>
               </div>
 
 
@@ -1223,35 +1251,6 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
-            {step === 4 && (
-              <div className="verification-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'center', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <div className={termsError ? 'shake-error' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.2rem', transition: 'all 0.3s ease', transform: termsError ? 'scale(1.05)' : 'scale(1)', background: termsError ? 'rgba(239, 68, 68, 0.2)' : 'transparent', borderRadius: '8px' }}>
-                  <input 
-                    type="checkbox" 
-                    id="bottom-terms-checkbox" 
-                    checked={acceptedTerms} 
-                    onChange={(e) => { setAcceptedTerms(e.target.checked); if (e.target.checked) setTermsError(false); }}
-                    style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer', accentColor: 'var(--primary)' }}
-                  />
-                  <label htmlFor="bottom-terms-checkbox" style={{ fontSize: '0.95rem', color: termsError ? '#ff6b6b' : '#ffffff', cursor: 'pointer', margin: 0, fontWeight: '700', transition: 'color 0.3s ease' }}>
-                    Acepto los <button type="button" onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} style={{ color: termsError ? '#ff6b6b' : '#ffffff', textDecoration: 'underline', textUnderlineOffset: '4px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontWeight: '900', transition: 'color 0.3s ease' }}>Términos y Condiciones</button>
-                  </label>
-                </div>
-                
-                {/* Turnstile visible - protege el form y es claro para el usuario */}
-                <div className="turnstile-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '0.5rem', marginBottom: '0.5rem' }}>
-                  <Turnstile 
-                    siteKey={turnstileSiteKey} 
-                    onSuccess={(token) => {
-                      setTurnstileToken(token);
-                      setTurnstileError(false);
-                    }}
-                    options={{ theme: 'dark' }}
-                  />
-                  {turnstileError && <span style={{ color: '#ff6b6b', fontSize: '0.85rem', fontWeight: '700', marginTop: '0.25rem', textAlign: 'center' }}>Por favor, completá la verificación de seguridad obligatoria.</span>}
-                </div>
-              </div>
-            )}
 
             <div style={{ display: 'flex', gap: '1rem', width: '100%', flexDirection: 'row' }}>
               {step > 1 && (
@@ -1819,6 +1818,13 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
           .turnstile-wrapper {
             margin-top: 0.25rem !important;
             margin-bottom: 0 !important;
+            overflow: visible;
+          }
+          /* Hack infalible para encoger Cloudflare en móviles si ignora el size='compact' */
+          .turnstile-wrapper > div {
+            transform: scale(0.5);
+            transform-origin: right center;
+            margin-left: -150px; /* 300px * 0.5 = 150px de espacio recuperado */
           }
         }
 

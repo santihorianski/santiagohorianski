@@ -107,8 +107,9 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
       }
       
       // Filtrar para mostrar SOLO los que están aprobados o en proceso, ocultar recibidos (genéricos) o solucionados
+      // EXCEPTO si el admin explícitamente marcó el reporte como visible (isVisible === true)
       const validStatuses = ['solucionado', 'en_tramite'];
-      if (!isExactTrackingSearch && !validStatuses.includes(rep.status)) {
+      if (!isExactTrackingSearch && !validStatuses.includes(rep.status) && rep.isVisible !== true) {
         return false;
       }
 

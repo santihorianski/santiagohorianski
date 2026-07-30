@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Lock, LogOut, Check, Search, MapPin, Eye, Calendar, AlertCircle, FileText, Phone, MessageSquare, ExternalLink, ShieldCheck, Trash2, Clock, EyeOff, Edit3, X, Download, RefreshCw, Copy, Plus, Image, ZoomIn, List, Grid, Inbox, Activity, CheckCircle, TrendingUp } from 'lucide-react';
-import { SignedIn, SignedOut, SignIn, UserButton, useUser } from '@clerk/clerk-react';
+import { Lock, LogOut, Check, Search, MapPin, Eye, Calendar, AlertCircle, FileText, Phone, MessageSquare, ExternalLink, ShieldCheck, Trash2, Clock, EyeOff, Edit3, X, Download, RefreshCw, Copy, Plus, Image, ZoomIn, List, Grid, Inbox, Activity, CheckCircle, TrendingUp, Mail } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 import santiagoImg from '../assets/santiago.jpg';
 import { generateLegislativeProject } from '../utils/wordGenerator';
 import AdminMap from './AdminMap';
@@ -16,15 +16,47 @@ const VIEWER_EMAILS = ['visor1@gmail.com', 'visor2@gmail.com', 'visor3@gmail.com
 
 const getUserRole = (email) => {
   if (!email) return 'unauthorized';
-  const lowerEmail = email.toLowerCase();
-  if (SUPER_ADMIN_EMAILS.includes(lowerEmail)) return 'admin';
-  if (VIEWER_EMAILS.includes(lowerEmail)) return 'viewer';
-  return 'unauthorized';
+  // Al usar Supabase y registro cerrado, asumimos que cualquier usuario registrado es admin.
+  // Podrías volver a habilitar chequeos estrictos aquí si lo necesitas.
+  return 'admin';
 };
 
-export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, onToggleReportVisibility, newsList, onSaveNews, onDeleteNews, onToggleNewsVisibility }) {
-  const { user } = useUser();
-  const userEmail = user?.primaryEmailAddress?.emailAddress;
+export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, onToggleReportVisibility, newsList, onSaveNews, onDeleteNews, onToggleNewsVisibility, onLogout }) {
+  const [session, setSession] = useState(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setIsCheckingAuth(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoggingIn(true);
+    setLoginError('');
+    const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password: loginPassword });
+    if (error) setLoginError(error.message);
+    setIsLoggingIn(false);
+  };
+
+  const handleSupabaseLogout = async () => {
+    await supabase.auth.signOut();
+    if (onLogout) onLogout();
+  };
+
+  const userEmail = session?.user?.email;
   const userRole = getUserRole(userEmail);
 
   // Tab state
@@ -898,40 +930,84 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
     });
   };
 
+  if (isCheckingAuth) {
+    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Cargando panel...</div>;
+  }
+
   return (
     <>
       <Helmet>
         <title>Acceso Restringido | Sistema Interno</title>
       </Helmet>
 
-      <SignedOut>
+      {!session ? (
         <div className="login-container">
-          <div className="login-card glass-panel" style={{ textAlign: 'center', padding: '2rem' }}>
-            <div className="login-header">
+          <div className="login-card glass-panel" style={{ textAlign: 'center', padding: '2.5rem', maxWidth: '400px', margin: '0 auto', marginTop: '10vh' }}>
+            <div className="login-header" style={{ marginBottom: '2rem' }}>
               <ShieldCheck size={48} color="var(--primary)" style={{ margin: '0 auto 1rem auto' }} />
-              <h2 className="gradient-text">Acceso Restringido</h2>
-              <p>Iniciá sesión para ingresar al Panel de Control</p>
+              <h2 className="gradient-text" style={{ marginBottom: '0.5rem' }}>Acceso Restringido</h2>
+              <p style={{ color: 'var(--text-secondary)' }}>Iniciá sesión para ingresar al Panel de Control</p>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
-              <SignIn routing="hash" forceRedirectUrl="/admin" fallbackRedirectUrl="/admin" />
-            </div>
+            
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
+              {loginError && (
+                <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.85rem' }}>
+                  {loginError}
+                </div>
+              )}
+              
+              <div className="form-group">
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Correo Electrónico</label>
+                <div style={{ position: 'relative' }}>
+                  <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input 
+                    type="email" 
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    className="form-input" 
+                    placeholder="admin@santiagohorianski.com"
+                    style={{ paddingLeft: '2.8rem', background: 'var(--bg-dark)' }}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Contraseña</label>
+                <div style={{ position: 'relative' }}>
+                  <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input 
+                    type="password" 
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    className="form-input" 
+                    placeholder="••••••••••••"
+                    style={{ paddingLeft: '2.8rem', background: 'var(--bg-dark)' }}
+                    required
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className="btn btn-primary" disabled={isLoggingIn} style={{ marginTop: '1rem', width: '100%', padding: '0.8rem' }}>
+                {isLoggingIn ? 'Verificando...' : 'Ingresar al Panel'}
+              </button>
+            </form>
           </div>
         </div>
-      </SignedOut>
-
-      <SignedIn>
-        {userRole === 'unauthorized' ? (
-          <div className="login-container">
-            <div className="login-card glass-panel" style={{ textAlign: 'center', padding: '3rem' }}>
-              <AlertCircle size={64} color="var(--danger)" style={{ margin: '0 auto 1rem auto' }} />
-              <h2 style={{ color: 'var(--danger)', marginBottom: '1rem' }}>Acceso Denegado</h2>
-              <p style={{ marginBottom: '2rem' }}>Tu cuenta ({userEmail}) no tiene permisos para acceder a este sistema.</p>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <UserButton afterSignOutUrl="/inicio" />
+      ) : (
+        <>
+          {userRole === 'unauthorized' ? (
+            <div className="login-container">
+              <div className="login-card glass-panel" style={{ textAlign: 'center', padding: '3rem' }}>
+                <AlertCircle size={64} color="var(--danger)" style={{ margin: '0 auto 1rem auto' }} />
+                <h2 style={{ color: 'var(--danger)', marginBottom: '1rem' }}>Acceso Denegado</h2>
+                <p style={{ marginBottom: '2rem' }}>Tu cuenta ({userEmail}) no tiene permisos para acceder a este sistema.</p>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <button onClick={handleSupabaseLogout} className="btn btn-secondary">Cerrar Sesión</button>
+                </div>
               </div>
             </div>
-          </div>
-        ) : (
+          ) : (
           <div className="admin-container fade-in">
             <Helmet>
               <title>Panel de Administración | Reclamos Posadas</title>
@@ -947,16 +1023,11 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
               </div>
               <div className="admin-header-right">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.4rem 1rem 0.4rem 0.5rem', background: 'rgba(116, 59, 188, 0.08)', borderRadius: '30px', border: '1px solid rgba(116, 59, 188, 0.2)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                  <UserButton 
-                    afterSignOutUrl="/inicio" 
-                    appearance={{ 
-                      elements: { 
-                        userButtonAvatarBox: { width: '42px', height: '42px', border: '2px solid var(--primary)' } 
-                      } 
-                    }} 
-                  />
+                  <button onClick={handleSupabaseLogout} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <LogOut size={16} /> Salir
+                  </button>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.fullName || 'Administrador'}</span>
+                    <span style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--text-primary)' }}>Administrador</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{userEmail}</span>
                   </div>
                 </div>
@@ -2379,8 +2450,9 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
         }
       `}} />
           </div>
-        )}
-      </SignedIn>
+          )}
+        </>
+      )}
     </>
   );
 }

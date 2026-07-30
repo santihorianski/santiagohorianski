@@ -2,25 +2,15 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
-import { ClerkProvider } from '@clerk/clerk-react'
-import { esES } from '@clerk/localizations'
 import App from './App.jsx'
 import './index.css'
-
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Zmx5aW5nLXR1bmEtNzAuY2xlcmsuYWNjb3VudHMuZGV2JA";
-
-if (!PUBLISHABLE_KEY) {
-  console.error("Missing Clerk Publishable Key - Authentication may not work");
-}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HelmetProvider>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY} localization={esES}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </ClerkProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </HelmetProvider>
   </React.StrictMode>,
 )

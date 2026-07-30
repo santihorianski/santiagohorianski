@@ -672,10 +672,10 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
       setTermsError(true);
       return;
     }
-    if (!turnstileToken) {
-      setTurnstileError(true);
-      return;
-    }
+    // if (!turnstileToken) {
+    //   setTurnstileError(true);
+    //   return;
+    // }
     setTermsError(false);
     setTurnstileError(false);
 
@@ -1197,8 +1197,8 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                   </label>
                 </div>
                 
-                {/* Turnstile compact - protege el form ahorrando espacio */}
-                <div className="turnstile-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0.2rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
+                {/* Turnstile compact - temporalmente desactivado */}
+                {/* <div className="turnstile-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0.2rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
                   <Turnstile 
                     siteKey={turnstileSiteKey} 
                     onSuccess={(token) => {
@@ -1208,7 +1208,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     options={{ theme: 'dark', size: 'compact' }}
                   />
                   {turnstileError && <span style={{ color: '#ff6b6b', fontSize: '0.7rem', fontWeight: '700', marginTop: '0.1rem', textAlign: 'center' }}>Requerido</span>}
-                </div>
+                </div> */}
               </div>
 
 

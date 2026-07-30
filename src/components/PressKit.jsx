@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Download, Copy, CheckCircle, FileText, Image as ImageIcon, Share2 } from 'lucide-react';
 import semImage from '../assets/sem.jpg';
@@ -11,6 +11,19 @@ export default function PressKit({ newsList }) {
   const toggleExpand = (id) => {
     setExpandedNews(prev => ({ ...prev, [id]: !prev[id] }));
   };
+
+  useEffect(() => {
+    if (window.location.hash) {
+      const id = window.location.hash.substring(1);
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setExpandedNews(prev => ({ ...prev, [id]: true }));
+        }
+      }, 500);
+    }
+  }, [newsList]);
 
   const fallbackText = "No hay noticias recientes cargadas en este momento.";
 

@@ -9,6 +9,12 @@ import FeaturedProject from './FeaturedProject';
 
   const getProjectType = (proj) => {
   if (!proj) return '';
+  const title = proj.title.toLowerCase();
+  if (title.startsWith('proy. ord') || title.startsWith('proy ord')) return 'Ordenanza';
+  if (title.startsWith('proy. com') || title.startsWith('proy com')) return 'Comunicación';
+  if (title.startsWith('proy. res') || title.startsWith('proy res')) return 'Resolución';
+  if (title.startsWith('proy. dec') || title.startsWith('proy dec')) return 'Declaración';
+
   const text = (proj.title + ' ' + proj.summary).toLowerCase();
   if (text.includes('ordenanza')) return 'Ordenanza';
   if (text.includes('resolución') || text.includes('resolucion')) return 'Resolución';
@@ -67,11 +73,17 @@ export default function ProjectsCatalog() {
 
   // Helper para asignar prioridad de orden
   const getProjectTypeWeight = (proj) => {
+    const title = proj.title.toLowerCase();
+    if (title.startsWith('proy. ord') || title.startsWith('proy ord')) return 1;
+    if (title.startsWith('proy. res') || title.startsWith('proy res')) return 2;
+    if (title.startsWith('proy. com') || title.startsWith('proy com')) return 3;
+    if (title.startsWith('proy. dec') || title.startsWith('proy dec')) return 4;
+
     const text = (proj.title + " " + proj.summary).toLowerCase();
     if (text.includes("ordenanza")) return 1;
     if (text.includes("resolución") || text.includes("resolucion")) return 2;
     if (text.includes("comunicación") || text.includes("comunicacion")) return 3;
-    if (text.includes("interés") || text.includes("interes")) return 4;
+    if (text.includes("interés") || text.includes("interes") || text.includes("declaración") || text.includes("declaracion")) return 4;
     return 5; // Default para otros
   };
 

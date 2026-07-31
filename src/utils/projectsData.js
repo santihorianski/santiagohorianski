@@ -1,8 +1,8 @@
 export const PROJECTS_DATA = [
   {
     id: 1000,
-    title: "Proy. Ord. P/Modificar el artículo 5° de la Ord. XVI-N° 119.-",
-    original_title: "Proy. Ord. P/Modificar el artículo 5° de la Ord. XVI-N° 119.-",
+    title: "Proy. Com. P/Modificar el artículo 5° de la Ord. XVI-N° 119.-",
+    original_title: "Proy. Com. P/Modificar el artículo 5° de la Ord. XVI-N° 119.-",
     summary: "Expediente: 1475-C -2026",
     status: "25/06/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 14 - 25/06/2026) - Comisión de Cabecera",
     history: ["25/06/2026: Departamento de Mesa de Entradas y Salidas","25/06/2026: Dirección General de Asuntos Legislativos y Comisiones","25/06/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 14 - 25/06/2026) - Comisión de Cabecera"],
@@ -10,8 +10,8 @@ export const PROJECTS_DATA = [
   },
   {
     id: 1006,
-    title: "Proy. Ord. P/prohibir la utilización de sistemas automáticos de captación de imágenes, radares o dispositivos electrónicos destinados a la emisión automática de actas de infracción cuya configuración sea estrictamente algorítmica o sistematizada (“fotomultas”), careciendo de la constatación humana en tiempo real.-",
-    original_title: "Proy. Ord. P/prohibir la utilización de sistemas automáticos de captación de imágenes, radares o dispositivos electrónicos destinados a la emisión automática de actas de infracción cuya configuración sea estrictamente algorítmica o sistematizada (“fotomultas”), careciendo de la constatación humana en tiempo real.-",
+    title: "Proy. Com. P/prohibir la utilización de sistemas automáticos de captación de imágenes, radares o dispositivos electrónicos destinados a la emisión automática de actas de infracción cuya configuración sea estrictamente algorítmica o sistematizada (“fotomultas”), careciendo de la constatación humana en tiempo real.-",
+    original_title: "Proy. Com. P/prohibir la utilización de sistemas automáticos de captación de imágenes, radares o dispositivos electrónicos destinados a la emisión automática de actas de infracción cuya configuración sea estrictamente algorítmica o sistematizada (“fotomultas”), careciendo de la constatación humana en tiempo real.-",
     summary: "Expediente: 1151-C -2026",
     status: "14/05/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 8 - 14/05/2026) - Comisión de Cabecera",
     history: ["14/05/2026: Departamento de Mesa de Entradas y Salidas","14/05/2026: Dirección General de Asuntos Legislativos y Comisiones","14/05/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 8 - 14/05/2026)","14/05/2026: Comisión de Transporte y Tránsito (Sesión Ordinaria Nº 8 - 14/05/2026)","14/05/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 8 - 14/05/2026) - Comisión de Cabecera"],
@@ -572,7 +572,7 @@ export const FEATURED_PROJECTS = [
   {
     id: 1000,
     title: "5° de la Ord. XVI-N° 119.-",
-    original_title: "Proy. Ord. P/Modificar el artículo 5° de la Ord. XVI-N° 119.-",
+    original_title: "Proy. Com. P/Modificar el artículo 5° de la Ord. XVI-N° 119.-",
     summary: "Expediente: 1475-C -2026",
     status: "25/06/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 14 - 25/06/2026) - Comisión de Cabecera",
     history: ["25/06/2026: Departamento de Mesa de Entradas y Salidas","25/06/2026: Dirección General de Asuntos Legislativos y Comisiones","25/06/2026: Comisión de Hacienda y Presupuesto (Sesión Ordinaria Nº 14 - 25/06/2026) - Comisión de Cabecera"],
@@ -581,7 +581,7 @@ export const FEATURED_PROJECTS = [
   {
     id: 1006,
     title: "Prohibición de Fotomultas Automáticas sin Constatación Humana",
-    original_title: "Proy. Ord. P/prohibir la utilización de sistemas automáticos de captación de imágenes, radares o dispositivos electrónicos destinados a la emisión automática de actas de infracción cuya configuración sea estrictamente algorítmica o sistematizada (“fotomultas”), careciendo de la constatación humana en tiempo real.-",
+    original_title: "Proy. Com. P/prohibir la utilización de sistemas automáticos de captación de imágenes, radares o dispositivos electrónicos destinados a la emisión automática de actas de infracción cuya configuración sea estrictamente algorítmica o sistematizada (“fotomultas”), careciendo de la constatación humana en tiempo real.-",
     summary: "Expediente: 1151-C -2026",
     status: "14/05/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 8 - 14/05/2026) - Comisión de Cabecera",
     history: ["14/05/2026: Departamento de Mesa de Entradas y Salidas","14/05/2026: Dirección General de Asuntos Legislativos y Comisiones","14/05/2026: Comisión de Legislacion General, Régimen del Empleado Municipal y Enjuiciamiento (Sesión Ordinaria Nº 8 - 14/05/2026)","14/05/2026: Comisión de Transporte y Tránsito (Sesión Ordinaria Nº 8 - 14/05/2026)","14/05/2026: Comisión de Innovación, Ciencia y Tecnológica (Sesión Ordinaria Nº 8 - 14/05/2026) - Comisión de Cabecera"],

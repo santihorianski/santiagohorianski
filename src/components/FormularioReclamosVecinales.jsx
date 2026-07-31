@@ -641,16 +641,39 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
   };
 
   // Navegación del Wizard
+  const triggerErrorScroll = (specificId = null) => {
+    setTimeout(() => {
+      if (specificId) {
+        const el = document.getElementById(specificId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+      }
+      const errorInput = document.querySelector('[style*="var(--danger)"]');
+      if (errorInput) {
+        errorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        const errorAlert = document.querySelector('.error-alert');
+        if (errorAlert) {
+          errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }, 100);
+  };
+
   const nextStep = () => {
     if (step === 1) {
       if (!formData.category) {
         setErrorMessage('Por favor, seleccioná qué tipo de problema está ocurriendo.');
+        triggerErrorScroll();
         return;
       }
     } else if (step === 2) {
       if (!formData.callePrincipal.trim()) {
         setShowValidationAlerts(true);
         setErrorMessage('Por favor, ingresá la dirección del reclamo.');
+        triggerErrorScroll();
         return;
       }
     }
@@ -684,23 +707,31 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
     
     if (!formData.category || !formData.callePrincipal) {
       setErrorMessage('Faltan completar campos obligatorios del reclamo.');
+      triggerErrorScroll();
       return;
     }
 
     if (!isAnonymous) {
-      if (!formData.name.trim() || !formData.phone.trim() || !formData.dni.trim() || !formData.email.trim()) {
-        setShowValidationAlerts(true);
-        setErrorMessage('Para poder informarte sobre el seguimiento, necesitamos tu nombre, DNI, teléfono y correo electrónico. O podés seleccionar la opción de enviar de forma anónima.');
+      setShowValidationAlerts(true);
+      
+      if (!formData.dni.trim()) {
+        setErrorMessage('Por favor, ingresá tu número de DNI.');
+        triggerErrorScroll('input-dni');
         return;
       }
-      if (formData.phone.replace(/\D/g, '').length < 9) {
-        setShowValidationAlerts(true);
-        setErrorMessage('El número de celular debe tener al menos 9 dígitos (incluyendo código de área).');
+      if (!formData.name.trim()) {
+        setErrorMessage('Por favor, ingresá tu Nombre y Apellido.');
+        triggerErrorScroll('input-name');
         return;
       }
-      if (!formData.email.includes('@')) {
-        setShowValidationAlerts(true);
-        setErrorMessage('El correo electrónico debe ser válido (contener un @).');
+      if (!formData.phone.trim() || formData.phone.replace(/\D/g, '').length < 9) {
+        setErrorMessage('Por favor, ingresá un número de celular válido (mínimo 9 dígitos).');
+        triggerErrorScroll('input-phone');
+        return;
+      }
+      if (!formData.email.trim() || !formData.email.includes('@')) {
+        setErrorMessage('Por favor, ingresá un correo electrónico válido.');
+        triggerErrorScroll('input-email');
         return;
       }
     }
@@ -1096,6 +1127,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     <div className="input-with-icon" style={showValidationAlerts && !formData.dni.trim() ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
                       <ShieldCheck size={18} className="input-icon" />
                       <input maxLength="500" type="tel" 
+                        id="input-dni"
                         name="dni"
                         inputMode="numeric"
                         pattern="[0-9]*"
@@ -1116,6 +1148,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
                     <div className="input-with-icon" style={showValidationAlerts && !formData.name.trim() ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
                       <User size={18} className="input-icon" />
                       <input maxLength="500" type="text" 
+                        id="input-name"
                         name="name"
                         value={formData.name}
                         onChange={handleInputChange}
@@ -1128,13 +1161,14 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
                   <div className="form-group animate-fade-in">
                     <label className="form-label">Teléfono WhatsApp *</label>
-                    <div style={{ display: 'flex', width: '100%', ...(showValidationAlerts && !formData.phone.trim() ? { border: '2px solid var(--danger)', borderRadius: '14px' } : {}) }}>
+                    <div style={{ display: 'flex', width: '100%', ...(showValidationAlerts && (!formData.phone.trim() || formData.phone.replace(/\D/g, '').length < 9) ? { border: '2px solid var(--danger)', borderRadius: '14px' } : {}) }}>
                       <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-secondary)', border: '2px solid var(--border-color)', borderRight: 'none', borderRadius: '14px 0 0 14px', padding: '0 1rem', height: '56px', flexShrink: 0, transition: 'all 0.3s ease' }}>
                          <span style={{ fontSize: '1.2rem', marginRight: '6px' }}>🇦🇷</span>
                          <span style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '1rem' }}>+54</span>
                       </div>
                       <input 
                         type="tel" 
+                        id="input-phone"
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
@@ -1153,9 +1187,10 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
 
                   <div className="form-group animate-fade-in">
                     <label className="form-label">Correo Electrónico *</label>
-                    <div className="input-with-icon" style={showValidationAlerts && !formData.email.trim() ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
+                    <div className="input-with-icon" style={showValidationAlerts && (!formData.email.trim() || !formData.email.includes('@')) ? { border: '2px solid var(--danger)', borderRadius: '12px' } : {}}>
                       <Mail size={16} className="input-icon" />
                       <input maxLength="200" type="email" 
+                        id="input-email"
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}

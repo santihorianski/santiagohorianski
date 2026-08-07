@@ -825,16 +825,7 @@ export default function FormularioReclamosVecinales({ onSubmitReport, onClose })
             ¡Muchas gracias por involucrarte y confiar en este equipo para mejorar tu barrio! 💪
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem', flexWrap: 'wrap' }}>
-            <a 
-              href={`https://wa.me/5493765383604?text=${encodeURIComponent(`Hola Santiago, acabo de presentar un reclamo con el código #${createdTrackingCode}. Quería avisarte para tener una respuesta más rápida.`)}`} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="btn btn-primary" 
-              style={{ margin: 0, padding: '0.65rem 1.5rem', background: '#25D366', borderColor: '#25D366', color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-            >
-              <MessageSquare size={18} /> Avisar por WhatsApp
-            </a>
-            <button className="btn btn-secondary wizard-btn-next" style={{ margin: 0, padding: '0.65rem 1.5rem' }} onClick={handleCloseWizard}>
+            <button className="btn btn-primary wizard-btn-next" style={{ margin: 0, padding: '0.65rem 1.5rem' }} onClick={handleCloseWizard}>
               Volver al Portal
             </button>
           </div>

@@ -1996,9 +1996,9 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                         <div className="form-group">
                           <label className="form-label">Estado del Reclamo</label>
                           <select value={editStatus} onChange={(e) => setEditStatus(e.target.value)} className="form-select">
-                            <option value="recibido">Recibido (Pendiente de Aprobación)</option>
-                            <option value="en_tramite">En Trámite Legislativo</option>
-                            <option value="solucionado">Solucionado / Respuesta Oficial</option>
+                            <option value="recibido">Recibido y presentado al Concejo falta de aprobación en Sesión</option>
+                            <option value="en_tramite">Aprobado en la comisión</option>
+                            <option value="solucionado">Aprobado en recinto del concejo a esperar</option>
                           </select>
                         </div>
                         
@@ -2007,11 +2007,11 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                           <select value={editInternalStatus} onChange={(e) => setEditInternalStatus(e.target.value)} className="form-select" style={{ borderLeft: '4px solid var(--accent)' }}>
                             <option value="nuevo">🆕 Nuevo</option>
                             <option value="visto">👁️ Visto</option>
-                            <option value="cargado">☁️ Cargado</option>
+                            <option value="cargado">☁️ Publicado con firma digital</option>
                             <option value="en_word">📝 En creación de Word</option>
                             <option value="revisado">✅ Revisado / Espera de subir</option>
                             <option value="falta_analisis">🔍 Falta de análisis</option>
-                            <option value="falta_informacion">ℹ️ Falta de información</option>
+                            <option value="falta_informacion">ℹ️ Falta Fotos</option>
                           </select>
                         </div>
                         

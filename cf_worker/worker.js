@@ -235,7 +235,7 @@ var worker_default = {
 
     if (request.method === "POST" && url.pathname === "/api/status-change") {
       try {
-        const { phone, trackingCode, newStatus, userName } = await request.json();
+        const { phone, trackingCode, newStatus, userName, category } = await request.json();
         if (!phone || !trackingCode || !newStatus) {
           return new Response(JSON.stringify({ error: "Faltan parámetros" }), { status: 400, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
         }
@@ -288,7 +288,9 @@ var worker_default = {
         try {
           const CALLMEBOT_API_KEY = env.CALLMEBOT_API_KEY || "2805481";
           const ADMIN_PHONE = env.ADMIN_PHONE || "5493764515738";
-          const alertText = `🔔 Alerta: El reclamo #${trackingCode} ha cambiado a estado '${newStatus}'.`;
+          let [publicStatus, internalStatusRaw] = newStatus.split(' (Interno: ');
+          let internalStatus = internalStatusRaw ? internalStatusRaw.replace(')', '') : 'N/A';
+          const alertText = `🔔 *Alerta de Reclamo #${trackingCode}*\n👤 *Vecino:* ${userName || 'Anónimo'}\n🏷️ *Categoría:* ${category || 'General'}\n🔄 *Nuevo Estado:* ${publicStatus}\n🔒 *Estado Interno:* ${internalStatus}`;
           const waUrl = `https://api.callmebot.com/whatsapp.php?phone=${ADMIN_PHONE}&text=${encodeURIComponent(alertText)}&apikey=${CALLMEBOT_API_KEY}`;
           const cmbResp = await fetch(waUrl);
           const cmbText = await cmbResp.text();
@@ -299,6 +301,34 @@ var worker_default = {
         }
 
         return new Response(JSON.stringify({ success: true, whatsapp: waResult, callmebot: callmebotResult }), { 
+          status: 200, 
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } 
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+      }
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/new-report") {
+      try {
+        const { trackingCode, userName, category, description } = await request.json();
+        
+        let callmebotResult = null;
+        try {
+          const CALLMEBOT_API_KEY = env.CALLMEBOT_API_KEY || "2805481";
+          const ADMIN_PHONE = env.ADMIN_PHONE || "5493764515738";
+          const shortDesc = description ? (description.length > 100 ? description.substring(0, 100) + '...' : description) : 'Sin descripción';
+          const alertText = `🌟 *¡Nuevo Reclamo Ingresado!*\n🔹 *Código:* #${trackingCode}\n👤 *Vecino:* ${userName || 'Anónimo'}\n🏷️ *Categoría:* ${category || 'General'}\n📝 *Detalle:* ${shortDesc}`;
+          const waUrl = `https://api.callmebot.com/whatsapp.php?phone=${ADMIN_PHONE}&text=${encodeURIComponent(alertText)}&apikey=${CALLMEBOT_API_KEY}`;
+          const cmbResp = await fetch(waUrl);
+          const cmbText = await cmbResp.text();
+          callmebotResult = { status: cmbResp.status, text: cmbText };
+        } catch (e) {
+          console.error("Error sending admin alert for new report:", e);
+          callmebotResult = { error: e.message };
+        }
+
+        return new Response(JSON.stringify({ success: true, callmebot: callmebotResult }), { 
           status: 200, 
           headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } 
         });

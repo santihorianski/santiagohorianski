@@ -322,6 +322,20 @@ export default function App() {
           .from('municipal_reports')
           .insert([mapReportToDb(newReport)]);
         if (error) throw error;
+        
+        try {
+          fetch('https://buzon-ciudadano-mail-api.horianskiseguros.workers.dev/api/new-report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              trackingCode: newReport.trackingCode,
+              userName: newReport.anonymousName || 'Vecino Anónimo',
+              category: newReport.category || 'General',
+              description: newReport.description || ''
+            })
+          }).catch(e => console.error('Error webhook new-report:', e));
+        } catch (e) {}
+
       } catch (err) {
         console.error("Error al guardar el reclamo en Supabase:", err);
       }
@@ -369,7 +383,8 @@ export default function App() {
                 phone: updatedReport.phone || updatedReport.telefono || '000',
                 trackingCode: updatedReport.trackingCode || updatedReport.tracking_code,
                 newStatus: (updatedReport.status + ' (Interno: ' + (updatedReport.internalStatus || 'N/A') + ')'),
-                userName: updatedReport.anonymousName || updatedReport.name || 'Vecino'
+                userName: updatedReport.anonymousName || updatedReport.name || 'Vecino',
+                category: updatedReport.category || 'General'
               })
             }).catch(e => console.error('Error webhook:', e));
           } catch (e) {}

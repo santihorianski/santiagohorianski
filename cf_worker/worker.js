@@ -318,7 +318,7 @@ var worker_default = {
           const CALLMEBOT_API_KEY = env.CALLMEBOT_API_KEY || "2805481";
           const ADMIN_PHONE = env.ADMIN_PHONE || "5493764515738";
           const shortDesc = description ? (description.length > 100 ? description.substring(0, 100) + '...' : description) : 'Sin descripción';
-          const alertText = `🌟 *¡Nuevo Reclamo Ingresado!*\n🔹 *Código:* #${trackingCode}\n👤 *Vecino:* ${userName || 'Anónimo'}\n🏷️ *Categoría:* ${category || 'General'}\n📝 *Detalle:* ${shortDesc}`;
+          const alertText = `🌟 *NUEVO INGRESO POR LA WEB DE RECLAMOS*\n🔹 *Código:* #${trackingCode}\n👤 *Vecino:* ${userName || 'Anónimo'}\n🏷️ *Categoría:* ${category || 'General'}\n📝 *Detalle:* ${shortDesc}`;
           const waUrl = `https://api.callmebot.com/whatsapp.php?phone=${ADMIN_PHONE}&text=${encodeURIComponent(alertText)}&apikey=${CALLMEBOT_API_KEY}`;
           const cmbResp = await fetch(waUrl);
           const cmbText = await cmbResp.text();

@@ -1238,7 +1238,13 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 </div>
               </div>
               <div className="admin-header-right">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.4rem 1rem 0.4rem 0.5rem', background: 'rgba(116, 59, 188, 0.08)', borderRadius: '30px', border: '1px solid rgba(116, 59, 188, 0.2)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  {userRole === 'admin' && (
+                    <button type="button" onClick={() => setShowWaConfig(true)} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(37, 211, 102, 0.5)', color: '#25D366' }} title="Configurar textos de WhatsApp">
+                      ⚙️ WhatsApp
+                    </button>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.4rem 1rem 0.4rem 0.5rem', background: 'rgba(116, 59, 188, 0.08)', borderRadius: '30px', border: '1px solid rgba(116, 59, 188, 0.2)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                   <button onClick={handleSupabaseLogout} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <LogOut size={16} /> Salir
                   </button>
@@ -1246,10 +1252,10 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                     <span style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--text-primary)' }}>Administrador</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{userEmail}</span>
                   </div>
+                  </div>
                 </div>
               </div>
             </header>
-
         {/* Dashboard Header */}
         <div className="admin-header-row glass-panel" style={{ flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-start' }}>
           <div className="admin-title-info">
@@ -1786,9 +1792,6 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                           <h4 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                             <MessageSquare size={16} color="#25D366" /> Respuestas Rápidas de WhatsApp
                           </h4>
-                          <button type="button" onClick={() => setShowWaConfig(true)} className="btn btn-sm" style={{ padding: '0.2rem', background: 'transparent', color: 'var(--text-muted)' }} title="Configurar textos">
-                            ⚙️
-                          </button>
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                           <a 
@@ -2092,14 +2095,10 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                               <div key={idx} style={{ position: 'relative' }}>
                                 <div style={{ position: 'absolute', left: '-1.65rem', top: '0.2rem', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--primary)', border: '2px solid var(--bg-card)' }}></div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
-                                  {formatDate(historyItem.date)}
+                                  {formatDate(historyItem.timestamp || historyItem.date)}
                                 </div>
                                 <div style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: '600' }}>
-                                  {historyItem.status === 'recibido' && 'Recibido por secretaría'}
-                                  {historyItem.status === 'presentado' && 'Proyecto presentado'}
-                                  {historyItem.status === 'en_comision' && 'Proyecto en comisión'}
-                                  {historyItem.status === 'en_votacion' && 'Proyecto en votación'}
-                                  {historyItem.status === 'aprobado' && 'Proyecto Aprobado'}
+                                  {getStatusDetails(historyItem.status).text}
                                 </div>
                                 {historyItem.note && (
                                   <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.35rem', fontStyle: 'italic', background: 'rgba(255,255,255,0.03)', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)' }}>

@@ -75,6 +75,11 @@ export default function App() {
     isVisible: db.is_visible !== false,
     photos: db.photos || [],
     statusHistory: db.status_history || [],
+    internalStatus: db.internal_status || 'nuevo',
+    assignedTo: db.assigned_to || '',
+    internalLink: db.internal_link || '',
+    deletedAt: db.deleted_at || null,
+    deletedBy: db.deleted_by || null,
     createdAt: db.created_at
   });
 
@@ -98,6 +103,11 @@ export default function App() {
     upvotes: Number(rep.upvotes || 0),
     status: rep.status,
     is_visible: rep.isVisible !== false,
+    internal_status: rep.internalStatus || 'nuevo',
+    assigned_to: rep.assignedTo || '',
+    internal_link: rep.internalLink || '',
+    deleted_at: rep.deletedAt || null,
+    deleted_by: rep.deletedBy || null,
     photos: rep.photos || [],
     status_history: rep.statusHistory || []
   });
@@ -142,20 +152,23 @@ export default function App() {
   useEffect(() => {
     if (!isSupabaseConfigured) return;
 
-    const fetchSupabaseData = async () => {
+    const fetchSupabaseData = async (session) => {
       try {
         // 1. Reclamos
+        const publicColumns = 'id, tracking_code, title, description, category, barrio, calle_principal, entre_calle_1, entre_calle_2, anonymous_name, gps_lat, gps_lng, upvotes, status, is_visible, photos, status_history, created_at';
+        const selectCols = session ? '*' : publicColumns;
+
         const { data: reportsData, error: reportsError } = await supabase
           .from('municipal_reports')
-          .select('*')
+          .select(selectCols)
           .order('created_at', { ascending: false });
 
         if (reportsError) throw reportsError;
 
         if (reportsData && reportsData.length > 0) {
           setReports(reportsData.map(mapDbToReport));
-        } else {
-          // Sembrar datos iniciales si la DB está vacía
+        } else if (!session) {
+          // Sembrar datos iniciales si la DB está vacía y estamos en entorno de prueba
           const dbSeed = INITIAL_REPORTS.map(mapReportToDb);
           const { error: seedError } = await supabase
             .from('municipal_reports')
@@ -175,7 +188,7 @@ export default function App() {
 
         if (newsData && newsData.length > 0) {
           setNewsList(newsData);
-        } else {
+        } else if (!session) {
           // Sembrar noticias si la DB está vacía
           const { error: seedNewsError } = await supabase
             .from('municipal_news')
@@ -189,7 +202,23 @@ export default function App() {
       }
     };
 
-    fetchSupabaseData();
+    // Consultar sesión inicial
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      fetchSupabaseData(session);
+    });
+
+    // Escuchar cambios de autenticación
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        fetchSupabaseData(session);
+      }
+    });
+
+    return () => {
+      if (authListener && authListener.subscription) {
+        authListener.subscription.unsubscribe();
+      }
+    };
   }, []);
 
   // Persist state
@@ -336,18 +365,34 @@ export default function App() {
     }
   };
 
-  const handleDeleteReport = async (id) => {
-    setReports(prevReports => prevReports.filter(rep => rep.id !== id));
+  const handleDeleteReport = async (id, userEmail) => {
+    setReports(prevReports => prevReports.map(rep => rep.id === id ? { ...rep, deletedAt: new Date().toISOString(), deletedBy: userEmail } : rep));
 
     if (isSupabaseConfigured) {
       try {
         const { error } = await supabase
           .from('municipal_reports')
-          .delete()
+          .update({ deleted_at: new Date().toISOString(), deleted_by: userEmail })
           .eq('id', id);
         if (error) throw error;
       } catch (err) {
         console.error("Error al eliminar el reclamo en Supabase:", err);
+      }
+    }
+  };
+
+  const handleRestoreReport = async (id) => {
+    setReports(prevReports => prevReports.map(rep => rep.id === id ? { ...rep, deletedAt: null, deletedBy: null } : rep));
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase
+          .from('municipal_reports')
+          .update({ deleted_at: null, deleted_by: null })
+          .eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error al restaurar el reclamo en Supabase:", err);
       }
     }
   };
@@ -387,6 +432,20 @@ export default function App() {
             .update(newsData)
             .eq('id', newsData.id);
           if (error) throw error;
+          if (currentReport && (currentReport.status !== updatedReport.status || currentReport.internalStatus !== updatedReport.internalStatus)) {
+            try {
+              fetch('https://buzon-ciudadano-mail-api.horianskiseguros.workers.dev/api/status-change', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  phone: updatedReport.phone || updatedReport.telefono || '000',
+                  trackingCode: updatedReport.trackingCode || updatedReport.tracking_code,
+                  newStatus: (updatedReport.status + ' (Interno: ' + (updatedReport.internalStatus || 'N/A') + ')'),
+                  userName: updatedReport.name || updatedReport.nombre || 'Vecino'
+                })
+              }).catch(e => console.error('Error webhook:', e));
+            } catch (e) {}
+          }
         } catch (err) {
           console.error("Error al actualizar la noticia en Supabase:", err);
         }
@@ -515,6 +574,7 @@ export default function App() {
                 reports={reports} 
                 onUpdateReport={handleUpdateReport}
                 onDeleteReport={handleDeleteReport}
+                onRestoreReport={handleRestoreReport}
                 onToggleReportVisibility={handleToggleReportVisibility}
                 newsList={newsList}
                 onSaveNews={handleSaveNews}
@@ -537,3 +597,5 @@ export default function App() {
     </ErrorBoundary>
   );
 }
+
+

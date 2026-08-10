@@ -26,26 +26,26 @@ const getStatusDetails = (report) => {
   switch (status) {
     case 'recibido':
       return {
-        text: 'Recibido (Oculto al público hasta su aprobación)',
+        text: 'Recibido y presentado al Concejo falta de aprobación en Sesión',
         badgeClass: 'badge-recibido',
         shortText: 'Recibido',
         style: { background: 'rgba(150, 150, 150, 0.12)', color: '#b0b0b0', border: '1px solid rgba(150, 150, 150, 0.25)' }
       };
     case 'en_tramite':
       return {
-        text: 'En Trámite Legislativo',
+        text: report.comisionName ? `Aprobado en la comisión de ${report.comisionName}` : 'Aprobado en la comisión',
         badgeClass: 'badge-warning',
         shortText: 'En Trámite'
       };
     case 'solucionado':
       return {
-        text: 'Solucionado / Respuesta Oficial',
+        text: 'Aprobado en recinto del concejo a esperar',
         badgeClass: 'badge-success',
-        shortText: 'Solucionado'
+        shortText: 'Aprobado'
       };
     default:
       return {
-        text: 'Recibido (Pendiente de Aprobación)',
+        text: 'Recibido y presentado al Concejo falta de aprobación en Sesión',
         badgeClass: 'badge-recibido',
         shortText: 'Recibido',
         style: { background: 'rgba(150, 150, 150, 0.12)', color: '#b0b0b0', border: '1px solid rgba(150, 150, 150, 0.25)' }
@@ -110,23 +110,17 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
         return true;
       }
 
-      // 3. Si el estado es "recibido" (nuevo) y NO está explícitamente marcado como visible por el admin, lo ocultamos.
-      // (Por defecto los reclamos nuevos son privados hasta que se aprueban o el admin los hace visibles)
-      if (rep.status === 'recibido' && rep.isVisible !== true) {
-        return false;
-      }
-
-      // 4. Filtro por Categoría
+      // 3. Filtro por Categoría
       if (selectedCategory !== 'Todas' && rep.category !== selectedCategory) {
         return false;
       }
 
-      // 5. Filtro por Estado (por si en el futuro se reactiva el selector de estados)
+      // 4. Filtro por Estado (por si en el futuro se reactiva el selector de estados)
       if (selectedStatus !== 'Todos' && rep.status !== selectedStatus) {
         return false;
       }
 
-      // 6. Filtro por Búsqueda de Texto
+      // 5. Filtro por Búsqueda de Texto
       if (cleanSearch !== '') {
         const matchesSearch = 
           (rep.title && rep.title.toLowerCase().includes(searchTermLower)) || 

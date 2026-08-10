@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Lock, LogOut, Check, Search, MapPin, Eye, Calendar, AlertCircle, FileText, Phone, MessageSquare, ExternalLink, ShieldCheck, Trash2, Clock, EyeOff, Edit3, X, Download, RefreshCw, Copy, Plus, Image, ZoomIn, List, Grid, Inbox, Activity, CheckCircle, TrendingUp, Mail } from 'lucide-react';
+import { Lock, LogOut, Check, Search, MapPin, Eye, Calendar, AlertCircle, FileText, Phone, MessageSquare, ExternalLink, ShieldCheck, Trash2, Clock, EyeOff, Edit3, X, Download, RefreshCw, Copy, Plus, Image, ZoomIn, List, Grid, Inbox, Activity, CheckCircle, TrendingUp, Mail, Users } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import santiagoImg from '../assets/santiago.jpg';
 import { generateLegislativeProject } from '../utils/wordGenerator';
@@ -11,17 +11,27 @@ import jsPDF from 'jspdf';
 import ReportFichaPDF from './ReportFichaPDF';
 
 // Configuración de Roles
-const SUPER_ADMIN_EMAILS = ['horianskiseguros@gmail.com', 'santiago.horianski@gmail.com', 'admin@gmail.com'];
-const VIEWER_EMAILS = ['visor1@gmail.com', 'visor2@gmail.com', 'visor3@gmail.com'];
+const SUPER_ADMIN_EMAILS = ['gaston.horianski@gmail.com', 'santiago.horianski@gmail.com'];
+const RECLAMOS_EMAILS = ['deliaestermeza@gmail.com', 'yamilaponcee@gmail.com'];
 
 const getUserRole = (email) => {
   if (!email) return 'unauthorized';
-  // Al usar Supabase y registro cerrado, asumimos que cualquier usuario registrado es admin.
-  // Podrías volver a habilitar chequeos estrictos aquí si lo necesitas.
+  const lowerEmail = email.toLowerCase();
+  
+  if (SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === lowerEmail)) {
+    return 'admin'; // Acceso total
+  }
+  
+  if (RECLAMOS_EMAILS.some(e => e.toLowerCase() === lowerEmail)) {
+    return 'editor'; // Acceso solo a reclamos
+  }
+  
+  // Por defecto, si está autenticado pero no en la lista explícita, le damos admin por legado o lo restringimos.
+  // Como registramos los usuarios a mano, le damos admin.
   return 'admin';
 };
 
-export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, onToggleReportVisibility, newsList, onSaveNews, onDeleteNews, onToggleNewsVisibility, onLogout }) {
+export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, onRestoreReport, onToggleReportVisibility, newsList, onSaveNews, onDeleteNews, onToggleNewsVisibility, onLogout }) {
   const [session, setSession] = useState(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   
@@ -276,17 +286,54 @@ export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, on
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('table'); // 'table' | 'grid'
   const [statusFilter, setStatusFilter] = useState('Todos');
+  const [internalStatusFilter, setInternalStatusFilter] = useState('Todos');
+  const [assignedToFilter, setAssignedToFilter] = useState('Todos');
+  const [attachmentFilter, setAttachmentFilter] = useState('Todos');
   const [categoryFilter, setCategoryFilter] = useState('Todas');
+  
+  // New States for Plan Features
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 50;
+  
+  const [showWaConfig, setShowWaConfig] = useState(false);
+  const [waTemplates, setWaTemplates] = useState(() => {
+    const saved = localStorage.getItem('buzon_wa_templates');
+    return saved ? JSON.parse(saved) : {
+      location: "Hola {vecino}, recibimos tu reclamo en el Buzón Ciudadano. Por favor, ¿podrías indicarnos la calle exacta y la altura (numeración) o entre qué calles queda para poder ubicar mejor el problema? ¡Muchas gracias!",
+      photos: "Hola {vecino}, vimos tu reclamo en el Buzón Ciudadano. Para poder avanzar con el armado del proyecto y presentarlo, necesitamos que nos envíes por este medio algunas fotos que muestren claramente la problemática. ¡Quedamos a la espera!",
+      idea: "Hola {vecino}. Vimos tu mensaje en el Buzón Ciudadano. ¡Muchas gracias por tu sugerencia/idea! La vamos a estar analizando con el equipo para ver cómo podemos transformarla en un proyecto de ordenanza o comunicación que beneficie a la ciudad."
+    };
+  });
+
+  const saveWaTemplates = (e) => {
+    e.preventDefault();
+    localStorage.setItem('buzon_wa_templates', JSON.stringify(waTemplates));
+    setShowWaConfig(false);
+    alert('Plantillas de WhatsApp guardadas con éxito (solo en este navegador).');
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, internalStatusFilter, assignedToFilter, attachmentFilter, categoryFilter, dateFrom, dateTo, activeTab]);
+
   const [selectedReport, setSelectedReport] = useState(null);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Detail form states (when editing a report)
   const [editStatus, setEditStatus] = useState('');
+  const [editInternalStatus, setEditInternalStatus] = useState('nuevo');
+  const [editAssignedTo, setEditAssignedTo] = useState('');
+  const [editInternalLink, setEditInternalLink] = useState('');
   const [editResponse, setEditResponse] = useState('');
   const [editComisionName, setEditComisionName] = useState('');
   const [editComisionConcejal, setEditComisionConcejal] = useState('');
   const [editSesionNumber, setEditSesionNumber] = useState('');
+  const [editAnonymousName, setEditAnonymousName] = useState('');
+  const [editAnonymousPhone, setEditAnonymousPhone] = useState('');
+  const [editAnonymousEmail, setEditAnonymousEmail] = useState('');
   const [isSaveSuccess, setIsSaveSuccess] = useState(false);
 
   // News CMS states
@@ -402,6 +449,18 @@ Párrafo final o conclusión de la noticia.`);
   const receivedReports = reports.filter(r => r.status === 'recibido').length;
   const reviewReports = reports.filter(r => r.status === 'en_tramite').length;
   const resolvedReports = reports.filter(r => r.status === 'solucionado').length;
+  const resolutionRate = totalReports > 0 ? Math.round((resolvedReports / totalReports) * 100) : 0;
+  
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const newReportsThisWeek = reports.filter(r => new Date(r.createdAt) >= oneWeekAgo).length;
+
+  const teamPerf = {
+    santiago: reports.filter(r => r.assignedTo === 'Santiago').length,
+    delia: reports.filter(r => r.assignedTo === 'Delia').length,
+    gaston: reports.filter(r => r.assignedTo === 'Gastón').length,
+    yamila: reports.filter(r => r.assignedTo === 'Yamila').length,
+  };
 
   const calculateAverageResolutionTime = () => {
     const resolved = reports.filter(r => r.status === 'solucionado' && r.statusHistory && r.statusHistory.length > 1);
@@ -426,17 +485,40 @@ Párrafo final o conclusión de la noticia.`);
     const cleanTerm = term.replace(/^#/, ''); // Omitir # si se busca por código
     
     const matchesSearch = 
-      rep.title.toLowerCase().includes(term) ||
+      (rep.title && rep.title.toLowerCase().includes(term)) ||
       (rep.anonymousName && rep.anonymousName.toLowerCase().includes(term)) ||
-      rep.location.toLowerCase().includes(term) ||
-      rep.description.toLowerCase().includes(term) ||
+      (rep.location && rep.location.toLowerCase().includes(term)) ||
+      (rep.description && rep.description.toLowerCase().includes(term)) ||
       (rep.trackingCode && rep.trackingCode.toString().includes(cleanTerm));
 
     const matchesStatus = statusFilter === 'Todos' || rep.status === statusFilter;
+    const matchesInternalStatus = internalStatusFilter === 'Todos' || rep.internalStatus === internalStatusFilter;
+    const matchesAssignedTo = assignedToFilter === 'Todos' || rep.assignedTo === assignedToFilter;
     const matchesCategory = categoryFilter === 'Todas' || rep.category === categoryFilter;
+    
+    const hasAttachments = rep.photos && rep.photos.length > 0;
+    const matchesAttachment = attachmentFilter === 'Todos' 
+      ? true 
+      : (attachmentFilter === 'Con Archivos' ? hasAttachments : !hasAttachments);
+    
+    const isDeleted = rep.deletedAt != null;
+    const matchesTab = activeTab === 'papelera' ? isDeleted : !isDeleted;
 
-    return matchesSearch && matchesStatus && matchesCategory;
+    let matchesDate = true;
+    if (dateFrom) {
+      matchesDate = matchesDate && new Date(rep.createdAt) >= new Date(dateFrom);
+    }
+    if (dateTo) {
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59, 999);
+      matchesDate = matchesDate && new Date(rep.createdAt) <= toDate;
+    }
+
+    return matchesSearch && matchesStatus && matchesInternalStatus && matchesAssignedTo && matchesCategory && matchesAttachment && matchesTab && matchesDate;
   });
+
+  const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
+  const paginatedReports = filteredReports.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const getStatusDetails = (reportOrStatus) => {
     const status = typeof reportOrStatus === 'string' ? reportOrStatus : reportOrStatus.status;
@@ -445,28 +527,48 @@ Párrafo final o conclusión de la noticia.`);
     switch (status) {
       case 'recibido':
         return {
-          text: '📥 Recibido (Oculto al público hasta su aprobación)',
+          text: '📥 Recibido y presentado al Concejo falta de aprobación en Sesión',
           badgeClass: 'admin-badge-recibido',
           shortText: 'Recibido'
         };
       case 'en_tramite':
         return {
-          text: '🏛️ En Trámite Legislativo',
+          text: '🏛️ ' + (report.comisionName ? `Aprobado en la comisión de ${report.comisionName}` : 'Aprobado en la comisión'),
           badgeClass: 'admin-badge-comision',
-          shortText: 'En Trámite'
+          shortText: 'Aprobado'
         };
       case 'solucionado':
         return {
-          text: '✅ Solucionado / Respuesta Oficial',
+          text: '✅ Aprobado en recinto del concejo a esperar',
           badgeClass: 'admin-badge-aprobado',
-          shortText: 'Solucionado'
+          shortText: 'Aprobado'
         };
       default:
         return {
-          text: '📥 Recibido (Oculto al público)',
+          text: '📥 Recibido y presentado al Concejo falta de aprobación en Sesión',
           badgeClass: 'admin-badge-recibido',
           shortText: 'Recibido'
         };
+    }
+  };
+
+  const getInternalStatusDetails = (status) => {
+    switch (status) {
+      case 'visto':
+        return { text: '👁️ Visto', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)', border: '#bfdbfe' };
+      case 'cargado':
+        return { text: '☁️ Publicado con firma digital', color: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.1)', border: '#bae6fd' };
+      case 'en_word':
+        return { text: '📝 En creación de Word', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.1)', border: '#ddd6fe' };
+      case 'revisado':
+        return { text: '✅ Revisado / Espera', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)', border: '#fde68a' };
+      case 'falta_analisis':
+        return { text: '🔍 Falta de análisis', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', border: '#fecaca' };
+      case 'falta_informacion':
+        return { text: 'ℹ️ Falta Fotos', color: '#64748b', bg: 'rgba(100, 116, 139, 0.1)', border: '#cbd5e1' };
+      case 'nuevo':
+      default:
+        return { text: '🆕 Nuevo', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', border: '#a7f3d0' };
     }
   };
 
@@ -611,11 +713,17 @@ Párrafo final o conclusión de la noticia.`);
 
   const handleOpenDetail = async (report) => {
     setSelectedReport(report);
-    setEditStatus(report.status);
-    setEditResponse(report.candidateResponse || '');
+    setEditStatus(report.status || 'recibido');
+    setEditInternalStatus(report.internalStatus || 'nuevo');
+    setEditAssignedTo(report.assignedTo || '');
+    setEditInternalLink(report.internalLink || '');
+    setEditResponse(report.statusHistory?.[0]?.description || '');
     setEditComisionName(report.comisionName || '');
     setEditComisionConcejal(report.comisionConcejal || '');
     setEditSesionNumber(report.sesionNumber || '');
+    setEditAnonymousName(report.anonymousName || '');
+    setEditAnonymousPhone(report.phone || '');
+    setEditAnonymousEmail(report.email || '');
     setIsSaveSuccess(false);
     setPadronMatch(null);
 
@@ -653,10 +761,37 @@ Párrafo final o conclusión de la noticia.`);
     }
   };
 
+  const handleCloseModal = () => {
+    if (!selectedReport) return;
+    
+    const hasChanges = 
+      editStatus !== selectedReport.status ||
+      editInternalStatus !== selectedReport.internalStatus ||
+      editAssignedTo !== selectedReport.assignedTo ||
+      editInternalLink !== (selectedReport.internalLink || '') ||
+      editResponse !== (selectedReport.response || '') ||
+      editComisionName !== (selectedReport.comisionName || '');
+
+    if (hasChanges) {
+      if (!window.confirm("Tenés cambios sin guardar en la ficha de este reclamo. ¿Estás seguro de que querés cerrar y perder los cambios?")) {
+        return;
+      }
+    }
+    
+    setSelectedReport(null);
+  };
+
   const handleDelete = (id) => {
-    if (window.confirm(`¿Estás seguro de que deseas eliminar permanentemente este reclamo?`)) {
-      onDeleteReport(id);
+    const reportToDelete = reports.find(r => r.id === id) || {};
+    if (window.confirm(`¿Estás seguro de que deseas enviar a la papelera el reclamo: "${reportToDelete.title || reportToDelete.category}" (Código #${reportToDelete.trackingCode || id})?`)) {
+      onDeleteReport(id, loginEmail);
       if (selectedReport?.id === id) setSelectedReport(null);
+    }
+  };
+
+  const handleRestore = (id) => {
+    if (window.confirm('¿Estás seguro de que deseas restaurar este reclamo de la papelera?')) {
+      if (onRestoreReport) onRestoreReport(id);
     }
   };
 
@@ -671,18 +806,21 @@ Párrafo final o conclusión de la noticia.`);
     const updated = {
       ...selectedReport,
       status: editStatus,
+      internalStatus: editInternalStatus,
+      assignedTo: editAssignedTo,
+      internalLink: editInternalLink,
+      comisionName: editComisionName,
+      comisionConcejal: editComisionConcejal,
+      sesionNumber: editSesionNumber,
+      anonymousName: editAnonymousName,
+      phone: editAnonymousPhone,
+      email: editAnonymousEmail,
       candidateResponse: editResponse.trim() ? editResponse.trim() : null,
     };
 
     onUpdateReport(updated);
-    
-    setIsSaveSuccess(true);
-    setSelectedReport(updated);
-
-    setTimeout(() => {
-      setIsSaveSuccess(false);
-      setIsEditingReport(false);
-    }, 1500);
+    setSelectedReport(null);
+    setIsEditingReport(false);
   };
 
   const handleResolveReport = (report) => {
@@ -725,6 +863,18 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
         
     const text = encodeURIComponent(generateStatusMessage(report));
     return `https://wa.me/${formatted}?text=${text}`;
+  };
+
+  const getCustomWhatsAppLink = (report, customText) => {
+    if (!report.phone) return '#';
+    const cleaned = report.phone.replace(/\D/g, '');
+    const formatted = cleaned.startsWith('54') 
+      ? cleaned 
+      : cleaned.startsWith('9') 
+        ? '54' + cleaned 
+        : '549' + (cleaned.startsWith('0') ? cleaned.slice(1) : cleaned);
+        
+    return `https://wa.me/${formatted}?text=${encodeURIComponent(customText)}`;
   };
 
   const sendWhatsAppNotification = async (report, silent = false) => {
@@ -810,7 +960,60 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
       };
       copyText(message);
 
-      alert(`💥 Error al conectar con Evolution API.\n\n⚠️ El texto del mensaje se copió automáticamente al portapapeles por si querés enviarlo de forma manual.\n\nError: ${error.message}`);
+      if (!silent) {
+        alert(`💥 Error al conectar con Evolution API.\n\n⚠️ El texto del mensaje se copió automáticamente al portapapeles por si querés enviarlo de forma manual.\n\nError: ${error.message}`);
+      }
+    } finally {
+      setIsSendingWA(false);
+    }
+  };
+
+  const sendCustomWhatsAppMessage = async (report, text) => {
+    if (!report.phone) return;
+    setIsSendingWA(true);
+    try {
+      const cleaned = report.phone.toString().replace(/\D/g, '');
+      const formatted = cleaned.startsWith('54') 
+        ? cleaned 
+        : cleaned.startsWith('9') 
+          ? '54' + cleaned 
+          : '549' + (cleaned.startsWith('0') ? cleaned.slice(1) : cleaned);
+      
+      const apiBaseUrl = localStorage.getItem('override_evolution_api_url') || import.meta.env.VITE_EVOLUTION_API_URL || "https://api.santiagohorianski.com";
+      const instanceName = localStorage.getItem('override_evolution_instance_name') || import.meta.env.VITE_EVOLUTION_INSTANCE_NAME || "buzon_ciudadano";
+      const apiKey = localStorage.getItem('override_evolution_api_key') || import.meta.env.VITE_EVOLUTION_API_KEY || "my_secure_evolution_api_global_key";
+
+      if (!apiBaseUrl || !instanceName || !apiKey) {
+        alert("Faltan las credenciales de Evolution API en las variables de entorno.");
+        setIsSendingWA(false);
+        return;
+      }
+
+      const cleanUrl = apiBaseUrl.replace(/\/$/, "");
+      const url = `${cleanUrl}/message/sendText/${instanceName}`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'apikey': apiKey
+        },
+        body: JSON.stringify({
+          number: formatted,
+          text: text
+        })
+      });
+
+      const data = await response.json();
+      if (data && data.key && data.key.id) {
+        alert(`✅ ¡Mensaje rápido enviado con éxito a ${formatted}!`);
+      } else {
+        alert(`❌ Error al enviar. Revisa la consola para más detalles.`);
+        console.error('Evolution API Error Response:', data);
+      }
+    } catch (error) {
+      console.error("Error al enviar custom WA:", error);
+      alert(`❌ Error: ${error.message}`);
     } finally {
       setIsSendingWA(false);
     }
@@ -1009,6 +1212,19 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
             </div>
           ) : (
           <div className="admin-container fade-in">
+            <style>
+              {`
+                .admin-container {
+                  --primary: #4f46e5;
+                  --primary-hover: #4338ca;
+                  --accent: #8b5cf6;
+                }
+                .admin-container .badge-accent {
+                  background-color: rgba(139, 92, 246, 0.15);
+                  color: #8b5cf6;
+                }
+              `}
+            </style>
             <Helmet>
               <title>Panel de Administración | Reclamos Posadas</title>
             </Helmet>
@@ -1061,51 +1277,64 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 onClick={() => setActiveTab('mapa')}
                 className={`btn ${activeTab === 'mapa' ? 'btn-primary' : 'btn-secondary'}`}
               >Mapa Interactivo</button>
-
-
+              {userRole === 'admin' && (
+                <button 
+                  onClick={() => setActiveTab('papelera')}
+                  className={`btn ${activeTab === 'papelera' ? 'btn-primary' : 'btn-secondary'}`}
+                  style={{ marginLeft: 'auto', border: activeTab === 'papelera' ? 'none' : '1px solid var(--border)', background: activeTab === 'papelera' ? 'var(--danger)' : 'transparent', color: activeTab === 'papelera' ? 'white' : 'var(--danger)' }}
+                >
+                  🗑️ Papelera
+                </button>
+              )}
             </div>
           </div>
         </div>
 
-        {activeTab === 'reclamos' && (
+        {(activeTab === 'reclamos' || activeTab === 'papelera') && (
           <>
             {/* Dashboard KPIs Grid */}
             <div className="admin-kpis-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
               
-              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(59, 130, 246, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
+              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(59, 130, 246, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
                 <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><FileText size={48} color="#a8c0ff" /></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
                   <FileText size={16} color="#a8c0ff" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Reclamos Recibidos</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Reclamos</span>
                 </div>
                 <span style={{ fontSize: '2.5rem', fontWeight: 800, background: 'linear-gradient(to right, #a8c0ff, #3f2b96)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1 }}>{totalReports}</span>
               </div>
 
-              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(168, 85, 247, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
-                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><Activity size={48} color="var(--warning)" /></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-                  <Activity size={16} color="var(--warning)" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>En Trámite Legislativo</span>
-                </div>
-                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--warning)', lineHeight: 1 }}>{reviewReports}</span>
-              </div>
-
-              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(16, 185, 129, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
+              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(16, 185, 129, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
                 <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><CheckCircle size={48} color="var(--success)" /></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
                   <CheckCircle size={16} color="var(--success)" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Solucionados / Respuestas</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tasa de Resolución</span>
                 </div>
-                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--success)', lineHeight: 1 }}>{resolvedReports}</span>
+                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--success)', lineHeight: 1 }}>{resolutionRate}%</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{resolvedReports} resueltos</span>
               </div>
 
-              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(116, 59, 188, 0.08), rgba(116, 59, 188, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(116, 59, 188, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'transform 0.3s ease', cursor: 'default' }}>
-                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><TrendingUp size={48} color="#c4a7e7" /></div>
+              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(168, 85, 247, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><Activity size={48} color="var(--warning)" /></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-                  <TrendingUp size={16} color="#c4a7e7" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Resolución</span>
+                  <Activity size={16} color="var(--warning)" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nuevos (Últimos 7 días)</span>
                 </div>
-                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: '#c4a7e7', lineHeight: 1 }}>{calculateAverageResolutionTime()}</span>
+                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--warning)', lineHeight: 1 }}>{newReportsThisWeek}</span>
+              </div>
+
+              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.08), rgba(236, 72, 153, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(236, 72, 153, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><Users size={48} color="#ec4899" /></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                  <Users size={16} color="#ec4899" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Carga de Equipo</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
+                  <div>S: {teamPerf.santiago}</div>
+                  <div>D: {teamPerf.delia}</div>
+                  <div>G: {teamPerf.gaston}</div>
+                  <div>Y: {teamPerf.yamila}</div>
+                </div>
               </div>
             </div>
 
@@ -1125,8 +1354,18 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
               <div className="filters-row" style={{ flexWrap: 'wrap' }}>
                 <button onClick={handleExportExcel} className="btn btn-secondary" style={{ marginRight: 'auto', background: 'var(--success)', color: 'white', borderColor: 'var(--success)', alignSelf: 'flex-end' }}>
                   <Download size={16} />
-                  <span>Exportar a Excel (.xls)</span>
+                  <span>Exportar Vista a Excel (.xls)</span>
                 </button>
+
+                <div className="filter-select-group">
+                  <label>Desde:</label>
+                  <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="sort-select" style={{ padding: '0.4rem' }} />
+                </div>
+                
+                <div className="filter-select-group">
+                  <label>Hasta:</label>
+                  <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="sort-select" style={{ padding: '0.4rem' }} />
+                </div>
 
                 <div className="filter-select-group">
                   <label>Eje Temático:</label>
@@ -1150,6 +1389,51 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                     <option value="recibido">Recibidos (Pendientes)</option>
                     <option value="en_tramite">En Trámite Legislativo</option>
                     <option value="solucionado">Solucionados / Respuestas</option>
+                  </select>
+                </div>
+
+                <div className="filter-select-group">
+                  <label>Estado Interno (Privado):</label>
+                  <select 
+                    value={internalStatusFilter}
+                    onChange={(e) => setInternalStatusFilter(e.target.value)}
+                    className="sort-select"
+                  >
+                    <option value="Todos">Todos</option>
+                    <option value="nuevo">Nuevo / No Visto</option>
+                    <option value="visto">Visto / En Revisión</option>
+                    <option value="falta_analisis">Falta de Análisis / Info</option>
+                    <option value="creando_word">Creando Word</option>
+                    <option value="revisado_espera">Revisado (A la espera)</option>
+                    <option value="cargado">Cargado</option>
+                  </select>
+                </div>
+
+                <div className="filter-select-group">
+                  <label>Responsable:</label>
+                  <select 
+                    value={assignedToFilter}
+                    onChange={(e) => setAssignedToFilter(e.target.value)}
+                    className="sort-select"
+                  >
+                    <option value="Todos">Todos</option>
+                    <option value="Santiago">Santiago</option>
+                    <option value="Delia">Delia</option>
+                    <option value="Gaston">Gaston</option>
+                    <option value="Yamila">Yamila</option>
+                  </select>
+                </div>
+
+                <div className="filter-select-group">
+                  <label>Archivos Adjuntos:</label>
+                  <select 
+                    value={attachmentFilter}
+                    onChange={(e) => setAttachmentFilter(e.target.value)}
+                    className="sort-select"
+                  >
+                    <option value="Todos">Todos</option>
+                    <option value="Con Archivos">Con Archivos</option>
+                    <option value="Sin Archivos">Sin Archivos</option>
                   </select>
                 </div>
 
@@ -1190,10 +1474,11 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredReports.map((rep) => {
+                    {paginatedReports.map((rep) => {
                       const statusDetails = getStatusDetails(rep);
+                      const internalDetails = getInternalStatusDetails(rep.internalStatus);
                       return (
-                        <tr key={rep.id} className="table-row-item">
+                        <tr key={rep.id} style={{ borderLeft: `4px solid ${internalDetails.color}`, backgroundColor: internalDetails.bg }} className="table-row-item">
                           <td data-label="ID / Nº" className="font-display-bold" style={{ color: 'var(--text-muted)' }}>
                             # {rep.id}
                           </td>
@@ -1211,6 +1496,11 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                           </td>
                           <td data-label="Categoría" className="td-cat">
                             <span className="badge badge-accent">{rep.category}</span>
+                            {rep.photos && rep.photos.length > 0 && (
+                              <span className="badge" style={{ marginLeft: '0.4rem', backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#d97706', border: '1px solid rgba(245, 158, 11, 0.3)' }} title={`${rep.photos.length} archivo(s) adjunto(s)`}>
+                                📎 {rep.photos.length}
+                              </span>
+                            )}
                           </td>
                           <td data-label="Ubicación" className="td-loc">
                             <div className="location-text-wrap" title={rep.location}>
@@ -1219,9 +1509,19 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                             </div>
                           </td>
                           <td data-label="Estado">
-                            <span className={`badge ${statusDetails.badgeClass}`}>
-                              {statusDetails.shortText}
-                            </span>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start' }}>
+                              <span className={`badge ${statusDetails.badgeClass}`}>
+                                {statusDetails.shortText}
+                              </span>
+                              <span className="badge" style={{ backgroundColor: internalDetails.bg, color: internalDetails.color, border: `1px solid ${internalDetails.border}`, fontSize: '0.7rem' }}>
+                                {internalDetails.text}
+                              </span>
+                              {rep.assignedTo && (
+                                <span className="badge" style={{ backgroundColor: 'rgba(55, 65, 81, 0.1)', color: 'var(--text-primary)', border: '1px solid rgba(55, 65, 81, 0.2)', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                                  👤 {rep.assignedTo}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td data-label="Visibilidad">
                             {rep.isVisible !== false ? (
@@ -1231,7 +1531,6 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                             )}
                           </td>
                           <td data-label="Acción" style={{ display: 'flex', gap: '0.5rem' }}>
-                            {userRole === 'admin' && (
                               <>
                                 {rep.status !== 'aprobado' && (
                                   <button onClick={() => handleResolveReport(rep)} className="action-btn-circle outline" style={{ color: 'var(--success)', borderColor: 'var(--success)' }} title="Marcar como Solucionado/Aprobado">
@@ -1241,11 +1540,15 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                                 <button onClick={() => handleToggleReportVisibility(rep.id)} className="action-btn-circle outline" title={rep.isVisible !== false ? "Ocultar al público" : "Hacer visible"}>
                                   {rep.isVisible !== false ? <EyeOff size={16} /> : <Eye size={16} />}
                                 </button>
+                                {activeTab === 'papelera' && (
+                                  <button onClick={() => handleRestore(rep.id)} className="action-btn-circle outline" style={{ color: 'var(--primary)', borderColor: 'var(--primary)' }} title="Restaurar de la papelera">
+                                    ♻️
+                                  </button>
+                                )}
                                 <button onClick={() => handleDelete(rep.id)} className="action-btn-circle danger" title="Eliminar definitivamente">
                                   <Trash2 size={16} />
                                 </button>
                               </>
-                            )}
                             {rep.phone && (
                               <>
                                 <a href={getWhatsAppLink(rep)} target="_blank" rel="noopener noreferrer" className="btn btn-table-action" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '0.35rem 0.5rem', display: 'inline-flex', alignItems: 'center' }} title="Enviar WhatsApp Manual">
@@ -1267,14 +1570,15 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 </table>
               ) : (
                 <div className="reclamos-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
-                  {filteredReports.map((rep) => {
+                  {paginatedReports.map((rep) => {
                     const statusDetails = getStatusDetails(rep);
+                    const internalDetails = getInternalStatusDetails(rep.internalStatus);
                     let photoUrl = null;
                     if (rep.photos && rep.photos.length > 0) {
                       photoUrl = rep.photos[0];
                     }
                     return (
-                      <div key={rep.id} className="reclamo-card card glass-panel" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                      <div key={rep.id} className="reclamo-card card glass-panel" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: `1px solid ${internalDetails.border}`, borderTop: `4px solid ${internalDetails.color}` }}>
                         {photoUrl && (
                           <div style={{ height: '180px', width: '100%', overflow: 'hidden', position: 'relative' }}>
                             <img src={photoUrl} alt="Evidencia" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -1289,17 +1593,38 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                           {!photoUrl && (
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                               <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600 }}># {rep.id}</span>
-                              <span className={`badge ${statusDetails.badgeClass}`}>
-                                {statusDetails.shortText}
-                              </span>
+                              <div style={{ display: 'flex', gap: '0.2rem', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                <span className={`badge ${statusDetails.badgeClass}`}>{statusDetails.shortText}</span>
+                                <span className="badge" style={{ backgroundColor: internalDetails.bg, color: internalDetails.color, border: `1px solid ${internalDetails.border}`, fontSize: '0.7rem' }}>{internalDetails.text}</span>
+                                {rep.assignedTo && (
+                                  <span className="badge" style={{ backgroundColor: 'rgba(55, 65, 81, 0.1)', color: 'var(--text-primary)', border: '1px solid rgba(55, 65, 81, 0.2)', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                                    👤 {rep.assignedTo}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           )}
                           {photoUrl && (
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}># {rep.id}</div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                              <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600 }}># {rep.id}</div>
+                              <div style={{ display: 'flex', gap: '0.2rem', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                <span className="badge" style={{ backgroundColor: internalDetails.bg, color: internalDetails.color, border: `1px solid ${internalDetails.border}`, fontSize: '0.7rem' }}>{internalDetails.text}</span>
+                                {rep.assignedTo && (
+                                  <span className="badge" style={{ backgroundColor: 'rgba(55, 65, 81, 0.1)', color: 'var(--text-primary)', border: '1px solid rgba(55, 65, 81, 0.2)', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                                    👤 {rep.assignedTo}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           )}
                           
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                             <Calendar size={14} /> <span>{formatDate(rep.createdAt)}</span>
+                            {rep.deletedAt && (
+                              <span style={{ marginLeft: 'auto', color: 'var(--danger)', fontSize: '0.75rem', fontWeight: 600 }}>
+                                Eliminado por: {rep.deletedBy || 'Desconocido'}
+                              </span>
+                            )}
                           </div>
                           
                           <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: 'var(--text-primary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{rep.description?.length > 500 ? rep.description.substring(0, 500) + '...' : rep.description}</h4>
@@ -1314,11 +1639,14 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                               <button onClick={() => handleOpenDetail(rep)} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem', borderRadius: '6px' }} title="Gestionar detalle">
                                 <Edit3 size={16} />
                               </button>
-                              {userRole === 'admin' && (
-                                <button onClick={() => handleDelete(rep.id)} className="btn btn-sm" style={{ padding: '0.4rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', border: 'none' }} title="Eliminar">
-                                  <Trash2 size={16} />
+                              {activeTab === 'papelera' && (
+                                <button onClick={() => handleRestore(rep.id)} className="btn btn-sm" style={{ padding: '0.4rem', borderRadius: '6px', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--primary)', border: 'none' }} title="Restaurar de la papelera">
+                                  ♻️
                                 </button>
                               )}
+                              <button onClick={() => handleDelete(rep.id)} className="btn btn-sm" style={{ padding: '0.4rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', border: 'none' }} title="Eliminar">
+                                <Trash2 size={16} />
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -1328,14 +1656,83 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 </div>
               )}
             </div>
+
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem', gap: '1rem', marginTop: '1rem' }}>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="btn btn-secondary btn-sm"
+                >
+                  Anterior
+                </button>
+                <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                  Página <strong>{currentPage}</strong> de {totalPages}
+                </span>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="btn btn-secondary btn-sm"
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
           </>
+        )}
+
+        {/* MODAL CONFIGURACIÓN WA */}
+        {showWaConfig && (
+          <div className="modal-overlay" style={{ zIndex: 12000 }}>
+            <div className="modal-content glass-panel animate-fade-in" style={{ maxWidth: '600px', width: '90%' }}>
+              <button className="modal-close-btn" onClick={() => setShowWaConfig(false)}>✕</button>
+              <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-primary)' }}>
+                <MessageSquare size={20} color="#25D366" /> Configurar Textos Rápidos
+              </h3>
+              
+              <form onSubmit={saveWaTemplates} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div className="form-group">
+                  <label style={{ color: 'var(--text-primary)' }}>Texto: "Falta Ubicación"</label>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Use <code>{'{vecino}'}</code> para que se reemplace por el nombre automáticamente.</p>
+                  <textarea 
+                    value={waTemplates.location}
+                    onChange={(e) => setWaTemplates({...waTemplates, location: e.target.value})}
+                    rows={4}
+                    className="form-control"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label style={{ color: 'var(--text-primary)' }}>Texto: "Faltan Fotos"</label>
+                  <textarea 
+                    value={waTemplates.photos}
+                    onChange={(e) => setWaTemplates({...waTemplates, photos: e.target.value})}
+                    rows={4}
+                    className="form-control"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label style={{ color: 'var(--text-primary)' }}>Texto: "Proyecto / Idea"</label>
+                  <textarea 
+                    value={waTemplates.idea}
+                    onChange={(e) => setWaTemplates({...waTemplates, idea: e.target.value})}
+                    rows={4}
+                    className="form-control"
+                    required
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-end', background: '#25D366', borderColor: '#25D366', color: 'white' }}>Guardar Plantillas</button>
+              </form>
+            </div>
+          </div>
         )}
 
         {/* MODAL / DRAWER DE GESTIÓN */}
         {selectedReport && (
           <div className="modal-overlay">
             <div className="modal-content admin-drawer glass-panel animate-fade-in" style={{ maxWidth: '900px', maxHeight: '90vh', overflowY: 'auto' }}>
-              <button className="modal-close-btn" onClick={() => setSelectedReport(null)}>✕</button>
+              <button className="modal-close-btn" onClick={handleCloseModal}>✕</button>
 
               {isSaveSuccess ? (
                 <div className="modal-success" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -1382,21 +1779,83 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                         <Download size={16} /> {isGeneratingPDF ? 'Generando...' : 'Ficha PDF'}
                       </button>
                     </div>
+
+                    {selectedReport.phone && (
+                      <div style={{ marginTop: '1rem', background: 'rgba(37, 211, 102, 0.05)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(37, 211, 102, 0.2)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                          <h4 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <MessageSquare size={16} color="#25D366" /> Respuestas Rápidas de WhatsApp
+                          </h4>
+                          <button type="button" onClick={() => setShowWaConfig(true)} className="btn btn-sm" style={{ padding: '0.2rem', background: 'transparent', color: 'var(--text-muted)' }} title="Configurar textos">
+                            ⚙️
+                          </button>
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          <a 
+                            href={getCustomWhatsAppLink(selectedReport, waTemplates.location.replace('{vecino}', selectedReport.anonymousName || 'vecino'))}
+                            target="_blank" rel="noopener noreferrer"
+                            className="btn btn-secondary btn-sm" 
+                            style={{ borderColor: 'rgba(37, 211, 102, 0.5)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                            title="Pedir más datos de la ubicación vía WhatsApp Web"
+                          >
+                            📍 Falta Ubicación
+                          </a>
+                          <a 
+                            href={getCustomWhatsAppLink(selectedReport, waTemplates.photos.replace('{vecino}', selectedReport.anonymousName || 'vecino'))}
+                            target="_blank" rel="noopener noreferrer"
+                            className="btn btn-secondary btn-sm" 
+                            style={{ borderColor: 'rgba(37, 211, 102, 0.5)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                            title="Pedir fotos vía WhatsApp Web"
+                          >
+                            📸 Faltan Fotos
+                          </a>
+                          <a 
+                            href={getCustomWhatsAppLink(selectedReport, waTemplates.idea.replace('{vecino}', selectedReport.anonymousName || 'vecino'))}
+                            target="_blank" rel="noopener noreferrer"
+                            className="btn btn-secondary btn-sm" 
+                            style={{ borderColor: 'rgba(37, 211, 102, 0.5)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                            title="Agradecer idea de proyecto vía WhatsApp Web"
+                          >
+                            💡 Es un Proyecto / Idea
+                          </a>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
-                  <p className="drawer-subtitle-id">Seguimiento: #{selectedReport.trackingCode || '----'} (ID: {selectedReport.id})</p>
+                  <p className="drawer-subtitle-id" style={{ marginTop: '1.5rem' }}>Seguimiento: #{selectedReport.trackingCode || '----'} (ID: {selectedReport.id})</p>
                   
                   <div className="drawer-info-sections">
                     <div className="drawer-left-col">
                       <div className="info-block">
                         <h4>Datos de Contacto Vecinal</h4>
-                        <p><strong>Nombre:</strong> {selectedReport.anonymousName ? (selectedReport.anonymousName.length > 500 ? selectedReport.anonymousName.substring(0, 500) + '... [TRUNCADO]' : selectedReport.anonymousName) : 'Vecino Anónimo'}</p>
-                        <p className="whatsapp-row">
-                          <strong>WhatsApp:</strong> 
-                          <span className="phone-number-badge">{selectedReport.phone || 'No provisto'}</span>
-                        </p>
-                        <p><strong>DNI Reportado:</strong> {selectedReport.dni || 'No provisto'}</p>
-                        <p><strong>Correo Electrónico:</strong> {selectedReport.email || 'No provisto'}</p>
+                        {userRole === 'admin' ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <div>
+                              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Nombre:</label>
+                              <input type="text" value={editAnonymousName} onChange={(e) => setEditAnonymousName(e.target.value)} className="form-control" style={{ padding: '0.4rem', fontSize: '0.9rem' }} />
+                            </div>
+                            <div>
+                              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>WhatsApp:</label>
+                              <input type="text" value={editAnonymousPhone} onChange={(e) => setEditAnonymousPhone(e.target.value)} className="form-control" style={{ padding: '0.4rem', fontSize: '0.9rem' }} />
+                            </div>
+                            <div>
+                              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Correo Electrónico:</label>
+                              <input type="text" value={editAnonymousEmail} onChange={(e) => setEditAnonymousEmail(e.target.value)} className="form-control" style={{ padding: '0.4rem', fontSize: '0.9rem' }} />
+                            </div>
+                            <p style={{ margin: 0, marginTop: '0.5rem' }}><strong>DNI Reportado:</strong> {selectedReport.dni || 'No provisto'}</p>
+                          </div>
+                        ) : (
+                          <>
+                            <p><strong>Nombre:</strong> {selectedReport.anonymousName ? (selectedReport.anonymousName.length > 500 ? selectedReport.anonymousName.substring(0, 500) + '... [TRUNCADO]' : selectedReport.anonymousName) : 'Vecino Anónimo'}</p>
+                            <p className="whatsapp-row">
+                              <strong>WhatsApp:</strong> 
+                              <span className="phone-number-badge">{selectedReport.phone || 'No provisto'}</span>
+                            </p>
+                            <p><strong>DNI Reportado:</strong> {selectedReport.dni || 'No provisto'}</p>
+                            <p><strong>Correo Electrónico:</strong> {selectedReport.email || 'No provisto'}</p>
+                          </>
+                        )}
                       </div>
 
                       <div className="info-block">
@@ -1540,6 +1999,49 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                             <option value="recibido">Recibido (Pendiente de Aprobación)</option>
                             <option value="en_tramite">En Trámite Legislativo</option>
                             <option value="solucionado">Solucionado / Respuesta Oficial</option>
+                          </select>
+                        </div>
+                        
+                        <div className="form-group" style={{ marginTop: '1rem' }}>
+                          <label className="form-label">Estado Interno (Privado)</label>
+                          <select value={editInternalStatus} onChange={(e) => setEditInternalStatus(e.target.value)} className="form-select" style={{ borderLeft: '4px solid var(--accent)' }}>
+                            <option value="nuevo">🆕 Nuevo</option>
+                            <option value="visto">👁️ Visto</option>
+                            <option value="cargado">☁️ Cargado</option>
+                            <option value="en_word">📝 En creación de Word</option>
+                            <option value="revisado">✅ Revisado / Espera de subir</option>
+                            <option value="falta_analisis">🔍 Falta de análisis</option>
+                            <option value="falta_informacion">ℹ️ Falta de información</option>
+                          </select>
+                        </div>
+                        
+                        {editInternalStatus === 'cargado' && (
+                          <div className="form-group" style={{ marginTop: '1rem' }}>
+                            <label className="form-label">Dirección de Carga (Link Privado)</label>
+                            <input 
+                              type="text" 
+                              value={editInternalLink} 
+                              onChange={(e) => setEditInternalLink(e.target.value)} 
+                              className="form-control" 
+                              placeholder="https://drive.google.com/..." 
+                              style={{ borderLeft: '4px solid #0ea5e9' }}
+                            />
+                            {editInternalLink && (
+                              <a href={editInternalLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.8rem', color: 'var(--accent)', marginTop: '0.4rem', display: 'inline-block' }}>
+                                Abrir enlace externo ↗
+                              </a>
+                            )}
+                          </div>
+                        )}
+                        
+                        <div className="form-group" style={{ marginTop: '1rem' }}>
+                          <label className="form-label">Asignado A (Privado)</label>
+                          <select value={editAssignedTo} onChange={(e) => setEditAssignedTo(e.target.value)} className="form-select" style={{ borderLeft: '4px solid #10b981' }}>
+                            <option value="">Sin asignar</option>
+                            <option value="Santiago">Santiago</option>
+                            <option value="Delia">Delia</option>
+                            <option value="Gaston">Gaston</option>
+                            <option value="Yamila">Yamila</option>
                           </select>
                         </div>
                         

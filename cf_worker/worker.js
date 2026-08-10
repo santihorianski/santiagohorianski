@@ -11,6 +11,114 @@ var worker_default = {
         }
       });
     }
+
+    // WEBHOOK PARA CALLMEBOT Y GEMINI (BOT PERSONAL)
+    if (request.method === "GET" && url.pathname === "/callmebot") {
+      try {
+        const text = url.searchParams.get("text");
+        const phone = url.searchParams.get("phone"); // CallMeBot envia el numero
+        
+        if (!text) {
+          return new Response("Webhook activo. Envia un mensaje.", { status: 200 });
+        }
+
+        const GEMINI_API_KEY = env.GEMINI_API_KEY || "FALTA_CLAVE";
+        const CALLMEBOT_API_KEY = env.CALLMEBOT_API_KEY || "2805481";
+        const ADMIN_PHONE = env.ADMIN_PHONE || "5493764515738";
+
+        // Definimos las herramientas (Function Calling) para Gemini
+        const tools = [{
+          functionDeclarations: [{
+            name: "consultar_reclamo",
+            description: "Busca un reclamo municipal por su codigo de seguimiento y devuelve toda la informacion disponible (estado, categoria, descripcion, etc).",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                codigo: { type: "INTEGER", description: "Codigo de seguimiento numérico." }
+              },
+              required: ["codigo"]
+            }
+          }]
+        }];
+
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        
+        let contents = [{ role: "user", parts: [{ text: text }] }];
+        
+        // 1. Primera consulta a Gemini
+        let geminiResponse = await fetch(geminiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents, tools })
+        });
+        
+        let geminiData = await geminiResponse.json();
+        let replyText = "Lo siento, hubo un problema al pensar la respuesta.";
+        
+        // 2. Verificar si Gemini quiere ejecutar una funcion
+        const part = geminiData.candidates?.[0]?.content?.parts?.[0];
+        
+        if (part?.functionCall) {
+          const funcName = part.functionCall.name;
+          const args = part.functionCall.args;
+          
+          if (funcName === "consultar_reclamo") {
+             // Realizar la busqueda en Supabase
+             let dbResult = { error: "No se encontro el reclamo o faltan credenciales de base de datos." };
+             if (env.SUPABASE_URL && env.SUPABASE_ANON_KEY && args.codigo) {
+                const supaRes = await fetch(`${env.SUPABASE_URL}/rest/v1/municipal_reports?tracking_code=eq.${args.codigo}&select=*`, {
+                   headers: {
+                      "apikey": env.SUPABASE_ANON_KEY,
+                      "Authorization": `Bearer ${env.SUPABASE_ANON_KEY}`
+                   }
+                });
+                if (supaRes.ok) {
+                   const data = await supaRes.json();
+                   dbResult = data.length > 0 ? data[0] : { mensaje: "El reclamo no existe en la base de datos." };
+                }
+             }
+
+             // Anadimos el historial y la respuesta de la funcion para la segunda consulta
+             contents.push({ role: "model", parts: [{ functionCall: part.functionCall }] });
+             contents.push({
+               role: "function",
+               parts: [{
+                 functionResponse: {
+                   name: "consultar_reclamo",
+                   response: { name: "consultar_reclamo", content: dbResult }
+                 }
+               }]
+             });
+
+             // Segunda consulta a Gemini con los datos
+             const geminiResponse2 = await fetch(geminiUrl, {
+               method: "POST",
+               headers: { "Content-Type": "application/json" },
+               body: JSON.stringify({ contents, tools })
+             });
+             const geminiData2 = await geminiResponse2.json();
+             if (geminiData2.candidates && geminiData2.candidates[0].content.parts[0].text) {
+                replyText = geminiData2.candidates[0].content.parts[0].text;
+             }
+          }
+        } else if (part?.text) {
+          // Si no llamo a ninguna funcion, es una respuesta normal de texto
+          replyText = part.text;
+        } else if (geminiData.error) {
+           replyText = `Error de Gemini: ${geminiData.error.message}`;
+        }
+
+        // 3. Enviar respuesta por WhatsApp via CallMeBot
+        const waUrl = `https://api.callmebot.com/whatsapp.php?phone=${ADMIN_PHONE}&text=${encodeURIComponent(replyText)}&apikey=${CALLMEBOT_API_KEY}`;
+        await fetch(waUrl);
+
+        return new Response("Mensaje procesado y enviado", { status: 200 });
+      } catch (err) {
+        console.error("Error en CallMeBot Webhook:", err);
+        return new Response("Error interno del bot", { status: 500 });
+      }
+    }
+
     if (request.method === "GET" && url.pathname === "/webhook") {
       const mode = url.searchParams.get("hub.mode");
       const token = url.searchParams.get("hub.verify_token");
@@ -175,7 +283,22 @@ var worker_default = {
           waResult = { success: waResponse.ok, data: waData };
         }
         
-        return new Response(JSON.stringify({ success: true, whatsapp: waResult }), { 
+        // NOTIFICAR AL ADMIN VIA CALLMEBOT
+        let callmebotResult = null;
+        try {
+          const CALLMEBOT_API_KEY = env.CALLMEBOT_API_KEY || "2805481";
+          const ADMIN_PHONE = env.ADMIN_PHONE || "5493764515738";
+          const alertText = `🔔 Alerta: El reclamo #${trackingCode} ha cambiado a estado '${newStatus}'.`;
+          const waUrl = `https://api.callmebot.com/whatsapp.php?phone=${ADMIN_PHONE}&text=${encodeURIComponent(alertText)}&apikey=${CALLMEBOT_API_KEY}`;
+          const cmbResp = await fetch(waUrl);
+          const cmbText = await cmbResp.text();
+          callmebotResult = { status: cmbResp.status, text: cmbText };
+        } catch (e) {
+          console.error("Error sending admin alert:", e);
+          callmebotResult = { error: e.message };
+        }
+
+        return new Response(JSON.stringify({ success: true, whatsapp: waResult, callmebot: callmebotResult }), { 
           status: 200, 
           headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } 
         });

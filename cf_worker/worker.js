@@ -235,7 +235,7 @@ var worker_default = {
 
     if (request.method === "POST" && url.pathname === "/api/status-change") {
       try {
-        const { phone, trackingCode, newStatus, userName, category } = await request.json();
+        const { phone, trackingCode, newStatus, userName, category, assignedTo } = await request.json();
         if (!phone || !trackingCode || !newStatus) {
           return new Response(JSON.stringify({ error: "Faltan parámetros" }), { status: 400, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
         }
@@ -290,7 +290,7 @@ var worker_default = {
           const ADMIN_PHONE = env.ADMIN_PHONE || "5493764515738";
           let [publicStatus, internalStatusRaw] = newStatus.split(' (Interno: ');
           let internalStatus = internalStatusRaw ? internalStatusRaw.replace(')', '') : 'N/A';
-          const alertText = `🔔 *Alerta de Reclamo #${trackingCode}*\n👤 *Vecino:* ${userName || 'Anónimo'}\n🏷️ *Categoría:* ${category || 'General'}\n🔄 *Nuevo Estado:* ${publicStatus}\n🔒 *Estado Interno:* ${internalStatus}`;
+          const alertText = `🔔 *Alerta de Reclamo #${trackingCode}*\n👤 *Vecino:* ${userName || 'Anónimo'}\n🏷️ *Categoría:* ${category || 'General'}\n👷 *Asignado a:* ${assignedTo || 'Nadie'}\n🔄 *Nuevo Estado:* ${publicStatus}\n🔒 *Estado Interno:* ${internalStatus}`;
           const waUrl = `https://api.callmebot.com/whatsapp.php?phone=${ADMIN_PHONE}&text=${encodeURIComponent(alertText)}&apikey=${CALLMEBOT_API_KEY}`;
           const cmbResp = await fetch(waUrl);
           const cmbText = await cmbResp.text();

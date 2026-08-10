@@ -384,7 +384,8 @@ export default function App() {
                 trackingCode: updatedReport.trackingCode || updatedReport.tracking_code,
                 newStatus: (updatedReport.status + ' (Interno: ' + (updatedReport.internalStatus || 'N/A') + ')'),
                 userName: updatedReport.anonymousName || updatedReport.name || 'Vecino',
-                category: updatedReport.category || 'General'
+                category: updatedReport.category || 'General',
+                assignedTo: updatedReport.assignedTo || 'Nadie'
               })
             }).catch(e => console.error('Error webhook:', e));
           } catch (e) {}

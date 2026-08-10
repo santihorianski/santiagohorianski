@@ -359,6 +359,21 @@ export default function App() {
           .update(mapReportToDb(reportToUpload))
           .eq('id', updatedReport.id);
         if (error) throw error;
+        
+        if (currentReport && (currentReport.status !== updatedReport.status || currentReport.internalStatus !== updatedReport.internalStatus)) {
+          try {
+            fetch('https://buzon-ciudadano-mail-api.horianskiseguros.workers.dev/api/status-change', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                phone: updatedReport.phone || updatedReport.telefono || '000',
+                trackingCode: updatedReport.trackingCode || updatedReport.tracking_code,
+                newStatus: (updatedReport.status + ' (Interno: ' + (updatedReport.internalStatus || 'N/A') + ')'),
+                userName: updatedReport.anonymousName || updatedReport.name || 'Vecino'
+              })
+            }).catch(e => console.error('Error webhook:', e));
+          } catch (e) {}
+        }
       } catch (err) {
         console.error("Error al actualizar el reclamo en Supabase:", err);
       }
@@ -432,20 +447,6 @@ export default function App() {
             .update(newsData)
             .eq('id', newsData.id);
           if (error) throw error;
-          if (currentReport && (currentReport.status !== updatedReport.status || currentReport.internalStatus !== updatedReport.internalStatus)) {
-            try {
-              fetch('https://buzon-ciudadano-mail-api.horianskiseguros.workers.dev/api/status-change', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  phone: updatedReport.phone || updatedReport.telefono || '000',
-                  trackingCode: updatedReport.trackingCode || updatedReport.tracking_code,
-                  newStatus: (updatedReport.status + ' (Interno: ' + (updatedReport.internalStatus || 'N/A') + ')'),
-                  userName: updatedReport.name || updatedReport.nombre || 'Vecino'
-                })
-              }).catch(e => console.error('Error webhook:', e));
-            } catch (e) {}
-          }
         } catch (err) {
           console.error("Error al actualizar la noticia en Supabase:", err);
         }

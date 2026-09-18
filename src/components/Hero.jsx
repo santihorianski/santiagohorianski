@@ -98,27 +98,7 @@ export default function Hero({ reports = [] }) {
             </Link>
           </div>
 
-          {/* Quick Stats Grid */}
-          <div className="hero-stats" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-            <div className="stat-card glass-panel">
-              <span className="stat-num gradient-text">
-                <CountUp end={reports.length} />
-              </span>
-              <span className="stat-label">Reclamos Recibidos</span>
-            </div>
-            <div className="stat-card glass-panel">
-              <span className="stat-num gradient-text-accent">
-                <CountUp end={reports.filter(r => r.status === 'en_tramite').length} />
-              </span>
-              <span className="stat-label">En Trámite Legislativo</span>
-            </div>
-            <div className="stat-card glass-panel">
-              <span className="stat-num" style={{ color: 'var(--success)' }}>
-                <CountUp end={reports.filter(r => r.status === 'solucionado').length} />
-              </span>
-              <span className="stat-label">Solucionados / Respuestas</span>
-            </div>
-          </div>
+
         </div>
 
         {/* Right: Premium Candidate Profile Card */}

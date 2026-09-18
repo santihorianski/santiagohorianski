@@ -416,49 +416,7 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
           padding: 3.5rem 0;
         }
 
-        /* Live Metrics Bar */
-        .portal-metrics-bar {
-          display: flex;
-          align-items: center;
-          justify-content: space-around;
-          flex-wrap: wrap;
-          padding: 1.5rem 2.5rem;
-          max-width: 850px;
-          margin: 2rem auto 0 auto;
-          background: var(--glass-bg) !important;
-          border: 1px solid rgba(217, 160, 36, 0.25) !important;
-          border-radius: 20px;
-          box-shadow: 0 15px 35px var(--overlay-inverted), 0 0 25px rgba(217, 160, 36, 0.05);
-        }
 
-        .metric-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-
-        .metric-value {
-          font-family: var(--font-display);
-          font-size: 2.25rem;
-          font-weight: 800;
-          color: var(--primary);
-          text-shadow: 0 0 10px rgba(217, 160, 36, 0.2);
-        }
-
-        .metric-title {
-          font-size: 0.8rem;
-          color: var(--text-secondary);
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          margin-top: 0.25rem;
-        }
-
-        .metric-divider {
-          width: 1px;
-          height: 35px;
-          background: var(--overlay-medium);
-        }
 
         /* Resolved feedback box styles */
         .candidate-response-box.resolved-box {
@@ -483,24 +441,7 @@ export default function ReportsPortal({ reports, onUpvote, isSeguimientoMode = f
         }
 
         @media (max-width: 576px) {
-          .portal-metrics-bar {
-            flex-direction: row;
-            justify-content: space-around;
-            gap: 0.5rem;
-            padding: 1rem 0.5rem;
-            border-radius: 12px;
-          }
-          .metric-value {
-            font-size: 1.35rem;
-          }
-          .metric-title {
-            font-size: 0.65rem;
-            text-align: center;
-          }
-          .metric-divider {
-            width: 1px;
-            height: 25px;
-          }
+
         }
 
         .portal-grid {

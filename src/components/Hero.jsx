@@ -299,33 +299,7 @@ export default function Hero({ reports = [] }) {
           box-shadow: 0 5px 15px rgba(116, 59, 188, 0.3);
         }
 
-        .hero-stats {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 1rem;
-        }
 
-        .stat-card {
-          padding: 1.25rem 1rem;
-          text-align: center;
-          border-radius: 12px;
-        }
-
-        .stat-num {
-          display: block;
-          font-family: var(--font-display);
-          font-size: 1.8rem;
-          font-weight: 800;
-          margin-bottom: 0.25rem;
-        }
-
-        .stat-label {
-          font-size: 0.78rem;
-          color: var(--text-muted);
-          font-weight: 500;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
 
         /* Profile Card Styling */
         .hero-profile-container {
@@ -520,11 +494,7 @@ export default function Hero({ reports = [] }) {
           .hero-actions {
             justify-content: center;
           }
-          .hero-stats {
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-          }
+
         }
 
         @media (max-width: 768px) {
@@ -544,20 +514,7 @@ export default function Hero({ reports = [] }) {
           .hero-title {
             font-size: 2.3rem;
           }
-          .hero-stats {
-            grid-template-columns: repeat(1, 1fr);
-            gap: 0.5rem;
-          }
-          .stat-card {
-            padding: 1rem 0.5rem;
-          }
-          .stat-num {
-            font-size: 1.25rem;
-          }
-          .stat-label {
-            font-size: 0.75rem;
-            letter-spacing: 0.01em;
-          }
+
           .hero-actions {
             flex-direction: column;
             gap: 0.75rem;

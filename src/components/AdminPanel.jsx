@@ -9,10 +9,17 @@ import { COMMISSIONS } from '../utils/commissionsData';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import ReportFichaPDF from './ReportFichaPDF';
+import * as XLSX from 'xlsx';
 
 // Configuración de Roles
-const SUPER_ADMIN_EMAILS = ['gaston.horianski@gmail.com', 'santiago.horianski@gmail.com'];
-const RECLAMOS_EMAILS = ['deliaestermeza@gmail.com', 'yamilaponcee@gmail.com'];
+const SUPER_ADMIN_EMAILS = [
+  'gaston.horianski@gmail.com',
+  'santiago.horianski@gmail.com',
+  'deliaestermeza@gmail.com',
+  'yamilaponcee@gmail.com',
+  'admin@santiagohorianski.com'
+];
+const RECLAMOS_EMAILS = []; // Todos los usuarios autorizados tienen acceso completo
 
 const getUserRole = (email) => {
   if (!email) return 'unauthorized';
@@ -26,12 +33,11 @@ const getUserRole = (email) => {
     return 'editor'; // Acceso solo a reclamos
   }
   
-  // Por defecto, si está autenticado pero no en la lista explícita, le damos admin por legado o lo restringimos.
-  // Como registramos los usuarios a mano, le damos admin.
-  return 'admin';
+  // Usuario autenticado pero no registrado explícitamente -> sin acceso
+  return 'unauthorized';
 };
 
-export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, onRestoreReport, onToggleReportVisibility, newsList, onSaveNews, onDeleteNews, onToggleNewsVisibility, onLogout }) {
+export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, onRestoreReport, onToggleReportVisibility, newsList, onSaveNews, onDeleteNews, onToggleNewsVisibility, onLogout, onRefreshData }) {
   const [session, setSession] = useState(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   
@@ -294,8 +300,15 @@ export default function AdminPanel({ reports, onUpdateReport, onDeleteReport, on
   // New States for Plan Features
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [showStagnantOnly, setShowStagnantOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
+
+  const fileInputRef = useRef(null);
+  const [showManualReportForm, setShowManualReportForm] = useState(false);
+  const [manualReport, setManualReport] = useState({
+    title: '', description: '', category: '💬 Idea / Propuesta', barrio: '', calle_principal: '', anonymousName: '', phone: ''
+  });
   
   const [showWaConfig, setShowWaConfig] = useState(false);
   const [waTemplates, setWaTemplates] = useState(() => {
@@ -389,9 +402,13 @@ Párrafo final o conclusión de la noticia.`);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      window.location.reload();
-    }, 600);
+    if (onRefreshData) {
+      onRefreshData().finally(() => setIsRefreshing(false));
+    } else {
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
+    }
   };
 
   // Renderizador de texto (mismas reglas que PressKit)
@@ -445,25 +462,27 @@ Párrafo final o conclusión de la noticia.`);
 
 
   // KPIs calculations
-  const totalReports = reports.length;
-  const receivedReports = reports.filter(r => r.status === 'recibido').length;
-  const reviewReports = reports.filter(r => r.status === 'en_tramite').length;
-  const resolvedReports = reports.filter(r => r.status === 'solucionado').length;
+  const systemReports = reports.filter(r => r.deviceInfo !== 'Importado de Excel' && r.deviceInfo !== 'Carga Manual Admin');
+  const totalReports = systemReports.length;
+  const receivedReports = systemReports.filter(r => r.status === 'recibido').length;
+  const reviewReports = systemReports.filter(r => r.status === 'en_tramite').length;
+  const resolvedReports = systemReports.filter(r => r.status === 'solucionado').length;
   const resolutionRate = totalReports > 0 ? Math.round((resolvedReports / totalReports) * 100) : 0;
   
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  const newReportsThisWeek = reports.filter(r => new Date(r.createdAt) >= oneWeekAgo).length;
+  const newReportsThisWeek = systemReports.filter(r => new Date(r.createdAt) >= oneWeekAgo).length;
+  const stagnantReports = systemReports.filter(r => r.status !== 'solucionado' && new Date(r.createdAt) < oneWeekAgo).length;
 
   const teamPerf = {
-    santiago: reports.filter(r => r.assignedTo === 'Santiago').length,
-    delia: reports.filter(r => r.assignedTo === 'Delia').length,
-    gaston: reports.filter(r => r.assignedTo === 'Gastón').length,
-    yamila: reports.filter(r => r.assignedTo === 'Yamila').length,
+    santiago: systemReports.filter(r => r.assignedTo === 'Santiago').length,
+    delia: systemReports.filter(r => r.assignedTo === 'Delia').length,
+    gaston: systemReports.filter(r => r.assignedTo === 'Gastón' || r.assignedTo === 'Gaston').length,
+    yamila: systemReports.filter(r => r.assignedTo === 'Yamila').length,
   };
 
   const calculateAverageResolutionTime = () => {
-    const resolved = reports.filter(r => r.status === 'solucionado' && r.statusHistory && r.statusHistory.length > 1);
+    const resolved = systemReports.filter(r => r.status === 'solucionado' && r.statusHistory && r.statusHistory.length > 1);
     if (resolved.length === 0) return 'N/A';
     
     let totalMs = 0;
@@ -502,7 +521,20 @@ Párrafo final o conclusión de la noticia.`);
       : (attachmentFilter === 'Con Archivos' ? hasAttachments : !hasAttachments);
     
     const isDeleted = rep.deletedAt != null;
-    const matchesTab = activeTab === 'papelera' ? isDeleted : !isDeleted;
+    const isManual = rep.deviceInfo === 'Importado de Excel' || rep.deviceInfo === 'Carga Manual Admin';
+
+    let matchesTab = false;
+    if (activeTab === 'papelera') {
+      matchesTab = isDeleted;
+    } else if (activeTab === 'manuales') {
+      matchesTab = !isDeleted && isManual;
+    } else if (activeTab === 'reclamos') {
+      matchesTab = !isDeleted && !isManual;
+    } else {
+      matchesTab = !isDeleted;
+    }
+
+    if (!matchesTab) return false;
 
     let matchesDate = true;
     if (dateFrom) {
@@ -513,6 +545,9 @@ Párrafo final o conclusión de la noticia.`);
       toDate.setHours(23, 59, 59, 999);
       matchesDate = matchesDate && new Date(rep.createdAt) <= toDate;
     }
+
+    const isStagnant = rep.status !== 'solucionado' && new Date(rep.createdAt) < oneWeekAgo;
+    if (showStagnantOnly && !isStagnant) return false;
 
     return matchesSearch && matchesStatus && matchesInternalStatus && matchesAssignedTo && matchesCategory && matchesAttachment && matchesTab && matchesDate;
   });
@@ -572,6 +607,219 @@ Párrafo final o conclusión de la noticia.`);
     }
   };
 
+  const handleManualReportSubmit = async (e) => {
+    e.preventDefault();
+    if (!isSupabaseConfigured) {
+      alert("Supabase no está configurado.");
+      return;
+    }
+
+    const trackingCode = Math.floor(1000 + Math.random() * 9000);
+    const newReport = {
+      id: crypto.randomUUID(),
+      tracking_code: trackingCode,
+      title: manualReport.title,
+      description: manualReport.description,
+      category: manualReport.category,
+      barrio: manualReport.barrio || 'Desconocido',
+      calle_principal: manualReport.calle_principal || 'No especificada',
+      entre_calle_1: null,
+      entre_calle_2: null,
+      phone: manualReport.phone || null,
+      email: null,
+      dni: null,
+      device_info: 'Carga Manual Admin',
+      anonymous_name: manualReport.anonymousName || 'Vecino',
+      gps_lat: null,
+      gps_lng: null,
+      upvotes: 0,
+      status: 'pendiente',
+      is_visible: false,
+      internal_status: 'nuevo',
+      assigned_to: '',
+      internal_link: '',
+      deleted_at: null,
+      deleted_by: null,
+      photos: [],
+      status_history: []
+    };
+
+    try {
+      const { error } = await supabase.from('municipal_reports').insert([newReport]);
+      if (error) throw error;
+      
+      if (onRefreshData) onRefreshData();
+      setShowManualReportForm(false);
+      setManualReport({ title: '', description: '', category: '💬 Idea / Propuesta', barrio: '', calle_principal: '', anonymousName: '', phone: '' });
+      alert("✅ Reclamo manual cargado con éxito. Código: " + trackingCode);
+    } catch (err) {
+      console.error("Error guardando reclamo manual:", err);
+      alert("Error al guardar: " + err.message);
+    }
+  };
+
+  const handleDeleteAllImported = async () => {
+    if (!window.confirm("⚠️ ¿Estás seguro de que quieres BORRAR TODOS los reclamos importados de Excel? Esta acción los enviará a la papelera.")) return;
+    try {
+      const importedIds = reports.filter(r => r.deviceInfo === 'Importado de Excel' && r.deletedAt == null).map(r => r.id);
+      if (importedIds.length === 0) {
+        alert("No hay reclamos importados para borrar.");
+        return;
+      }
+      
+      const { error } = await supabase
+        .from('municipal_reports')
+        .update({ deleted_at: new Date().toISOString(), deleted_by: userEmail })
+        .in('id', importedIds);
+        
+      if (error) throw error;
+      
+      if (onRefreshData) onRefreshData();
+      alert(`✅ Se borraron ${importedIds.length} reclamos importados.`);
+    } catch (err) {
+      console.error("Error al borrar masivamente:", err);
+      alert("Error: " + err.message);
+    }
+  };
+
+  const handleImportExcel = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const rawData = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        
+        // Buscar la fila que contiene los encabezados (donde dice CELULAR o INFORMACION)
+        let headerRowIndex = 0;
+        for (let i = 0; i < rawData.length; i++) {
+          const rowStr = (rawData[i] || []).join(' ').toLowerCase();
+          if (rowStr.includes('celular') || rowStr.includes('informacion') || rowStr.includes('categor')) {
+            headerRowIndex = i;
+            break;
+          }
+        }
+
+        const headers = rawData[headerRowIndex] || [];
+        const data = [];
+
+        for (let i = headerRowIndex + 1; i < rawData.length; i++) {
+          const rowArr = rawData[i];
+          if (!rowArr || rowArr.length === 0) continue;
+          
+          const rowObj = {};
+          headers.forEach((h, idx) => {
+            if (h) rowObj[h] = rowArr[idx];
+          });
+          data.push(rowObj);
+        }
+
+        let importedCount = 0;
+        let duplicateCount = 0;
+        const newReportsToInsert = [];
+
+        for (const row of data) {
+          // Extraer información base
+          const celular = row.CELULAR ? String(row.CELULAR).trim() : '';
+          const info = row.INFORMACION ? String(row.INFORMACION).trim() : '';
+          const cat = row.CATEGORIA ? String(row.CATEGORIA).trim() : '';
+          
+          if (!celular && !info) continue; // Fila vacía
+
+          // Chequeo de duplicados robusto (contra BD y nuevos)
+          const allReports = [...reports, ...newReportsToInsert];
+          const isDuplicate = allReports.some(rep => {
+            if (celular && info) {
+              return rep.phone === celular && (rep.description || '').toLowerCase().includes(info.toLowerCase());
+            } else if (celular && !info) {
+              return rep.phone === celular && rep.category === (cat || '💬 Idea / Propuesta');
+            } else if (!celular && info) {
+              return (rep.description || '').toLowerCase().includes(info.toLowerCase());
+            }
+            return false;
+          });
+
+          if (isDuplicate) {
+            duplicateCount++;
+            continue;
+          }
+
+          // Combinar campos extras en la descripción si existen
+          let fullDescription = info;
+          const extras = [];
+          if (row.Visita) extras.push(`Visita: ${row.Visita}`);
+          if (row.Fotos) extras.push(`Fotos: ${row.Fotos}`);
+          if (row.COLABORADOR) extras.push(`Colaborador: ${row.COLABORADOR}`);
+          if (row['AVERIGUACIONES MUNICIPALIDAD']) extras.push(`Averiguaciones: ${row['AVERIGUACIONES MUNICIPALIDAD']}`);
+          
+          if (extras.length > 0) {
+            fullDescription += `\n\n[Importado - Notas Extra]\n${extras.join('\n')}`;
+          }
+
+          const trackingCode = Math.floor(1000 + Math.random() * 9000);
+          
+          // Mapeo del estado
+          let status = 'pendiente';
+          const rawEstado = String(row.Estado || '').toLowerCase();
+          if (rawEstado.includes('solucionado')) status = 'solucionado';
+          else if (rawEstado.includes('proceso') || rawEstado.includes('visita')) status = 'en_proceso';
+
+          const newReport = {
+            id: crypto.randomUUID(),
+            tracking_code: trackingCode,
+            title: `Importado: ${row.CATEGORIA || 'General'}`,
+            description: fullDescription,
+            category: row.CATEGORIA || '💬 Idea / Propuesta',
+            barrio: row.Barrio || 'Desconocido',
+            calle_principal: row.Chacra ? `Chacra ${row.Chacra}` : 'No especificada',
+            entre_calle_1: null,
+            entre_calle_2: null,
+            phone: celular || null,
+            email: null,
+            dni: null,
+            device_info: 'Importado de Excel',
+            anonymous_name: row.NOMBRE_Apellido || 'Vecino',
+            gps_lat: null,
+            gps_lng: null,
+            upvotes: 0,
+            status: status,
+            is_visible: false,
+            internal_status: 'nuevo',
+            assigned_to: '',
+            internal_link: '',
+            deleted_at: null,
+            deleted_by: null,
+            photos: [],
+            status_history: []
+          };
+
+          newReportsToInsert.push(newReport);
+        }
+
+        if (newReportsToInsert.length > 0) {
+          const { error } = await supabase.from('municipal_reports').insert(newReportsToInsert);
+          if (error) throw error;
+
+          if (onRefreshData) onRefreshData();
+          importedCount = newReportsToInsert.length;
+        }
+
+        alert(`✅ Proceso finalizado.\n\n- Se importaron ${importedCount} reclamos nuevos.\n- Se ignoraron ${duplicateCount} reclamos porque ya existían (duplicados).`);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+
+      } catch (err) {
+        console.error("Error procesando Excel:", err);
+        alert("Error al procesar el archivo: " + err.message);
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
   const handleExportExcel = () => {
     // Sort reports by category alphabetically
     const sortedReports = [...filteredReports].sort((a, b) => {
@@ -580,86 +828,33 @@ Párrafo final o conclusión de la noticia.`);
       return catA.localeCompare(catB);
     });
 
-    // Create an HTML table with inline styles for Excel to parse
-    const tableRows = sortedReports.map(rep => {
-      return `
-        <tr>
-          <td>${rep.trackingCode || 'N/A'}</td>
-          <td>${new Date(rep.createdAt).toLocaleDateString('es-ES')}</td>
-          <td>${rep.category}</td>
-          <td>${rep.location}</td>
-          <td>${rep.anonymousName || 'Anónimo'}</td>
-          <td>${rep.phone || 'N/A'}</td>
-          <td>${getStatusDetails(rep).shortText}</td>
-          <td>${rep.description.replace(/\n/g, '<br>')}</td>
-        </tr>
-      `;
-    }).join('');
+    const exportData = sortedReports.map(rep => ({
+      'ID Tracking': rep.trackingCode || 'N/A',
+      'Fecha': new Date(rep.createdAt).toLocaleDateString('es-ES'),
+      'Categoría': rep.category,
+      'Ubicación': rep.location,
+      'Vecino': rep.anonymousName || 'Anónimo',
+      'Teléfono': rep.phone || 'N/A',
+      'Estado': getStatusDetails(rep).shortText,
+      'Descripción del Reclamo': rep.description
+    }));
 
-    const htmlContent = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-      <head>
-        <meta charset="UTF-8">
-        <!--[if gte mso 9]>
-        <xml>
-          <x:ExcelWorkbook>
-            <x:ExcelWorksheets>
-              <x:ExcelWorksheet>
-                <x:Name>Reclamos</x:Name>
-                <x:WorksheetOptions>
-                  <x:DisplayGridlines/>
-                </x:WorksheetOptions>
-              </x:ExcelWorksheet>
-            </x:ExcelWorksheets>
-          </x:ExcelWorkbook>
-        </xml>
-        <![endif]-->
-        <style>
-          th { background-color: #743bbc; color: white; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #dddddd; }
-          td { padding: 8px; border: 1px solid #dddddd; vertical-align: top; }
-        </style>
-      </head>
-      <body>
-        <table>
-          <thead>
-            <tr>
-              <th>ID Tracking</th>
-              <th>Fecha</th>
-              <th>Categoría</th>
-              <th>Ubicación</th>
-              <th>Vecino</th>
-              <th>Teléfono</th>
-              <th>Estado</th>
-              <th>Descripción del Reclamo</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${tableRows}
-          </tbody>
-        </table>
-      </body>
-      </html>
-    `;
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Reclamos");
+    XLSX.writeFile(workbook, `Reclamos_Posadas_${new Date().toLocaleDateString('es-ES')}.xlsx`);
 
-    const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
-    const url = URL.createObjectURL(blob);
-    selectedReport.photos.forEach((photo, i) => {
-      const url = typeof photo === 'string' ? photo : photo.preview;
-      const link = document.createElement('a');
-      link.href = url;
-      // Extract the file extension from the URL (fallback to jpg)
-      const extMatch = url.match(/\.([a-zA-Z0-9]+)(?:\?|$)/);
-      const ext = extMatch ? extMatch[1] : 'jpg';
-      link.download = `evidencia-${selectedReport.id}-${i+1}.${ext}`;
-      link.click();
-    });
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `Reclamos_Posadas_${new Date().toLocaleDateString('es-ES')}.xls`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    if (selectedReport && selectedReport.photos) {
+      selectedReport.photos.forEach((photo, i) => {
+        const url = typeof photo === 'string' ? photo : photo.preview;
+        const link = document.createElement('a');
+        link.href = url;
+        const extMatch = url.match(/\.([a-zA-Z0-9]+)(?:\?|$)/);
+        const ext = extMatch ? extMatch[1] : 'jpg';
+        link.download = `evidencia-${selectedReport.id}-${i+1}.${ext}`;
+        link.click();
+      });
+    }
   };
 
   const handleGeneratePDF = async () => {
@@ -712,10 +907,16 @@ Párrafo final o conclusión de la noticia.`);
   const [isFetchingPadron, setIsFetchingPadron] = useState(false);
 
   const handleOpenDetail = async (report) => {
-    setSelectedReport(report);
-    setEditStatus(report.status || 'recibido');
-    setEditInternalStatus(report.internalStatus || 'nuevo');
-    setEditAssignedTo(report.assignedTo || '');
+    let currentReport = report;
+    if (!report.isRead) {
+      currentReport = { ...report, isRead: true };
+      onUpdateReport(currentReport);
+    }
+    
+    setSelectedReport(currentReport);
+    setEditStatus(currentReport.status || 'recibido');
+    setEditInternalStatus(currentReport.internalStatus || 'nuevo');
+    setEditAssignedTo(currentReport.assignedTo || '');
     setEditInternalLink(report.internalLink || '');
     setEditResponse(report.statusHistory?.[0]?.description || '');
     setEditComisionName(report.comisionName || '');
@@ -1266,9 +1467,13 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
             <h2>Panel de Control</h2>
             <div className="admin-tabs" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
               <button 
+                onClick={() => setActiveTab('overview')}
+                className={`btn ${activeTab === 'overview' ? 'btn-primary' : 'btn-secondary'}`}
+              >Resumen & Alertas</button>
+              <button 
                 onClick={() => setActiveTab('reclamos')}
                 className={`btn ${activeTab === 'reclamos' ? 'btn-primary' : 'btn-secondary'}`}
-              >Reclamos Vecinales</button>
+              >Gestión de Reclamos</button>
               {userRole === 'admin' && (
               <button 
                 onClick={() => setActiveTab('noticias')}
@@ -1279,6 +1484,10 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 Noticias & Prensa
               </button>
             )} 
+              <button 
+                onClick={() => setActiveTab('manuales')}
+                className={`btn ${activeTab === 'manuales' ? 'btn-primary' : 'btn-secondary'}`}
+              >Reclamos Manuales</button>
               <button 
                 onClick={() => setActiveTab('mapa')}
                 className={`btn ${activeTab === 'mapa' ? 'btn-primary' : 'btn-secondary'}`}
@@ -1296,8 +1505,10 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
           </div>
         </div>
 
-        {(activeTab === 'reclamos' || activeTab === 'papelera') && (
+        {(activeTab === 'reclamos' || activeTab === 'manuales' || activeTab === 'papelera' || activeTab === 'overview') && (
           <>
+            {activeTab === 'overview' && (
+              <>
             {/* Dashboard KPIs Grid */}
             <div className="admin-kpis-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
               
@@ -1329,21 +1540,42 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                 <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--warning)', lineHeight: 1 }}>{newReportsThisWeek}</span>
               </div>
 
-              <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.08), rgba(236, 72, 153, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(236, 72, 153, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
-                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><Users size={48} color="#ec4899" /></div>
+              <div 
+                className="kpi-card" 
+                onClick={() => {
+                  setShowStagnantOnly(!showStagnantOnly);
+                  setActiveTab('reclamos');
+                }}
+                style={{ cursor: 'pointer', background: showStagnantOnly ? 'rgba(239, 68, 68, 0.15)' : 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: showStagnantOnly ? '2px solid var(--danger)' : '1px solid rgba(239, 68, 68, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', transition: 'all 0.3s ease' }}>
+                <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><AlertCircle size={48} color="var(--danger)" /></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-                  <Users size={16} color="#ec4899" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Carga de Equipo</span>
+                  <AlertCircle size={16} color="var(--danger)" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Alertas (+7 días)</span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
-                  <div>S: {teamPerf.santiago}</div>
-                  <div>D: {teamPerf.delia}</div>
-                  <div>G: {teamPerf.gaston}</div>
-                  <div>Y: {teamPerf.yamila}</div>
-                </div>
+                <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--danger)', lineHeight: 1 }}>{stagnantReports}</span>
               </div>
-            </div>
 
+              {userEmail === 'santiago.horianski@gmail.com' && (
+                <div className="kpi-card" style={{ background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.08), rgba(236, 72, 153, 0.02))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(236, 72, 153, 0.25)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+                  <div style={{ position: 'absolute', top: '-15%', right: '-10%', opacity: 0.05, transform: 'scale(2.5)' }}><Users size={48} color="#ec4899" /></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                    <Users size={16} color="#ec4899" />
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Carga de Equipo</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
+                    <div>S: {teamPerf.santiago}</div>
+                    <div>D: {teamPerf.delia}</div>
+                    <div>G: {teamPerf.gaston}</div>
+                    <div>Y: {teamPerf.yamila}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+            </>
+            )}
+
+            {(activeTab === 'reclamos' || activeTab === 'manuales' || activeTab === 'papelera') && (
+              <>
             {/* Table Controls Panel */}
             <div className="table-controls glass-panel">
               <div className="search-box">
@@ -1358,10 +1590,35 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
               </div>
 
               <div className="filters-row" style={{ flexWrap: 'wrap' }}>
-                <button onClick={handleExportExcel} className="btn btn-secondary" style={{ marginRight: 'auto', background: 'var(--success)', color: 'white', borderColor: 'var(--success)', alignSelf: 'flex-end' }}>
-                  <Download size={16} />
-                  <span>Exportar Vista a Excel (.xls)</span>
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem', marginRight: 'auto', alignSelf: 'flex-end', flexWrap: 'wrap' }}>
+                  {activeTab === 'manuales' && (
+                    <>
+                      <button onClick={() => setShowManualReportForm(true)} className="btn btn-primary" style={{ background: 'var(--primary)', color: 'white' }}>
+                        <Plus size={16} />
+                        <span>Carga Manual</span>
+                      </button>
+                      <input 
+                        type="file" 
+                        accept=".xlsx, .xls, .csv" 
+                        style={{ display: 'none' }} 
+                        ref={fileInputRef}
+                        onChange={handleImportExcel}
+                      />
+                      <button onClick={() => fileInputRef.current && fileInputRef.current.click()} className="btn btn-secondary" style={{ background: '#f59e0b', color: 'white', borderColor: '#f59e0b' }}>
+                        <Download size={16} style={{ transform: 'rotate(180deg)' }} />
+                        <span>Importar Excel</span>
+                      </button>
+                      <button onClick={handleDeleteAllImported} className="btn btn-secondary" style={{ background: 'var(--danger)', color: 'white', borderColor: 'var(--danger)' }}>
+                        <Trash2 size={16} />
+                        <span>Vaciar Importados</span>
+                      </button>
+                    </>
+                  )}
+                  <button onClick={handleExportExcel} className="btn btn-secondary" style={{ background: 'var(--success)', color: 'white', borderColor: 'var(--success)' }}>
+                    <Download size={16} />
+                    <span>Exportar Vista a Excel (.xls)</span>
+                  </button>
+                </div>
 
                 <div className="filter-select-group">
                   <label>Desde:</label>
@@ -1425,7 +1682,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                     <option value="Todos">Todos</option>
                     <option value="Santiago">Santiago</option>
                     <option value="Delia">Delia</option>
-                    <option value="Gaston">Gaston</option>
+                    <option value="Gastón">Gastón</option>
                     <option value="Yamila">Yamila</option>
                   </select>
                 </div>
@@ -1484,9 +1741,9 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                       const statusDetails = getStatusDetails(rep);
                       const internalDetails = getInternalStatusDetails(rep.internalStatus);
                       return (
-                        <tr key={rep.id} style={{ borderLeft: `4px solid ${internalDetails.color}`, backgroundColor: internalDetails.bg }} className="table-row-item">
+                        <tr key={rep.id} style={{ borderLeft: `4px solid ${internalDetails.color}`, backgroundColor: internalDetails.bg, fontWeight: rep.isRead === false ? 'bold' : 'normal' }} className="table-row-item">
                           <td data-label="ID / Nº" className="font-display-bold" style={{ color: 'var(--text-muted)' }}>
-                            # {rep.id}
+                            # {rep.id} {rep.status !== 'solucionado' && new Date(rep.createdAt) < oneWeekAgo && <AlertCircle size={14} color="var(--danger)" style={{display:'inline', marginLeft:'4px', verticalAlign:'middle'}} title="Reclamo estancado (+7 días)" />}
                           </td>
                           <td data-label="Fecha" className="td-date">
                             <div className="date-wrapper">
@@ -1729,6 +1986,56 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                   />
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-end', background: '#25D366', borderColor: '#25D366', color: 'white' }}>Guardar Plantillas</button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL CARGA MANUAL */}
+        {showManualReportForm && (
+          <div className="modal-overlay" style={{ zIndex: 12000 }}>
+            <div className="modal-content glass-panel animate-fade-in" style={{ maxWidth: '600px', width: '90%', maxHeight: '90vh', overflowY: 'auto' }}>
+              <button className="modal-close-btn" onClick={() => setShowManualReportForm(false)}>✕</button>
+              <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-primary)' }}>
+                <Plus size={20} color="var(--primary)" /> Cargar Reclamo Manual
+              </h3>
+              
+              <form onSubmit={handleManualReportSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="form-group">
+                  <label>Título Breve</label>
+                  <input type="text" value={manualReport.title} onChange={e => setManualReport({...manualReport, title: e.target.value})} className="form-control" required />
+                </div>
+                <div className="form-group">
+                  <label>Descripción del Problema / Mensaje de WhatsApp</label>
+                  <textarea value={manualReport.description} onChange={e => setManualReport({...manualReport, description: e.target.value})} className="form-control" rows={3} required />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label>Categoría</label>
+                    <select value={manualReport.category} onChange={e => setManualReport({...manualReport, category: e.target.value})} className="form-control">
+                      {categories.filter(c => c !== 'Todas').map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Barrio</label>
+                    <input type="text" value={manualReport.barrio} onChange={e => setManualReport({...manualReport, barrio: e.target.value})} className="form-control" placeholder="Ej. Villa Cabello" required />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Calle Principal o Altura</label>
+                  <input type="text" value={manualReport.calle_principal} onChange={e => setManualReport({...manualReport, calle_principal: e.target.value})} className="form-control" required />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label>Nombre del Vecino</label>
+                    <input type="text" value={manualReport.anonymousName} onChange={e => setManualReport({...manualReport, anonymousName: e.target.value})} className="form-control" placeholder="Ej. Juan Pérez" />
+                  </div>
+                  <div className="form-group">
+                    <label>Teléfono (WhatsApp)</label>
+                    <input type="text" value={manualReport.phone} onChange={e => setManualReport({...manualReport, phone: e.target.value})} className="form-control" placeholder="Sin +549..." />
+                  </div>
+                </div>
+                <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-end', marginTop: '1rem' }}>Guardar Reclamo</button>
               </form>
             </div>
           </div>
@@ -2043,7 +2350,7 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
                             <option value="">Sin asignar</option>
                             <option value="Santiago">Santiago</option>
                             <option value="Delia">Delia</option>
-                            <option value="Gaston">Gaston</option>
+                            <option value="Gastón">Gastón</option>
                             <option value="Yamila">Yamila</option>
                           </select>
                         </div>
@@ -2135,6 +2442,8 @@ https://santiagohorianski.com/gestion?codigo=${codigo}
             />
           )}
         </div>
+        </>
+        )}
 
         {/* TAB: NOTICIAS */}
         {activeTab === 'noticias' && userRole === 'admin' && (

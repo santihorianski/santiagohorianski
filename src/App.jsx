@@ -80,7 +80,8 @@ export default function App() {
     internalLink: db.internal_link || '',
     deletedAt: db.deleted_at || null,
     deletedBy: db.deleted_by || null,
-    createdAt: db.created_at
+    createdAt: db.created_at,
+    isRead: db.is_read || false
   });
 
   const mapReportToDb = (rep) => ({
@@ -109,7 +110,8 @@ export default function App() {
     deleted_at: rep.deletedAt || null,
     deleted_by: rep.deletedBy || null,
     photos: rep.photos || [],
-    status_history: rep.statusHistory || []
+    status_history: rep.statusHistory || [],
+    // is_read: rep.isRead === true // DESACTIVADO TEMPORALMENTE HASTA QUE SE CREE LA COLUMNA EN SUPABASE
   });
 
   const [reports, setReports] = useState(() => {
@@ -155,7 +157,7 @@ export default function App() {
     const fetchSupabaseData = async (session) => {
       try {
         // 1. Reclamos
-        const publicColumns = 'id, tracking_code, title, description, category, barrio, calle_principal, entre_calle_1, entre_calle_2, anonymous_name, gps_lat, gps_lng, upvotes, status, is_visible, photos, status_history, created_at';
+        const publicColumns = 'id, tracking_code, title, description, category, barrio, calle_principal, entre_calle_1, entre_calle_2, anonymous_name, gps_lat, gps_lng, upvotes, status, is_visible, photos, status_history, created_at, is_read';
         const selectCols = session ? '*' : publicColumns;
 
         const { data: reportsData, error: reportsError } = await supabase
@@ -524,6 +526,26 @@ export default function App() {
     }
   };
 
+  const handleRefreshData = async () => {
+    if (!isSupabaseConfigured) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const publicColumns = 'id, tracking_code, title, description, category, barrio, calle_principal, entre_calle_1, entre_calle_2, anonymous_name, gps_lat, gps_lng, upvotes, status, is_visible, photos, status_history, created_at, is_read';
+      const selectCols = session ? '*' : publicColumns;
+
+      const { data: reportsData } = await supabase
+        .from('municipal_reports')
+        .select(selectCols)
+        .order('created_at', { ascending: false });
+
+      if (reportsData) {
+        setReports(reportsData.map(mapDbToReport));
+      }
+    } catch (err) {
+      console.error("Error al refrescar datos:", err);
+    }
+  };
+
   // Scroll al top en cambio de ruta
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -597,6 +619,7 @@ export default function App() {
                 onSaveNews={handleSaveNews}
                 onDeleteNews={handleDeleteNews}
                 onToggleNewsVisibility={handleToggleNewsVisibility}
+                onRefreshData={handleRefreshData}
               />
             } />
             <Route path="*" element={<Navigate to="/inicio" replace />} />

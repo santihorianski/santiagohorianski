@@ -80,31 +80,14 @@ export default function AdminMap({ reports, onOpenDetail }) {
     'solucionado': { text: 'Solucionados / Respuestas', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.1)' }
   };
 
-  // Procesamiento y geocodificación ficticia si no tiene coordenadas de GPS
   const processedReports = useMemo(() => {
-    return reports.map((report, index) => {
-      let lat = POSADAS_CENTER[0];
-      let lng = POSADAS_CENTER[1];
-
-      if (report.gpsLat && report.gpsLng) {
-        lat = Number(report.gpsLat);
-        lng = Number(report.gpsLng);
-      } else {
-        // Generar offset estático basado en el index para que no salten en cada render
-        const pseudoRandom1 = (Math.sin(index + 1) * 10000) % 1;
-        const pseudoRandom2 = (Math.cos(index + 1) * 10000) % 1;
-        const latOffset = (pseudoRandom1 - 0.5) * 0.04;
-        const lngOffset = (pseudoRandom2 - 0.5) * 0.04;
-        lat = POSADAS_CENTER[0] + latOffset;
-        lng = POSADAS_CENTER[1] + lngOffset;
-      }
-
-      return {
+    return reports
+      .filter(report => report.gpsLat && report.gpsLng)
+      .map(report => ({
         ...report,
-        lat,
-        lng
-      };
-    });
+        lat: Number(report.gpsLat),
+        lng: Number(report.gpsLng)
+      }));
   }, [reports]);
 
   // Filtrado de reportes
